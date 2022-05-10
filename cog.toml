@@ -1,0 +1,18 @@
+tag_prefix = "v"
+
+pre_bump_hooks = [
+    "cargo bump {{version}}",
+    "cargo update",
+]
+post_bump_hooks = [
+    "git add Cargo.toml",
+    "git commit --amend --no-edit"
+]
+
+[commit_types]
+
+[changelog]
+path = "CHANGELOG.md"
+authors = []
+
+[bump_profiles]

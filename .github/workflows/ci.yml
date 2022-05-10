@@ -1,0 +1,60 @@
+name: CI
+
+on: push
+
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: check conventional commit compliance
+    steps:
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+      - name: Conventional commits check
+        uses: oknozor/cocogitto-action@v2
+        with:
+          check-latest-tag-only: true
+      - name: setup
+        run: |
+          cargo install cargo-outdated
+      - name: clippy
+        run: cargo clippy --verbose
+      - name: outdated and audit
+        run: |
+          cargo audit
+          cargo outdated
+  build:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: cargo build --verbose
+      - name: test
+        run: cargo test --verbose
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Cocogitto release
+        run: |
+          cargo install cargo-bump
+          mkdir -p .cog
+          wget -O .cog/cocogitto.tar.gz https://github.com/cocogitto/cocogitto/releases/download/5.1.0/cocogitto-5.1.0-x86_64-unknown-linux-musl.tar.gz
+          tar xvzf .cog/cocogitto.tar.gz --directory .cog/
+          git config --global user.email "github@field33.com"
+          git config --global user.name "github actions"
+          .cog/cog bump --auto || .cog/cog bump --patch
+          rm -rf .cog
+          TAG_VERSION=$(grep version Cargo.toml | head -1 | sed 's/version = "//g' | sed 's/"//g')
+          git remote set-url --push origin https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/field33/owlib
+          git push
+          git tag -d v$TAG_VERSION
+          git tag v$TAG_VERSION
+          git push origin v$TAG_VERSION

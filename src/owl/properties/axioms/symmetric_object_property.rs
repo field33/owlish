@@ -1,4 +1,4 @@
 use crate::owl::ObjectPropertyIRI;
 
 #[derive(Debug)]
-pub struct SymmetricObjectProperty(pub(crate) ObjectPropertyIRI);
+pub struct SymmetricObjectProperty(pub ObjectPropertyIRI);

@@ -48,6 +48,3 @@ pub use transitive_object_property::*;
 
 mod functional_data_property;
 pub use functional_data_property::*;
-
-mod object_inverse_of;
-pub use object_inverse_of::*;

@@ -1,3 +1,5 @@
+use crate::owl::IRI;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Value {
     String(String),
@@ -17,4 +19,11 @@ impl From<IRI> for Value {
     }
 }
 
-use crate::owl::IRI;
+impl Value {
+    pub fn string(&self) -> Option<&String> {
+        match self {
+            Value::String(s) => Some(s),
+            _ => None,
+        }
+    }
+}

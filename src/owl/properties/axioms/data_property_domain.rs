@@ -1,7 +1,7 @@
 use crate::owl::{ClassIRI, DataPropertyIRI, Regards, IRI};
 
 #[derive(Debug)]
-pub struct DataPropertyDomain(pub(crate) DataPropertyIRI, pub(crate) ClassIRI);
+pub struct DataPropertyDomain(pub DataPropertyIRI, pub ClassIRI);
 
 impl DataPropertyDomain {
     pub fn iri(&self) -> &DataPropertyIRI {

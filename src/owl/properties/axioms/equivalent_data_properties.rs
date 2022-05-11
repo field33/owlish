@@ -1,4 +1,4 @@
 use crate::owl::DataPropertyIRI;
 
 #[derive(Debug)]
-pub struct EquivalentDataProperties(pub(crate) DataPropertyIRI, pub(crate) DataPropertyIRI);
+pub struct EquivalentDataProperties(pub DataPropertyIRI, pub DataPropertyIRI);

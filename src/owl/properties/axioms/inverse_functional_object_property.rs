@@ -1,4 +1,4 @@
 use crate::owl::ObjectPropertyIRI;
 
 #[derive(Debug)]
-pub struct InverseFunctionalObjectProperty(pub(crate) ObjectPropertyIRI);
+pub struct InverseFunctionalObjectProperty(pub ObjectPropertyIRI);

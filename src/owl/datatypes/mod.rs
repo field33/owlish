@@ -1,20 +1,22 @@
-mod datatype_definition;
-pub use datatype_definition::*;
-
-mod data_some_values_from;
-pub use data_some_values_from::*;
-
 use crate::owl::{IndividualIRI, Value, IRI};
 
-#[derive(Debug, Clone)]
+mod constructors;
+pub use constructors::*;
+
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct DatatypeIRI(pub IRI);
 impl From<IRI> for DatatypeIRI {
     fn from(iri: IRI) -> Self {
         Self(iri)
     }
 }
+impl DatatypeIRI {
+    pub fn as_iri(&self) -> &IRI {
+        &self.0
+    }
+}
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct DataPropertyIRI(IRI);
 impl From<IRI> for DataPropertyIRI {
     fn from(iri: IRI) -> Self {
@@ -27,14 +29,6 @@ impl DataPropertyIRI {
     }
 }
 #[derive(Debug)]
-pub struct DataPropertyAssertion(
-    pub(crate) DataPropertyIRI,
-    pub(crate) IndividualIRI,
-    pub(crate) Value,
-);
+pub struct DataPropertyAssertion(pub DataPropertyIRI, pub IndividualIRI, pub Value);
 #[derive(Debug)]
-pub struct NegativeDataPropertyAssertion(
-    pub(crate) DataPropertyIRI,
-    pub(crate) IndividualIRI,
-    pub(crate) Value,
-);
+pub struct NegativeDataPropertyAssertion(pub DataPropertyIRI, pub IndividualIRI, pub Value);

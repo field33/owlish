@@ -73,7 +73,7 @@ impl Regards for Axiom {
             Axiom::EquivalentClasses(_) => false,       // TODO
             Axiom::DisjointClasses(_) => false,         // TODO
             Axiom::DatatypeDefinition(_) => false,      // TODO
-            Axiom::ClassAssertion(_) => false,          // TODO
+            Axiom::ClassAssertion(ca) => ca.regards(iri),          // TODO
             Axiom::SameIndividual(_) => false,          // TODO
             Axiom::DifferentIndividuals(_) => false,    // TODO
             Axiom::ObjectPropertyAssertion(_) => false, // TODO

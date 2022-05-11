@@ -1,7 +1,7 @@
 use crate::owl::{ObjectPropertyConstructor, ObjectPropertyIRI};
 
-#[derive(Debug)]
-pub struct ObjectInverseOf(pub(crate) ObjectPropertyIRI);
+#[derive(Debug, Eq, PartialEq)]
+pub struct ObjectInverseOf(pub ObjectPropertyIRI);
 
 impl From<ObjectInverseOf> for ObjectPropertyConstructor {
     fn from(c: ObjectInverseOf) -> Self {

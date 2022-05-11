@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::owl::{ClassIRI, DatatypeIRI, Regards, Value, IRI};
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct AnnotationPropertyIRI(IRI);
 impl AnnotationPropertyIRI {
     pub fn as_iri(&self) -> &IRI {
@@ -56,5 +56,14 @@ impl Regards for AnnotationAssertion {
     }
 }
 
-#[derive(Debug)]
-pub struct Annotation(pub(crate) AnnotationPropertyIRI, pub(crate) Value);
+#[derive(Debug, Eq, PartialEq)]
+pub struct Annotation(pub AnnotationPropertyIRI, pub Value);
+
+impl Annotation {
+    pub fn iri(&self) -> &AnnotationPropertyIRI {
+        &self.0
+    }
+    pub fn value(&self) -> &Value {
+        &self.1
+    }
+}

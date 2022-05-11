@@ -1,8 +1,22 @@
-use crate::owl::{ClassConstructor, IndividualIRI};
+use crate::owl::{ClassConstructor, IndividualIRI, Regards};
 
 #[derive(Debug)]
-pub struct SameIndividual(pub(crate) IndividualIRI, pub(crate) IndividualIRI);
+pub struct SameIndividual(pub IndividualIRI, pub IndividualIRI);
 #[derive(Debug)]
-pub struct DifferentIndividuals(pub(crate) IndividualIRI, pub(crate) IndividualIRI);
+pub struct DifferentIndividuals(pub IndividualIRI, pub IndividualIRI);
 #[derive(Debug)]
-pub struct ClassAssertion(pub(crate) ClassConstructor, pub(crate) IndividualIRI);
+pub struct ClassAssertion(pub ClassConstructor, pub IndividualIRI);
+impl ClassAssertion {
+    pub fn class_constructor(&self) -> &ClassConstructor {
+        &self.0
+    }
+    pub fn individual_iri(&self) -> &IndividualIRI {
+        &self.1
+    }
+}
+
+impl Regards for ClassAssertion {
+    fn regards(&self, iri: &crate::owl::IRI) -> bool {
+        self.individual_iri().as_iri() == iri || self.class_constructor().regards(iri)
+    }
+}

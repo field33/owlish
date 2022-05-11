@@ -1,6 +1,6 @@
 use crate::owl::{IndividualIRI, ObjectPropertyConstructor, IRI};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct ObjectPropertyIRI(IRI);
 impl From<IRI> for ObjectPropertyIRI {
     fn from(iri: IRI) -> Self {
@@ -18,20 +18,11 @@ impl ObjectPropertyIRI {
     }
 }
 
-#[derive(Debug)]
-pub struct ObjectPropertyAssertion(pub(crate) ObjectPropertyIRI, pub(crate) IndividualIRI, pub(crate) IndividualIRI);
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
+pub struct ObjectPropertyAssertion(pub ObjectPropertyIRI, pub IndividualIRI, pub IndividualIRI);
+#[derive(Debug, Eq, PartialEq)]
 pub struct NegativeObjectPropertyAssertion(
-    pub(crate) ObjectPropertyIRI,
-    pub(crate) IndividualIRI,
-    pub(crate) IndividualIRI,
+    pub ObjectPropertyIRI,
+    pub IndividualIRI,
+    pub IndividualIRI,
 );
-
-#[derive(Debug)]
-pub struct ObjectPropertyChain(pub Vec<ObjectPropertyIRI>);
-
-impl From<ObjectPropertyChain> for ObjectPropertyConstructor {
-    fn from(c: ObjectPropertyChain) -> Self {
-        Self::ObjectPropertyChain(c)
-    }
-}

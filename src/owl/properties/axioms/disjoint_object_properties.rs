@@ -1,4 +1,4 @@
 use crate::owl::ObjectPropertyIRI;
 
 #[derive(Debug)]
-pub struct DisjointObjectProperties(pub(crate) ObjectPropertyIRI, pub(crate) ObjectPropertyIRI);
+pub struct DisjointObjectProperties(pub ObjectPropertyIRI, pub ObjectPropertyIRI);

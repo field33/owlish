@@ -1,39 +1,11 @@
-use std::vec;
-
+use crate::api::Ontology as ApiOntology;
 use crate::owl::well_known as wk;
 use crate::owl::*;
 
-#[test]
-fn test() {
-    let iri = IRI::builder("https://example.com/ontology#").unwrap();
-    let family = family_ontology(&iri);
-
-    let person = family.class(&iri.new("Person")).unwrap();
-
-    assert_eq!(
-        person
-            .annotations()
-            .iter()
-            .find(|a| a.iri().to_string().ends_with("comment"))
-            .unwrap()
-            .value(),
-        &Value::from("Represents the set of all people")
-    );
-
-    assert_eq!(person.super_classes().is_empty(), true);
-
-    let woman = family.class(&iri.new("Woman")).unwrap();
-    println!("{:#?}", woman);
-    assert_eq!(woman.super_classes().is_empty(), false);
-    assert_eq!(
-        woman.super_classes()[0].iri().unwrap().to_string(),
-        "https://example.com/ontology#Person"
-    );
-}
-
-pub fn family_ontology(iri: &IRIBuilder) -> Ontology {
+pub fn family() -> ApiOntology {
     let other_ont = IRI::builder("https://example.com/otherOnt#").unwrap();
-    Ontology::new(
+    let iri = IRI::builder("https://example.com/family#").unwrap();
+    let owl = Ontology::new(
         vec![
             Declaration::NamedIndividual(iri.new("John")),
             Declaration::NamedIndividual(iri.new("Mary")),
@@ -249,26 +221,22 @@ pub fn family_ontology(iri: &IRIBuilder) -> Ontology {
             //
             Axiom::EquivalentClasses(
                 EquivalentClasses(
-                    iri.class("Person").into(),
+                    iri.class("Person"),
                     iri.class("Human").into(),
                     vec![],
-                )
-                .into(),
+                ),
             ),
-            Axiom::EquivalentClasses(
-                EquivalentClasses(
-                    iri.class("Person").into(),
-                    ObjectIntersectionOf(
-                        vec![iri.class("Woman").into(), iri.class("Parent").into()],
-                        vec![],
-                    )
-                    .into(),
+            Axiom::EquivalentClasses(EquivalentClasses(
+                iri.class("Person"),
+                ObjectIntersectionOf(
+                    vec![iri.class("Woman").into(), iri.class("Parent").into()],
                     vec![],
                 )
                 .into(),
-            ),
+                vec![],
+            )),
             Axiom::EquivalentClasses(EquivalentClasses(
-                iri.class("ChildlessPerson").into(),
+                iri.class("ChildlessPerson"),
                 ObjectUnionOf(
                     vec![iri.class("Mother").into(), iri.class("Father").into()],
                     vec![],
@@ -289,10 +257,10 @@ pub fn family_ontology(iri: &IRIBuilder) -> Ontology {
                 vec![],
             )),
             Axiom::EquivalentClasses(EquivalentClasses(
-                iri.class("Parent").into(),
+                iri.class("Parent"),
                 ObjectSomeValuesFrom(
                     iri.new::<ObjectPropertyIRI>("hasChild").into(),
-                    iri.class("Person").into(),
+                    iri.class("Person"),
                     vec![],
                 )
                 .into(),
@@ -381,7 +349,7 @@ pub fn family_ontology(iri: &IRIBuilder) -> Ontology {
                 ],
                 vec![],
             )),
-            Axiom::HasKey(HasKey(iri.class("Person").into(), vec![iri.new("hasSSN")])),
+            Axiom::HasKey(HasKey(iri.class("Person"), vec![iri.new("hasSSN")])),
             //
             Axiom::DatatypeDefinition(DatatypeDefinition(
                 iri.new("personAge"),
@@ -487,5 +455,6 @@ pub fn family_ontology(iri: &IRIBuilder) -> Ontology {
             Axiom::SameIndividual(SameIndividual(iri.new("Mary"), other_ont.new("MaryBrown"))),
             Axiom::DifferentIndividuals(DifferentIndividuals(iri.new("John"), iri.new("Bill"))),
         ],
-    )
+    );
+    ApiOntology::from((iri.base(), owl))
 }

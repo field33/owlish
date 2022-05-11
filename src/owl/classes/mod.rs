@@ -26,7 +26,7 @@ impl From<IRI> for ClassIRI {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum ClassConstructor {
     IRI(ClassIRI),
     SubClassOf(SubClassOf),
@@ -44,6 +44,17 @@ pub enum ClassConstructor {
     ObjectOneOf(ObjectOneOf),
     ObjectHasValue(ObjectHasValue),
     ObjectHasSelf(ObjectHasSelf),
+}
+
+impl From<ClassIRI> for Box<ClassConstructor> {
+    fn from(iri: ClassIRI) -> Self {
+        Box::new(ClassConstructor::IRI(iri))
+    }
+}
+impl From<ClassIRI> for ClassConstructor {
+    fn from(iri: ClassIRI) -> Self {
+        ClassConstructor::IRI(iri)
+    }
 }
 
 impl ClassConstructor {
@@ -66,20 +77,33 @@ impl Regards for ClassConstructor {
         match self {
             ClassConstructor::IRI(i) => i.as_iri() == iri,
             ClassConstructor::SubClassOf(c) => c.regards(iri),
-            ClassConstructor::DataSomeValuesFrom(_) => false, // TODO
-            ClassConstructor::EquivalentClasses(_) => false,  // TODO
-            ClassConstructor::DisjointClasses(_) => false,    // TODO
+            ClassConstructor::DataSomeValuesFrom(c) => c.regards(iri),
+            ClassConstructor::EquivalentClasses(_) => false, // TODO
+            ClassConstructor::DisjointClasses(_) => false,   // TODO
             ClassConstructor::ObjectComplementOf(_) => false, // TODO
             ClassConstructor::ObjectIntersectionOf(_) => false, // TODO
-            ClassConstructor::ObjectUnionOf(_) => false,      // TODO
+            ClassConstructor::ObjectUnionOf(_) => false,     // TODO
             ClassConstructor::ObjectSomeValuesFrom(_) => false, // TODO
             ClassConstructor::ObjectMaxCardinality(_) => false, // TODO
             ClassConstructor::ObjectMinCardinality(_) => false, // TODO
             ClassConstructor::ObjectExactCardinality(_) => false, // TODO
             ClassConstructor::ObjectAllValuesFrom(_) => false, // TODO
-            ClassConstructor::ObjectOneOf(_) => false,        // TODO
-            ClassConstructor::ObjectHasValue(_) => false,     // TODO
-            ClassConstructor::ObjectHasSelf(_) => false,      // TODO
+            ClassConstructor::ObjectOneOf(_) => false,       // TODO
+            ClassConstructor::ObjectHasValue(_) => false,    // TODO
+            ClassConstructor::ObjectHasSelf(_) => false,     // TODO
         }
+    }
+}
+
+// from data values
+
+impl From<DataSomeValuesFrom> for ClassConstructor {
+    fn from(c: DataSomeValuesFrom) -> Self {
+        ClassConstructor::DataSomeValuesFrom(c)
+    }
+}
+impl From<DataSomeValuesFrom> for Box<ClassConstructor> {
+    fn from(c: DataSomeValuesFrom) -> Self {
+        Box::new(ClassConstructor::DataSomeValuesFrom(c))
     }
 }

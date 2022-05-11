@@ -1,4 +1,4 @@
 use crate::owl::{DataPropertyIRI, DatatypeIRI};
 
 #[derive(Debug)]
-pub struct DataPropertyRange(pub(crate) DataPropertyIRI, pub(crate) DatatypeIRI);
+pub struct DataPropertyRange(pub DataPropertyIRI, pub DatatypeIRI);

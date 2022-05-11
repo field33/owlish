@@ -23,8 +23,8 @@ jobs:
         run: cargo clippy --verbose
       - name: outdated and audit
         run: |
-          cargo audit
           cargo outdated
+          cargo audit
   build:
     runs-on: ubuntu-latest
     needs: check

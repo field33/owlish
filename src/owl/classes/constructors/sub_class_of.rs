@@ -1,10 +1,15 @@
 use crate::owl::{Annotation, ClassConstructor, Regards, IRI};
 
-#[derive(Debug)]
+/// Defines that the subject is a sub class of the object.
+///
+/// Structure `(subject, object, annotations)`.
+#[derive(Debug, Eq, PartialEq)]
 pub struct SubClassOf(
-    pub(crate) Box<ClassConstructor>,
-    pub(crate) Box<ClassConstructor>,
-    pub(crate) Vec<Annotation>,
+    /// subject
+    pub Box<ClassConstructor>,
+    /// object
+    pub Box<ClassConstructor>,
+    pub Vec<Annotation>,
 );
 impl SubClassOf {
     pub fn subject(&self) -> &ClassConstructor {
@@ -28,9 +33,23 @@ impl From<SubClassOf> for ClassConstructor {
         ClassConstructor::SubClassOf(sco)
     }
 }
+// impl<'a> From<&'a SubClassOf> for &'a ClassConstructor {
+//     fn from(sco: &'a SubClassOf) -> Self {
+//         &ClassConstructor::SubClassOf(*sco)
+//     }
+// }
 
 impl Regards for SubClassOf {
     fn regards(&self, iri: &IRI) -> bool {
         self.subject().regards(iri) || self.parent().regards(iri)
+    }
+}
+
+impl ClassConstructor {
+    pub fn sub_class_of(&self) -> Option<&SubClassOf> {
+        match self {
+            ClassConstructor::SubClassOf(s) => Some(s),
+            _ => None,
+        }
     }
 }

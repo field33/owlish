@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.1.0 - 2022-05-11
+#### Features
+- Improve owlib convinience and documentation - (f038876) - Florian Loers
+
+- - -
+
 ## v0.0.1 - 2022-05-11
 #### Miscellaneous Chores
 - Setup initial draft version of owl library - (8e105f4) - Florian Loers

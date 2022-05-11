@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.0.1 - 2022-05-11
+#### Miscellaneous Chores
+- Setup initial draft version of owl library - (8e105f4) - Florian Loers
+
+- - -
+
 ## v0.0.3 - 2022-05-11
 #### Continuous Integration
 - Fix release build - (1a2c4cb) - Florian Loers

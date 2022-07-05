@@ -1,6 +1,6 @@
 use crate::owl::{Annotation, ClassConstructor};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectComplementOf(pub(crate) Box<ClassConstructor>, pub(crate) Vec<Annotation>);
 
 impl From<ObjectComplementOf> for Box<ClassConstructor> {

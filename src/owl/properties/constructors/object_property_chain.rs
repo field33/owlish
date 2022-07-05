@@ -1,6 +1,6 @@
 use crate::owl::{ObjectPropertyConstructor, ObjectPropertyIRI};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectPropertyChain(pub Vec<ObjectPropertyIRI>);
 
 impl From<ObjectPropertyChain> for ObjectPropertyConstructor {

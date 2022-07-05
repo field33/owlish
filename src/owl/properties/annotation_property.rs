@@ -1,8 +1,11 @@
 use std::fmt::Display;
 
-use crate::owl::{ClassIRI, DatatypeIRI, Regards, Value, IRI};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
-#[derive(Debug, Eq, PartialEq)]
+use crate::owl::{Axiom, ClassIRI, DatatypeIRI, Regards, IRI};
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct AnnotationPropertyIRI(IRI);
 impl AnnotationPropertyIRI {
     pub fn as_iri(&self) -> &IRI {
@@ -26,12 +29,13 @@ pub struct AnnotationPropertyDomain(pub(crate) AnnotationPropertyIRI, pub(crate)
 #[derive(Debug)]
 pub struct AnnotationPropertyRange(pub(crate) AnnotationPropertyIRI, pub(crate) DatatypeIRI);
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AnnotationAssertion(
     pub(crate) AnnotationPropertyIRI,
     pub(crate) IRI,
     pub(crate) Value,
 );
+
 impl AnnotationAssertion {
     pub fn iri(&self) -> &AnnotationPropertyIRI {
         &self.0
@@ -43,20 +47,19 @@ impl AnnotationAssertion {
         &self.2
     }
 }
+
 impl Regards for AnnotationAssertion {
     fn regards(&self, iri: &IRI) -> bool {
         self.iri().as_iri() == iri
             || self.subject() == iri
             || match self.value() {
-                Value::String(_) => false,
-                Value::Integer(_) => false,
-                Value::NonNegativeInteger(_) => false,
-                Value::IRI(i) => i == iri,
+                Value::String(i) => i == iri.as_str(),
+                _ => false,
             }
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct Annotation(pub AnnotationPropertyIRI, pub Value);
 
 impl Annotation {
@@ -65,5 +68,11 @@ impl Annotation {
     }
     pub fn value(&self) -> &Value {
         &self.1
+    }
+}
+
+impl From<AnnotationAssertion> for Axiom {
+    fn from(aa: AnnotationAssertion) -> Self {
+        Axiom::AnnotationAssertion(aa)
     }
 }

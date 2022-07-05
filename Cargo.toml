@@ -7,4 +7,8 @@ edition = "2021"
 
 [dependencies]
 iref = "2"
+serde = { version = "1", features = ["derive"] }
 serde_json = "*"
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+js-sys = "0.3"
+harriet = "0.1"

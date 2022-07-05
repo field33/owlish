@@ -2,7 +2,7 @@ use crate::owl::{Annotation, DataPropertyIRI};
 
 use super::{DataComplementOf, DataIntersectionOf, DataOneOf, DataUnionOf, DatatypeRestriction};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum DatatypeDefinitionConstructor {
     DatatypeRestriction(DatatypeRestriction),
     DataComplementOf(DataComplementOf),
@@ -11,7 +11,7 @@ pub enum DatatypeDefinitionConstructor {
     DataOneOf(DataOneOf),
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DatatypeDefinition(
     pub DataPropertyIRI,
     pub DatatypeDefinitionConstructor,

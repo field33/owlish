@@ -1,3 +1,5 @@
+use serde_json::Value;
+
 use crate::api::Ontology as ApiOntology;
 use crate::owl::well_known as wk;
 use crate::owl::*;
@@ -143,8 +145,8 @@ pub fn family() -> ApiOntology {
                     DatatypeRestriction(
                         wk::xsd_integer(),
                         vec![
-                            Restriction::Numeric(wk::xsd_minExclusive(), Value::Integer(12)),
-                            Restriction::Numeric(wk::xsd_maxInclusive(), Value::Integer(19)),
+                            Restriction::Numeric(wk::xsd_minExclusive(), Value::from(12u8)),
+                            Restriction::Numeric(wk::xsd_maxInclusive(), Value::from(19u8)),
                         ],
                     ),
                 )
@@ -219,13 +221,11 @@ pub fn family() -> ApiOntology {
                 vec![],
             )),
             //
-            Axiom::EquivalentClasses(
-                EquivalentClasses(
-                    iri.class("Person"),
-                    iri.class("Human").into(),
-                    vec![],
-                ),
-            ),
+            Axiom::EquivalentClasses(EquivalentClasses(
+                iri.class("Person"),
+                iri.class("Human").into(),
+                vec![],
+            )),
             Axiom::EquivalentClasses(EquivalentClasses(
                 iri.class("Person"),
                 ObjectIntersectionOf(
@@ -292,7 +292,7 @@ pub fn family() -> ApiOntology {
                 iri.class("JohnsChildren"),
                 ObjectHasValue(
                     iri.new::<ObjectPropertyIRI>("hasParent").into(),
-                    iri.new("John"),
+                    iri.new::<IRI>("John").into(),
                     vec![],
                 )
                 .into(),
@@ -356,8 +356,8 @@ pub fn family() -> ApiOntology {
                 DatatypeRestriction(
                     wk::xsd_integer(),
                     vec![
-                        Restriction::Numeric(wk::xsd_minInclusive(), Value::Integer(0)),
-                        Restriction::Numeric(wk::xsd_maxInclusive(), Value::Integer(150)),
+                        Restriction::Numeric(wk::xsd_minInclusive(), Value::from(0u8)),
+                        Restriction::Numeric(wk::xsd_maxInclusive(), Value::from(150u8)),
                     ],
                 )
                 .into(),
@@ -368,8 +368,8 @@ pub fn family() -> ApiOntology {
                 DatatypeRestriction(
                     wk::xsd_integer(),
                     vec![
-                        Restriction::Numeric(wk::xsd_minExclusive(), Value::Integer(0)),
-                        Restriction::Numeric(wk::xsd_maxInclusive(), Value::Integer(18)),
+                        Restriction::Numeric(wk::xsd_minExclusive(), Value::from(0u8)),
+                        Restriction::Numeric(wk::xsd_maxInclusive(), Value::from(18u8)),
                     ],
                 )
                 .into(),
@@ -386,7 +386,7 @@ pub fn family() -> ApiOntology {
             )),
             Axiom::DatatypeDefinition(DatatypeDefinition(
                 iri.new("toddlerAge"),
-                DataOneOf(vec![Value::Integer(1), Value::Integer(2)]).into(),
+                DataOneOf(vec![Value::from(1u8), Value::from(2u8)]).into(),
                 vec![],
             )),
             //
@@ -443,12 +443,12 @@ pub fn family() -> ApiOntology {
             Axiom::DataPropertyAssertion(DataPropertyAssertion(
                 iri.new("hasAge"),
                 iri.new("John"),
-                Value::Integer(51),
+                Value::from(51u8),
             )),
             Axiom::NegativeDataPropertyAssertion(NegativeDataPropertyAssertion(
                 iri.new("hasAge"),
                 iri.new("Jack"),
-                Value::Integer(53),
+                Value::from(53u8),
             )),
             Axiom::SameIndividual(SameIndividual(iri.new("James"), iri.new("Jim"))),
             Axiom::SameIndividual(SameIndividual(iri.new("John"), other_ont.new("JohnBrown"))),

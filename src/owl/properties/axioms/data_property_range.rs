@@ -1,4 +1,4 @@
 use crate::owl::{DataPropertyIRI, DatatypeIRI};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct DataPropertyRange(pub DataPropertyIRI, pub DatatypeIRI);

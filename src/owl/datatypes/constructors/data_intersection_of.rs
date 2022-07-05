@@ -2,7 +2,7 @@ use crate::owl::DataPropertyIRI;
 
 use super::DatatypeDefinitionConstructor;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataIntersectionOf(pub DataPropertyIRI, pub Box<DatatypeDefinitionConstructor>);
 
 impl From<DataIntersectionOf> for Box<DatatypeDefinitionConstructor> {

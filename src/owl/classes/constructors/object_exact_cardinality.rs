@@ -1,6 +1,6 @@
 use crate::owl::{ClassIRI, ObjectPropertyIRI, ClassConstructor};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectExactCardinality(pub u64, pub ObjectPropertyIRI, pub Option<ClassIRI>);
 
 impl From<ObjectExactCardinality> for Box<ClassConstructor> {

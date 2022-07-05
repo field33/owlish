@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use crate::owl::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum Axiom {
     // Annotations
     AnnotationAssertion(AnnotationAssertion),

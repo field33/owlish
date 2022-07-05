@@ -4,8 +4,9 @@ use crate::owl::{DataSomeValuesFrom, Regards, IRI};
 
 mod constructors;
 pub use constructors::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct ClassIRI(IRI);
 
 impl Display for ClassIRI {
@@ -26,7 +27,7 @@ impl From<IRI> for ClassIRI {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum ClassConstructor {
     IRI(ClassIRI),
     SubClassOf(SubClassOf),
@@ -105,5 +106,24 @@ impl From<DataSomeValuesFrom> for ClassConstructor {
 impl From<DataSomeValuesFrom> for Box<ClassConstructor> {
     fn from(c: DataSomeValuesFrom) -> Self {
         Box::new(ClassConstructor::DataSomeValuesFrom(c))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn test_ser_de_class_iri() {
+        let iri: ClassIRI = IRI::new("https://test.org#asdf").unwrap().into();
+
+        let json = serde_json::to_string(&iri).unwrap();
+
+        assert_eq!(json, r#""https://test.org#asdf""#);
+
+        let json = r#""https://test.org#asdf""#;
+        let iri1: ClassIRI = serde_json::from_str(json).unwrap();
+
+        assert_eq!(iri1, iri)
     }
 }

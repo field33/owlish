@@ -1,9 +1,9 @@
-use crate::owl::{Annotation, ClassConstructor, Regards, IRI};
+use crate::owl::{Annotation, ClassConstructor, Regards, IRI, Axiom};
 
 /// Defines that the subject is a sub class of the object.
 ///
 /// Structure `(subject, object, annotations)`.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct SubClassOf(
     /// subject
     pub Box<ClassConstructor>,
@@ -51,5 +51,11 @@ impl ClassConstructor {
             ClassConstructor::SubClassOf(s) => Some(s),
             _ => None,
         }
+    }
+}
+
+impl From<SubClassOf> for Axiom {
+    fn from(sco: SubClassOf) -> Self {
+        Axiom::SubClassOf(sco)
     }
 }

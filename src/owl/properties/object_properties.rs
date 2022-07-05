@@ -1,7 +1,10 @@
-use crate::owl::{IndividualIRI, ObjectPropertyConstructor, IRI};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+use crate::owl::{Axiom, IndividualIRI, ObjectPropertyConstructor, IRI};
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct ObjectPropertyIRI(IRI);
+
 impl From<IRI> for ObjectPropertyIRI {
     fn from(iri: IRI) -> Self {
         Self(iri)
@@ -18,11 +21,17 @@ impl ObjectPropertyIRI {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectPropertyAssertion(pub ObjectPropertyIRI, pub IndividualIRI, pub IndividualIRI);
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct NegativeObjectPropertyAssertion(
     pub ObjectPropertyIRI,
     pub IndividualIRI,
     pub IndividualIRI,
 );
+
+impl From<ObjectPropertyAssertion> for Axiom {
+    fn from(opa: ObjectPropertyAssertion) -> Self {
+        Self::ObjectPropertyAssertion(opa)
+    }
+}

@@ -1,6 +1,6 @@
 use crate::owl::{Annotation, ClassConstructor, IndividualIRI};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectOneOf(pub Vec<IndividualIRI>, pub Vec<Annotation>);
 
 impl From<ObjectOneOf> for Box<ClassConstructor> {

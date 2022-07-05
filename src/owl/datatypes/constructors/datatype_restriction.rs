@@ -1,13 +1,15 @@
-use crate::owl::{DatatypeIRI, Regards, Value};
+use serde_json::Value;
+
+use crate::owl::{DatatypeIRI, Regards};
 
 use super::DatatypeDefinitionConstructor;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Restriction {
     Numeric(DatatypeIRI, Value),
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DatatypeRestriction(pub(crate) DatatypeIRI, pub(crate) Vec<Restriction>);
 
 impl From<DatatypeRestriction> for Box<DatatypeDefinitionConstructor> {

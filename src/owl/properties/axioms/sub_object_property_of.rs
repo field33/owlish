@@ -1,7 +1,6 @@
+use serde::{Deserialize, Serialize};
+
 use crate::owl::{ObjectPropertyConstructor, ObjectPropertyIRI};
 
-#[derive(Debug)]
-pub struct SubObjectPropertyOf(
-    pub ObjectPropertyConstructor,
-    pub ObjectPropertyIRI,
-);
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct SubObjectPropertyOf(pub ObjectPropertyConstructor, pub ObjectPropertyIRI);

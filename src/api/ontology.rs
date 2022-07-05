@@ -1,7 +1,11 @@
-use crate::api::Class;
-use crate::owl::{ClassIRI, Declaration, IRIBuilder, IndividualIRI, Regards, IRI};
+use std::collections::HashMap;
 
 use super::Individual;
+use crate::api::Class;
+use crate::owl::{
+    Axiom, ClassIRI, Declaration, IRIBuilder, IndividualIRI, ObjectPropertyAssertion, Regards, IRI,
+};
+use wasm_bindgen::prelude::*;
 
 /// The field33 representation of an ontology
 ///
@@ -12,8 +16,11 @@ use super::Individual;
 ///   - Annotation(Properties)
 ///   - DataProperties
 ///   - ObjectProperties
+#[wasm_bindgen]
+#[derive(Debug)]
 pub struct Ontology {
     pub(crate) iri: IRI,
+    pub(crate) imports: HashMap<String, IRI>,
     pub(crate) owl: crate::owl::Ontology,
 }
 
@@ -22,12 +29,17 @@ impl Ontology {
     pub fn new(iri: IRI) -> Self {
         Self {
             iri,
+            imports: Default::default(),
             owl: crate::owl::Ontology::new(vec![], vec![]),
         }
     }
 
     pub fn set_owl(&mut self, owl: crate::owl::Ontology) {
         self.owl = owl
+    }
+
+    pub fn iri_builder(&self) -> IRIBuilder {
+        IRIBuilder::construct(self.iri.clone(), &self.imports)
     }
 
     /// Get the class of the given IRI.
@@ -114,14 +126,24 @@ impl Ontology {
         }
         individuals
     }
+}
 
-    pub fn iri_builder(&self) -> IRIBuilder {
-        IRIBuilder::construct(self.iri.clone())
+impl Ontology {
+    pub fn declarations(&self) -> &Vec<Declaration> {
+        &self.owl.declarations
+    }
+
+    pub fn axioms(&self) -> &Vec<Axiom> {
+        &self.owl.axioms
     }
 }
 
 impl From<(IRI, crate::owl::Ontology)> for Ontology {
     fn from((iri, owl): (IRI, crate::owl::Ontology)) -> Self {
-        Self { iri, owl }
+        Self {
+            iri,
+            imports: Default::default(),
+            owl,
+        }
     }
 }

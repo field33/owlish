@@ -1,6 +1,6 @@
 use crate::owl::{ObjectPropertyConstructor, ObjectPropertyIRI};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectInverseOf(pub ObjectPropertyIRI);
 
 impl From<ObjectInverseOf> for ObjectPropertyConstructor {

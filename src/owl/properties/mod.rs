@@ -9,8 +9,9 @@ pub use annotation_property::*;
 
 mod object_properties;
 pub use object_properties::*;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub enum ObjectPropertyConstructor {
     IRI(ObjectPropertyIRI),
     ObjectInverseOf(ObjectInverseOf),

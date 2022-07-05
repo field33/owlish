@@ -1,4 +1,10 @@
-use crate::owl::{ClassIRI, ObjectPropertyIRI};
+use crate::owl::{Axiom, ClassIRI, ObjectPropertyIRI};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ObjectPropertyRange(pub ObjectPropertyIRI, pub ClassIRI);
+
+impl From<ObjectPropertyRange> for Axiom {
+    fn from(opr: ObjectPropertyRange) -> Self {
+        Axiom::ObjectPropertyRange(opr)
+    }
+}

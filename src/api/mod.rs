@@ -4,3 +4,4 @@ mod ontology;
 pub use ontology::*;
 mod individual;
 pub use individual::*;
+pub mod wasm;

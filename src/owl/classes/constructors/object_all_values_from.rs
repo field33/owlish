@@ -1,6 +1,6 @@
 use crate::owl::{Annotation, ClassConstructor, ClassIRI, ObjectPropertyConstructor};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectAllValuesFrom(
     pub ObjectPropertyConstructor,
     pub ClassIRI,

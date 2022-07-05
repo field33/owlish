@@ -1,6 +1,6 @@
 use crate::owl::{ClassIRI, DataPropertyIRI, Regards, IRI};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct DataPropertyDomain(pub DataPropertyIRI, pub ClassIRI);
 
 impl DataPropertyDomain {

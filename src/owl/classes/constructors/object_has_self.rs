@@ -1,6 +1,6 @@
-use crate::owl::{ObjectPropertyConstructor, Annotation, ClassConstructor};
+use crate::owl::{Annotation, ClassConstructor, ObjectPropertyConstructor};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectHasSelf(pub ObjectPropertyConstructor, pub Vec<Annotation>);
 
 impl From<ObjectHasSelf> for Box<ClassConstructor> {

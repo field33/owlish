@@ -1,6 +1,6 @@
 use crate::owl::{Annotation, ClassConstructor, ClassIRI};
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct EquivalentClasses(
     pub(crate) ClassIRI,
     pub(crate) Box<ClassConstructor>,

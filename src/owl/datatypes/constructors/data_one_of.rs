@@ -1,8 +1,8 @@
-use crate::owl::Value;
+use serde_json::Value;
 
 use super::DatatypeDefinitionConstructor;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataOneOf(pub Vec<Value>);
 
 impl From<DataOneOf> for Box<DatatypeDefinitionConstructor> {

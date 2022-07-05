@@ -1,7 +1,7 @@
 use crate::owl::{ObjectPropertyConstructor, ClassIRI, Annotation, ClassConstructor};
 
 /// Class construction based on properties.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectSomeValuesFrom(
     pub ObjectPropertyConstructor,
     pub ClassIRI,

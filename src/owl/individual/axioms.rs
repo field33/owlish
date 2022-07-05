@@ -1,10 +1,10 @@
 use crate::owl::{ClassConstructor, IndividualIRI, Regards};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct SameIndividual(pub IndividualIRI, pub IndividualIRI);
-#[derive(Debug)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct DifferentIndividuals(pub IndividualIRI, pub IndividualIRI);
-#[derive(Debug)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ClassAssertion(pub ClassConstructor, pub IndividualIRI);
 impl ClassAssertion {
     pub fn class_constructor(&self) -> &ClassConstructor {

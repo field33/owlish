@@ -43,7 +43,7 @@ pub fn xsd_maxExclusive() -> DatatypeIRI {
         .into()
 }
 
-// Annotations
+// RDFS
 
 #[allow(non_snake_case)]
 pub fn rdfs_comment() -> AnnotationPropertyIRI {
@@ -52,11 +52,39 @@ pub fn rdfs_comment() -> AnnotationPropertyIRI {
         .into()
 }
 
-// Classes
+#[allow(non_snake_case)]
+pub fn rdfs_label() -> AnnotationPropertyIRI {
+    IRI::new("http://www.w3.org/2000/01/rdf-schema#label")
+        .unwrap()
+        .into()
+}
+
+// OWL
 
 #[allow(non_snake_case)]
 pub fn owl_Thing() -> ClassIRI {
     IRI::new("http://www.w3.org/2002/07/owl#Thing")
+        .unwrap()
+        .into()
+}
+
+#[allow(non_snake_case)]
+pub fn owl_Class() -> ClassIRI {
+    IRI::new("http://www.w3.org/2002/07/owl#Class")
+        .unwrap()
+        .into()
+}
+
+#[allow(non_snake_case)]
+pub fn owl_AsymmetricProperty() -> ClassIRI {
+    IRI::new("http://www.w3.org/2002/07/owl#AsymmetricProperty")
+        .unwrap()
+        .into()
+}
+
+#[allow(non_snake_case)]
+pub fn owl_SymmetricProperty() -> ClassIRI {
+    IRI::new("http://www.w3.org/2002/07/owl#SymmetricProperty")
         .unwrap()
         .into()
 }

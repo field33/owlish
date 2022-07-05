@@ -2,7 +2,7 @@ use crate::owl::DataPropertyIRI;
 
 use super::DatatypeDefinitionConstructor;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataUnionOf(pub DataPropertyIRI, pub Box<DatatypeDefinitionConstructor>);
 
 impl From<DataUnionOf> for Box<DatatypeDefinitionConstructor> {

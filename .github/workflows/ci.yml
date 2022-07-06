@@ -50,7 +50,7 @@ jobs:
           tar xvzf .cog/cocogitto.tar.gz --directory .cog/
           git config --global user.email "github@field33.com"
           git config --global user.name "github actions"
-          .cog/cog bump --auto || .cog/cog bump --patch
+          .cog/cog bump --auto
           rm -rf .cog
           TAG_VERSION=$(grep version Cargo.toml | head -1 | sed 's/version = "//g' | sed 's/"//g')
           git remote set-url --push origin https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/field33/owlib

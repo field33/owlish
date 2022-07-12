@@ -1,10 +1,10 @@
-use crate::owl::{ClassConstructor, IndividualIRI, Regards};
+use crate::owl::{Axiom, ClassConstructor, IndividualIRI, Regards};
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct SameIndividual(pub IndividualIRI, pub IndividualIRI);
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DifferentIndividuals(pub IndividualIRI, pub IndividualIRI);
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ClassAssertion(pub ClassConstructor, pub IndividualIRI);
 impl ClassAssertion {
     pub fn class_constructor(&self) -> &ClassConstructor {
@@ -18,5 +18,11 @@ impl ClassAssertion {
 impl Regards for ClassAssertion {
     fn regards(&self, iri: &crate::owl::IRI) -> bool {
         self.individual_iri().as_iri() == iri || self.class_constructor().regards(iri)
+    }
+}
+
+impl From<ClassAssertion> for Axiom {
+    fn from(ca: ClassAssertion) -> Self {
+        Axiom::ClassAssertion(ca)
     }
 }

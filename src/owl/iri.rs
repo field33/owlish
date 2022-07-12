@@ -156,6 +156,17 @@ impl IRIBuilder {
         self.new(name)
     }
 
+    pub fn from<T: From<IRI>>(&self, prefix: &str, name: &str) -> Option<T> {
+        match self.imports.get(prefix) {
+            Some(prefix) => {
+                let mut iribuf = prefix.clone();
+                iribuf.set_fragment(Some(iref::Fragment::try_from(name.as_ref()).unwrap()));
+                Some(T::from(IRI(iribuf)))
+            }
+            None => None,
+        }
+    }
+
     pub fn from_opt<T: From<IRI>>(
         &self,
         prefix: &Option<Cow<str>>,

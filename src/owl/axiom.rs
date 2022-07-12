@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::owl::*;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Axiom {
     // Annotations
     AnnotationAssertion(AnnotationAssertion),
@@ -72,17 +72,17 @@ impl Regards for Axiom {
             Axiom::TransitiveObjectProperty(_) => false, // TODO
             Axiom::FunctionalDataProperty(_) => false,   // TODO
             Axiom::SubClassOf(s) => s.regards(iri),
-            Axiom::EquivalentClasses(_) => false,       // TODO
-            Axiom::DisjointClasses(_) => false,         // TODO
-            Axiom::DatatypeDefinition(_) => false,      // TODO
-            Axiom::ClassAssertion(ca) => ca.regards(iri),          // TODO
-            Axiom::SameIndividual(_) => false,          // TODO
-            Axiom::DifferentIndividuals(_) => false,    // TODO
+            Axiom::EquivalentClasses(_) => false,  // TODO
+            Axiom::DisjointClasses(_) => false,    // TODO
+            Axiom::DatatypeDefinition(_) => false, // TODO
+            Axiom::ClassAssertion(ca) => ca.regards(iri), // TODO
+            Axiom::SameIndividual(_) => false,     // TODO
+            Axiom::DifferentIndividuals(_) => false, // TODO
             Axiom::ObjectPropertyAssertion(_) => false, // TODO
             Axiom::NegativeObjectPropertyAssertion(_) => false, // TODO
-            Axiom::DataPropertyAssertion(_) => false,   // TODO
+            Axiom::DataPropertyAssertion(_) => false, // TODO
             Axiom::NegativeDataPropertyAssertion(_) => false, // TODO
-            Axiom::HasKey(_) => false,                  // TODO
+            Axiom::HasKey(_) => false,             // TODO
         }
     }
 }

@@ -29,7 +29,7 @@ pub struct AnnotationPropertyDomain(pub(crate) AnnotationPropertyIRI, pub(crate)
 #[derive(Debug)]
 pub struct AnnotationPropertyRange(pub(crate) AnnotationPropertyIRI, pub(crate) DatatypeIRI);
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct AnnotationAssertion(
     pub(crate) AnnotationPropertyIRI,
     pub(crate) IRI,

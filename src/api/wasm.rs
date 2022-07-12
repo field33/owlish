@@ -35,8 +35,10 @@ impl Ontology {
     /// @returns ```js
     /// enum {
     ///     AnnotationAssertion?: [annotation_prop_iri, iri, value],
+    ///     ClassAssertion?: [class_iri, individual_iri],
     ///     ObjectPropertyDomain?: [object_propp_iri, class_iri],
     ///     ObjectPropertyRange?: [object_prop_iri, class_iri],
+    ///     ObjectPropertyAssertion?: [object_prop_iri, subject_iri, object_iri],
     ///     ...
     /// }
     /// ```

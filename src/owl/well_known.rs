@@ -59,7 +59,21 @@ pub fn rdfs_label() -> AnnotationPropertyIRI {
         .into()
 }
 
+// RDF
+
+#[allow(non_snake_case)]
+pub fn rdf_type() -> AnnotationPropertyIRI {
+    IRI::new("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+        .unwrap()
+        .into()
+}
+
 // OWL
+
+#[allow(non_snake_case)]
+pub fn owl_Ontology() -> IRI {
+    IRI::new("http://www.w3.org/2002/07/owl#Ontology").unwrap()
+}
 
 #[allow(non_snake_case)]
 pub fn owl_Thing() -> ClassIRI {
@@ -85,6 +99,13 @@ pub fn owl_AsymmetricProperty() -> ClassIRI {
 #[allow(non_snake_case)]
 pub fn owl_SymmetricProperty() -> ClassIRI {
     IRI::new("http://www.w3.org/2002/07/owl#SymmetricProperty")
+        .unwrap()
+        .into()
+}
+
+#[allow(non_snake_case)]
+pub fn owl_ObjectProperty() -> ClassIRI {
+    IRI::new("http://www.w3.org/2002/07/owl#ObjectProperty")
         .unwrap()
         .into()
 }

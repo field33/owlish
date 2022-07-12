@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.2.0 - 2022-07-12
+#### Continuous Integration
+- Fix release job versioning - (49a8f48) - Florian Loers
+#### Features
+- Add wasm capabilities - (9cdfe65) - Florian Loers
+- Add turtle parsing with harriet and wasm API - (f462b16) - Florian Loers
+#### Miscellaneous Chores
+- Rename to owlish - (edbea35) - Florian Loers
+
+- - -
+
 ## v0.1.0 - 2022-05-11
 #### Features
 - Improve owlib convinience and documentation - (f038876) - Florian Loers

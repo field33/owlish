@@ -1,10 +1,7 @@
-use std::collections::HashMap;
-
 use crate::owl::{
     well_known, AnnotationAssertion, Axiom, ClassIRI, DataPropertyDomain, ObjectPropertyDomain,
-    ObjectPropertyIRI, ObjectPropertyRange, SubClassOf,
+    ObjectPropertyRange, SubClassOf,
 };
-use js_sys::Array;
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]

@@ -29,7 +29,7 @@ impl<'de> Deserialize<'de> for IRI {
             where
                 E: serde::de::Error,
             {
-                IRI::new(value).map_err(|e| E::custom("Invalid IRI"))
+                IRI::new(value).map_err(|_e| E::custom("Invalid IRI"))
             }
         }
         deserializer.deserialize_str(IRIVisitor)
@@ -160,7 +160,7 @@ impl IRIBuilder {
         match self.imports.get(prefix) {
             Some(prefix) => {
                 let mut iribuf = prefix.clone();
-                iribuf.set_fragment(Some(iref::Fragment::try_from(name.as_ref()).unwrap()));
+                iribuf.set_fragment(Some(iref::Fragment::try_from(name).unwrap()));
                 Some(T::from(IRI(iribuf)))
             }
             None => None,
@@ -188,10 +188,7 @@ impl IRIBuilder {
                 },
                 None => None,
             },
-            None => match name {
-                Some(name) => Some(self.new(name)),
-                None => None,
-            },
+            None => name.as_ref().map(|name| self.new(name)),
         }
     }
 }

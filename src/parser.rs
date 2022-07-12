@@ -10,9 +10,10 @@ use crate::{
 };
 
 impl Ontology {
-    pub fn parse(ttl: &str) -> Result<Self, ()> {
-        let td = harriet::TurtleDocument::parse_full(ttl).unwrap();
-        Ok(td.into())
+    pub fn parse(ttl: &str) -> Result<Self, String> {
+        harriet::TurtleDocument::parse_full(ttl)
+            .map_err(|e| format!("{:?}", e))
+            .map(|td| td.into())
     }
 }
 
@@ -91,7 +92,7 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                     harriet::Subject::IRI(iri) => {
                         IRI::try_from((&ontology.iri_builder(), iri)).ok()
                     }
-                    harriet::Subject::Collection(col) => {
+                    harriet::Subject::Collection(_col) => {
                         todo!()
                     }
                 };
@@ -151,7 +152,7 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                                     harriet::Object::BlankNodePropertyList(_) => {
                                                         todo!()
                                                     }
-                                                    harriet::Object::Literal(l) => {
+                                                    harriet::Object::Literal(_l) => {
                                                         // TODO: ignored
                                                     }
                                                 }
@@ -249,16 +250,11 @@ fn parse_rdf_type(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<harr
                             .owl
                             .axioms
                             .push(AsymmetricObjectProperty(subject_iri.clone().into()).into());
-                    } else {
-                        if !is_property(&iri) {
-                            ontology.owl.axioms.push(
-                                ClassAssertion(
-                                    ClassIRI::from(iri).into(),
-                                    subject_iri.clone().into(),
-                                )
+                    } else if !is_property(&iri) {
+                        ontology.owl.axioms.push(
+                            ClassAssertion(ClassIRI::from(iri).into(), subject_iri.clone().into())
                                 .into(),
-                            )
-                        }
+                        )
                     }
                 }
             }
@@ -308,7 +304,7 @@ impl<'a> TryFrom<(&IRIBuilder, &'a harriet::IRI<'a>)> for IRI {
             harriet::IRI::IRIReference(iriref) => IRI::new(&iriref.iri).map_err(|_e| ()),
             harriet::IRI::PrefixedName(pn) => iri_builder
                 .from_opt(&pn.prefix, &pn.name)
-                .map(|iri| Ok(iri))
+                .map(Ok)
                 .unwrap_or(Err(())),
         }
     }
@@ -319,8 +315,8 @@ mod tests {
     use crate::{
         api::Ontology,
         owl::{
-            well_known, AnnotationAssertion, AnnotationPropertyIRI, ClassAssertion, ClassIRI,
-            ObjectPropertyAssertion, ObjectPropertyDomain, ObjectPropertyIRI, IRI,
+            well_known, AnnotationAssertion, ClassAssertion, ClassIRI, ObjectPropertyAssertion,
+            ObjectPropertyDomain, IRI,
         },
     };
 
@@ -372,8 +368,6 @@ mod tests {
         let td = harriet::TurtleDocument::parse_full(turtle).unwrap();
 
         let o: Ontology = td.into();
-
-        println!("{:#?}", o);
 
         assert_eq!(
             o.iri.to_string(),
@@ -435,8 +429,6 @@ mod tests {
 
         let o: Ontology = td.into();
 
-        println!("{:#?}", o);
-
         assert_eq!(
             o.iri.to_string(),
             "http://field33.com/ontologies/@fld33/process/"
@@ -470,10 +462,8 @@ mod tests {
         assert_eq!(
             o.axioms()[2],
             AnnotationAssertion(
-                AnnotationPropertyIRI::from(well_known::rdfs_label()).into(),
-                IRI::new("http://field33.com/ontologies/@fld33/process/")
-                    .unwrap()
-                    .into(),
+                well_known::rdfs_label(),
+                IRI::new("http://field33.com/ontologies/@fld33/process/").unwrap(),
                 "Processes".into()
             )
             .into()
@@ -481,10 +471,8 @@ mod tests {
         assert_eq!(
             o.axioms()[3],
             AnnotationAssertion(
-                AnnotationPropertyIRI::from(well_known::rdfs_label()).into(),
-                IRI::new("http://field33.com/ontologies/@fld33/process/#Activity")
-                    .unwrap()
-                    .into(),
+                well_known::rdfs_label(),
+                IRI::new("http://field33.com/ontologies/@fld33/process/#Activity").unwrap(),
                 "Activity".into()
             )
             .into()
@@ -492,10 +480,8 @@ mod tests {
         assert_eq!(
             o.axioms()[4],
             AnnotationAssertion(
-                AnnotationPropertyIRI::from(well_known::rdfs_label()).into(),
-                IRI::new("http://field33.com/ontologies/@fld33/process/#Process")
-                    .unwrap()
-                    .into(),
+                well_known::rdfs_label(),
+                IRI::new("http://field33.com/ontologies/@fld33/process/#Process").unwrap(),
                 "Process".into()
             )
             .into()
@@ -572,13 +558,12 @@ mod tests {
 
         let o: Ontology = td.into();
 
-        println!("{:#?}", o);
-
         assert_eq!(
             o.iri.to_string(),
             "http://field33.com/ontologies/@fld33/process/"
         );
 
-        assert_eq!(o.declarations().len(), 7);
+        assert_eq!(o.declarations().len(), 0);
+        assert_eq!(o.axioms().len(), 21);
     }
 }

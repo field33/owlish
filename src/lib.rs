@@ -3,7 +3,7 @@
 //! # Examples
 //!
 //! ```rust
-//! use owlib::api::*;
+//! use owlish::api::*;
 //!
 //!
 //!

@@ -29,7 +29,7 @@ impl Ontology {
                 array.push(&value);
             }
         }
-        return array;
+        array
     }
 
     /// @returns ```js

@@ -1,4 +1,4 @@
-# owlib
+# owlish
 
 This library provides OWL2 datastructures that allow you to build and work with ontologies.
 
@@ -16,12 +16,12 @@ pub struct ClassAssertion(pub(crate) ClassConstructor, pub(crate) IndividualIRI)
 
 ## Usage
 
-owlib provides two APIs:
+owlish provides two APIs:
 
 1. A low level representation of OWL based on functional syntax
-   - This is exported in `owlib::owl::*`
+   - This is exported in `owlish::owl::*`
 2. A conceptional field33-specific api that concatenates OWL data for relevant types.
-   - This is exported in `owlib::api::*`
+   - This is exported in `owlish::api::*`
 
 ## Dev stuff
 

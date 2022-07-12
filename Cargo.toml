@@ -1,9 +1,11 @@
 [package]
-name = "owlib"
+name = "owlish"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "OWL 2 implementation with wasm support and turtle parsing"
+authors = ["Field33", "Florian Loers <florianloers@mailbox.org>"]
+readme = "README.md"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 iref = "2"

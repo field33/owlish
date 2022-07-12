@@ -1,6 +1,6 @@
 use serde_json::Value;
 
-use crate::owl::{Annotation, ObjectPropertyConstructor, ClassConstructor};
+use crate::owl::{Annotation, ClassConstructor, ObjectPropertyConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectHasValue(

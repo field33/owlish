@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use super::Individual;
 use crate::api::Class;
 use crate::owl::{
-    Axiom, ClassIRI, Declaration, IRIBuilder, IndividualIRI, ObjectPropertyAssertion, Regards, IRI,
+    Axiom, ClassIRI, Declaration, IRIBuilder, IndividualIRI, Regards, IRI,
 };
 use wasm_bindgen::prelude::*;
 

@@ -1,4 +1,4 @@
-use crate::owl::{Annotation, ClassConstructor, Regards, IRI, Axiom};
+use crate::owl::{Annotation, Axiom, ClassConstructor, Regards, IRI};
 
 /// Defines that the subject is a sub class of the object.
 ///

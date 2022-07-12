@@ -1,4 +1,4 @@
-use crate::owl::{ObjectPropertyConstructor, ClassIRI, Annotation, ClassConstructor};
+use crate::owl::{Annotation, ClassConstructor, ClassIRI, ObjectPropertyConstructor};
 
 /// Class construction based on properties.
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]

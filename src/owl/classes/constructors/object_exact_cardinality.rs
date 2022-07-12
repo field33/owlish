@@ -1,4 +1,4 @@
-use crate::owl::{ClassIRI, ObjectPropertyIRI, ClassConstructor};
+use crate::owl::{ClassConstructor, ClassIRI, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectExactCardinality(pub u64, pub ObjectPropertyIRI, pub Option<ClassIRI>);

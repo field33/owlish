@@ -1,8 +1,10 @@
-use owlib::examples::family;
-use owlib::owl::*;
+use owlish::examples::family;
+use owlish::owl::*;
 
 #[test]
 fn test() {
+    use serde_json::Value;
+
     let family = family();
     let iri = family.iri_builder();
 
@@ -36,7 +38,6 @@ fn test() {
     {
         let man = family.class(&iri.new("Man")).unwrap();
         assert_eq!(man.super_classes().len(), 1);
-        println!("{:?}", man.super_classes()[0]);
         assert_eq!(
             man.super_classes()[0]
                 .annotations()
@@ -71,7 +72,7 @@ fn test() {
         );
         let has_parent_complex_class: ClassConstructor = ObjectMaxCardinality(
             4,
-            iri.object_prop("hasChild").into(),
+            iri.object_prop("hasChild"),
             Some(iri.class("Parent")),
         )
         .into();

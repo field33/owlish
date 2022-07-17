@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.4.0 - 2022-07-17
+#### Features
+- Add proper WASM bindings - (9903344) - Florian Loers
+
+- - -
+
 ## v0.2.0 - 2022-07-12
 #### Continuous Integration
 - Fix release job versioning - (49a8f48) - Florian Loers

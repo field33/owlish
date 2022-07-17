@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use super::Individual;
 use crate::api::Class;
-use crate::owl::{
-    Axiom, ClassIRI, Declaration, IRIBuilder, IndividualIRI, Regards, IRI,
-};
-use wasm_bindgen::prelude::*;
+use crate::owl::{Axiom, ClassIRI, Declaration, IRIBuilder, IndividualIRI, Regards, IRI};
 
 /// The field33 representation of an ontology
 ///

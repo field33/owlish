@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::owl::{Axiom, ClassIRI, DatatypeIRI, Regards, IRI};
 
@@ -36,6 +37,14 @@ pub struct AnnotationAssertion(
     pub(crate) Value,
 );
 
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+/**
+ * [AnnotationProperty IRI, Subject IRI, value]
+ */
+export type AnnotationAssertion = [IRI, IRI, unknown];
+"#;
+
 impl AnnotationAssertion {
     pub fn iri(&self) -> &AnnotationPropertyIRI {
         &self.0
@@ -61,6 +70,11 @@ impl Regards for AnnotationAssertion {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct Annotation(pub AnnotationPropertyIRI, pub Value);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+export type Annotation = [IRI, unknown];
+"#;
 
 impl Annotation {
     pub fn iri(&self) -> &AnnotationPropertyIRI {

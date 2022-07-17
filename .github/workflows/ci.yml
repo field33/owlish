@@ -5,56 +5,80 @@ on: push
 env:
   CARGO_TERM_COLOR: always
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    name: check conventional commit compliance
-    steps:
-      - uses: actions/checkout@main
-        with:
-          fetch-depth: 0
-      - name: Conventional commits check
-        uses: oknozor/cocogitto-action@v2
-        with:
-          check-latest-tag-only: true
-      - name: setup
-        run: |
-          cargo install cargo-outdated
-      - name: clippy
-        run: cargo clippy --verbose
-      - name: outdated and audit
-        run: |
-          cargo outdated
-          cargo audit
-  build:
-    runs-on: ubuntu-latest
-    needs: check
-    steps:
-      - uses: actions/checkout@v2
-      - name: build
-        run: cargo build --verbose
-      - name: test
-        run: cargo test --verbose
+  # check:
+  #   runs-on: ubuntu-latest
+  #   name: Run prechecks
+  #   steps:
+  #     - uses: actions/checkout@main
+  #       with:
+  #         fetch-depth: 0
+  #     - name: Conventional commits check
+  #       uses: oknozor/cocogitto-action@v2
+  #       with:
+  #         check-latest-tag-only: true
+  #     - name: setup cargo tools
+  #       run: |
+  #         cargo install cargo-outdated
+  #     - name: clippy
+  #       run: cargo clippy
+  #     - name: outdated and audit
+  #       run: |
+  #         cargo outdated
+  #         cargo audit
+  # build:
+  #   runs-on: ubuntu-latest
+  #   needs: check
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: build
+  #       run: cargo build
+  #     - name: test
+  #       run: cargo test
+  #     - name: wasm test
+  #       run : |
+  #         curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+  #         wasm-pack --version
+  #         npm --version
+  #         wasm-pack build --target web
   release:
     runs-on: ubuntu-latest
-    needs: build
+    # needs: build
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Cocogitto release
+      - name: Release crate and npm package
         run: |
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+          wasm-pack --version
+          echo npm version:
+          npm --version
           cargo install cargo-bump
           mkdir -p .cog
           wget -O .cog/cocogitto.tar.gz https://github.com/cocogitto/cocogitto/releases/download/5.1.0/cocogitto-5.1.0-x86_64-unknown-linux-musl.tar.gz
           tar xvzf .cog/cocogitto.tar.gz --directory .cog/
           git config --global user.email "github@field33.com"
           git config --global user.name "github actions"
+          #
+          # bump version
           .cog/cog bump --auto
           rm -rf .cog
           TAG_VERSION=$(grep version Cargo.toml | head -1 | sed 's/version = "//g' | sed 's/"//g')
-          git remote set-url --push origin https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/field33/owlib
+          git remote set-url --push origin https://${{ secrets.USERNAME }}:${{ secrets.PAT }}@github.com/field33/owlish
           git push
           git tag -d v$TAG_VERSION
           git tag v$TAG_VERSION
           git push origin v$TAG_VERSION
+          #
+          # publish crate
+          cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
+          #
+          # Release npm package
+          wasm-pack build --target web --release
+          ./extend_wasm_pkg.sh
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > pkg/.npmrc
+          cd pkg && npm publish --access public
+
+          
+

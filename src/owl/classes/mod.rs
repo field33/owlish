@@ -5,6 +5,7 @@ use crate::owl::{DataSomeValuesFrom, Regards, IRI};
 mod constructors;
 pub use constructors::*;
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct ClassIRI(IRI);
@@ -46,6 +47,49 @@ pub enum ClassConstructor {
     ObjectHasValue(ObjectHasValue),
     ObjectHasSelf(ObjectHasSelf),
 }
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+export interface ClassConstructor {
+    IRI?: IRI
+    SubClassOf?: SubClassOf
+    DataSomeValuesFrom?: DataSomeValuesFrom
+    EquivalentClasses?: EquivalentClasses
+    DisjointClasses?: DisjointClasses
+    ObjectComplementOf?: ObjectComplementOf
+    ObjectIntersectionOf?: ObjectIntersectionOf
+    ObjectUnionOf?: ObjectUnionOf
+    ObjectSomeValuesFrom?: ObjectSomeValuesFrom
+    ObjectMaxCardinality?: ObjectMaxCardinality
+    ObjectMinCardinality?: ObjectMinCardinality
+    ObjectExactCardinality?: ObjectExactCardinality
+    ObjectAllValuesFrom?: ObjectAllValuesFrom
+    ObjectOneOf?: ObjectOneOf
+    ObjectHasValue?: ObjectHasValue
+    ObjectHasSelf?: ObjectHasSelf
+}
+
+interface ClassConstructorMatcher<R> {
+    IRI?: (c: IRI) => R
+    SubClassOf?: (c: SubClassOf) => R
+    DataSomeValuesFrom?: (c: DataSomeValuesFrom) => R
+    EquivalentClasses?: (c: EquivalentClasses) => R
+    DisjointClasses?: (c: DisjointClasses) => R
+    ObjectComplementOf?: (c: ObjectComplementOf) => R
+    ObjectIntersectionOf?: (c: ObjectIntersectionOf) => R
+    ObjectUnionOf?: (c: ObjectUnionOf) => R
+    ObjectSomeValuesFrom?: (c: ObjectSomeValuesFrom) => R
+    ObjectMaxCardinality?: (c: ObjectMaxCardinality) => R
+    ObjectMinCardinality?: (c: ObjectMinCardinality) => R
+    ObjectExactCardinality?: (c: ObjectExactCardinality) => R
+    ObjectAllValuesFrom?: (c: ObjectAllValuesFrom) => R
+    ObjectOneOf?: (c: ObjectOneOf) => R
+    ObjectHasValue?: (c: ObjectHasValue) => R
+    ObjectHasSelf?: (c: ObjectHasSelf) => R
+}
+
+export function matchClassConst<R>(classConstructor: ClassConstructor, matcher: ClassConstructorMatcher<R>): R
+"#;
 
 impl From<ClassIRI> for Box<ClassConstructor> {
     fn from(iri: ClassIRI) -> Self {
@@ -119,9 +163,9 @@ mod tests {
 
         let json = serde_json::to_string(&iri).unwrap();
 
-        assert_eq!(json, r#""https://test.org#asdf""#);
+        assert_eq!(json, r#"{"_type":"IRI","string":"https://test.org#asdf"}"#);
 
-        let json = r#""https://test.org#asdf""#;
+        let json = r#"{"_type":"IRI","string":"https://test.org#asdf"}"#;
         let iri1: ClassIRI = serde_json::from_str(json).unwrap();
 
         assert_eq!(iri1, iri)

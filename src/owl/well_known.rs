@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::owl::{AnnotationPropertyIRI, ClassIRI, DatatypeIRI, IRI};
 
 // Datatypes
@@ -109,3 +111,28 @@ pub fn owl_ObjectProperty() -> ClassIRI {
         .unwrap()
         .into()
 }
+
+// wasm api
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+/**
+ * All well known OWL-2 relevant IRIs.
+ */
+export const well_known: {
+    xsd_integer: IRI,
+    xsd_nonNegativeInteger: IRI,
+    xsd_minExclusive: IRI,
+    xsd_minInclusive: IRI,
+    xsd_maxInclusive: IRI,
+    xsd_maxExclusive: IRI,
+    rdfs_comment: IRI,
+    rdfs_label: IRI,
+    rdf_type: IRI,
+    owl_Ontology: IRI,
+    owl_Thing: IRI,
+    owl_Class: IRI,
+    owl_AsymmetricProperty: IRI,
+    owl_SymmetricProperty: IRI,
+    owl_ObjectProperty: IRI,
+}
+"#;

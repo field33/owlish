@@ -70,12 +70,8 @@ fn test() {
             "Expect to contain 'Father' but was: {:?}",
             john.classes()
         );
-        let has_parent_complex_class: ClassConstructor = ObjectMaxCardinality(
-            4,
-            iri.object_prop("hasChild"),
-            Some(iri.class("Parent")),
-        )
-        .into();
+        let has_parent_complex_class: ClassConstructor =
+            ObjectMaxCardinality(4, iri.object_prop("hasChild"), Some(iri.class("Parent"))).into();
         assert!(
             john.classes().contains(&&has_parent_complex_class),
             "Expect to contain {:?} but was: {:?}",

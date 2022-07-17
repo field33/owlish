@@ -1,7 +1,14 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::owl::{DataPropertyIRI, DatatypeRestriction, Regards};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataSomeValuesFrom(pub DataPropertyIRI, pub DatatypeRestriction);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+export type DataSomeValuesFrom = [IRI, DatatypeRestriction];
+"#;
 
 impl DataSomeValuesFrom {
     pub fn data_property_iri(&self) -> &DataPropertyIRI {

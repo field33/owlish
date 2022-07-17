@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::owl::{Axiom, ClassIRI, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -8,3 +10,11 @@ impl From<ObjectPropertyRange> for Axiom {
         Axiom::ObjectPropertyRange(opr)
     }
 }
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+/**
+ * [ObjectProperty IRI, Class IRI]
+ */
+export type ObjectPropertyRange = [IRI, IRI];
+"#;

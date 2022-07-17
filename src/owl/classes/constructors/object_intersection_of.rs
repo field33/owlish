@@ -1,7 +1,14 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::owl::{Annotation, ClassConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectIntersectionOf(pub(crate) Vec<ClassConstructor>, pub(crate) Vec<Annotation>);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+export type ObjectIntersectionOf = [Array<ClassConstructor>, Array<Annotation>];
+"#;
 
 impl From<ObjectIntersectionOf> for Box<ClassConstructor> {
     fn from(c: ObjectIntersectionOf) -> Self {

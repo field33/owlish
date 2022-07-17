@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::owl::{ObjectPropertyConstructor, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -8,3 +10,8 @@ impl From<ObjectInverseOf> for ObjectPropertyConstructor {
         Self::ObjectInverseOf(c)
     }
 }
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+export type ObjectInverseOf = IRI
+"#;

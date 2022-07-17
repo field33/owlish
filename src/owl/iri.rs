@@ -1,7 +1,8 @@
 use std::{borrow::Cow, collections::HashMap, fmt::Display, str::FromStr};
 
-use serde::{de::Visitor, Deserialize, Serialize};
+use serde::{de::Visitor, ser::SerializeMap, Deserialize, Serialize};
 use serde_json::Value;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use super::{ClassIRI, ObjectPropertyIRI};
 
@@ -22,26 +23,58 @@ impl<'de> Deserialize<'de> for IRI {
             type Value = IRI;
 
             fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                formatter.write_str("string")
+                formatter.write_str(r#"an object {_type: "IRI", value: <the iri string> }"#)
             }
 
-            fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
             where
-                E: serde::de::Error,
+                A: serde::de::MapAccess<'de>,
             {
-                IRI::new(value).map_err(|_e| E::custom("Invalid IRI"))
+                let key1: Option<&str> = map.next_key()?;
+                let value1: Option<&str> = map.next_value()?;
+                let key2: Option<&str> = map.next_key()?;
+                let value2: Option<&str> = map.next_value()?;
+                
+                if let (Some("string"), Some(iri)) = (key1, value1) {
+                    IRI::try_from(iri).map_err(|_| {
+                        serde::de::Error::custom(format!("Could not parse IRI {}", iri))
+                    })
+                } else if let (Some("string"), Some(iri)) = (key2, value2) {
+                    IRI::try_from(iri).map_err(|_| {
+                        serde::de::Error::custom(format!("Could not parse IRI {}", iri))
+                    })
+                } else {
+                    Err(serde::de::Error::custom(
+                        "Could not parse IRI: Missing 'value' field.",
+                    ))
+                }
             }
         }
-        deserializer.deserialize_str(IRIVisitor)
+        deserializer.deserialize_map(IRIVisitor)
     }
 }
+
+#[wasm_bindgen(typescript_custom_section)]
+const ONTOLOGY_TS_API: &'static str = r#"
+export interface IRI {
+    _type: "IRI",
+    string: string
+}
+
+export function Iri(iri: string): IRI
+"#;
 
 impl Serialize for IRI {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(self.0.as_str())
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_key("_type")?;
+        map.serialize_value("IRI")?;
+        map.serialize_key("string")?;
+        map.serialize_value(self.0.as_str())?;
+        map.end()
     }
 }
 
@@ -208,9 +241,9 @@ mod tests {
 
         let json = serde_json::to_string(&iri).unwrap();
 
-        assert_eq!(json, r#""https://test.org#asdf""#);
+        assert_eq!(json, r#"{"_type":"IRI","string":"https://test.org#asdf"}"#);
 
-        let json = r#""https://test.org#asdf""#;
+        let json = r#"{"_type":"IRI","string":"https://test.org#asdf"}"#;
         let iri1: IRI = serde_json::from_str(json).unwrap();
 
         assert_eq!(iri1, iri)

@@ -7,6 +7,9 @@ authors = ["Field33", "Florian Loers <florianloers@mailbox.org>"]
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 iref = "2"
 serde = { version = "1", features = ["derive"] }

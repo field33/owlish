@@ -4,6 +4,7 @@ mod constructors;
 pub use constructors::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct DatatypeIRI(pub IRI);
@@ -34,5 +35,22 @@ impl DataPropertyIRI {
 }
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataPropertyAssertion(pub DataPropertyIRI, pub IndividualIRI, pub Value);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+/**
+ * [DataProperty IRI, Individual IRI, Value]
+ */
+export type DataPropertyAssertion = [IRI, IRI, unknown]
+"#;
+
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct NegativeDataPropertyAssertion(pub DataPropertyIRI, pub IndividualIRI, pub Value);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+/**
+ * [DataProperty IRI, Individual IRI, Value]
+ */
+export type NegativeDataPropertyAssertion = [IRI, IRI, unknown]
+"#;

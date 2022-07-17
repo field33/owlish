@@ -1,11 +1,37 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::owl::{Axiom, ClassConstructor, IndividualIRI, Regards};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct SameIndividual(pub IndividualIRI, pub IndividualIRI);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+/**
+ * [Individual IRI, Individual IRI]
+ */
+export type SameIndividual = [IRI, IRI]
+"#;
+
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DifferentIndividuals(pub IndividualIRI, pub IndividualIRI);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+/**
+ * [Individual IRI, Individual IRI]
+ */
+export type DifferentIndividuals = [IRI, IRI]
+"#;
+
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ClassAssertion(pub ClassConstructor, pub IndividualIRI);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+export type ClassAssertion = [ClassConstructor, IRI]
+"#;
+
 impl ClassAssertion {
     pub fn class_constructor(&self) -> &ClassConstructor {
         &self.0

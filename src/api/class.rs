@@ -1,8 +1,7 @@
 use crate::owl::{
-    well_known, AnnotationAssertion, Axiom, ClassIRI, DataPropertyDomain, ObjectPropertyDomain,
+    AnnotationAssertion, Axiom, ClassIRI, DataPropertyDomain, ObjectPropertyDomain,
     ObjectPropertyRange, SubClassOf,
 };
-use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
 pub struct Class<'a> {
@@ -72,39 +71,39 @@ impl<'a> Class<'a> {
             .collect()
     }
 
-    pub fn to_owned_class(&self) -> OwnedClass {
-        OwnedClass {
-            iri: self.iri.clone(),
-            axioms: self.axioms.iter().map(|a| (*a).clone()).collect(),
-        }
-    }
+    // pub fn to_owned_class(&self) -> OwnedClass {
+    //     OwnedClass {
+    //         iri: self.iri.clone(),
+    //         axioms: self.axioms.iter().map(|a| (*a).clone()).collect(),
+    //     }
+    // }
 }
 
-#[derive(Debug)]
-#[wasm_bindgen]
-pub struct OwnedClass {
-    iri: ClassIRI,
-    axioms: Vec<Axiom>,
-}
+// #[derive(Debug)]
+// #[wasm_bindgen]
+// pub struct OwnedClass {
+//     iri: ClassIRI,
+//     axioms: Vec<Axiom>,
+// }
 
-#[wasm_bindgen]
-impl OwnedClass {
-    #[wasm_bindgen(getter)]
-    pub fn iri(&self) -> String {
-        self.iri.to_string()
-    }
+// #[wasm_bindgen]
+// impl OwnedClass {
+//     #[wasm_bindgen(getter)]
+//     pub fn iri(&self) -> String {
+//         self.iri.to_string()
+//     }
 
-    #[wasm_bindgen(getter)]
-    pub fn label(&self) -> Option<String> {
-        self.axioms.iter().find_map(|a| match a {
-            Axiom::AnnotationAssertion(an) => {
-                if well_known::rdfs_label() == an.0 {
-                    an.2.as_str().map(|s| s.to_string())
-                } else {
-                    None
-                }
-            }
-            _ => None,
-        })
-    }
-}
+//     #[wasm_bindgen(getter)]
+//     pub fn label(&self) -> Option<String> {
+//         self.axioms.iter().find_map(|a| match a {
+//             Axiom::AnnotationAssertion(an) => {
+//                 if well_known::rdfs_label() == an.0 {
+//                     an.2.as_str().map(|s| s.to_string())
+//                 } else {
+//                     None
+//                 }
+//             }
+//             _ => None,
+//         })
+//     }
+// }

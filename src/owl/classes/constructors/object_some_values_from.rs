@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::owl::{Annotation, ClassConstructor, ClassIRI, ObjectPropertyConstructor};
 
 /// Class construction based on properties.
@@ -7,6 +9,12 @@ pub struct ObjectSomeValuesFrom(
     pub ClassIRI,
     pub Vec<Annotation>,
 );
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+export type ObjectSomeValuesFrom = [ObjectPropertyConstructor, IRI, Array<Annotation>];
+"#;
+
 impl From<ObjectSomeValuesFrom> for ClassConstructor {
     fn from(c: ObjectSomeValuesFrom) -> Self {
         ClassConstructor::ObjectSomeValuesFrom(c)

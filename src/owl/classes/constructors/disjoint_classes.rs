@@ -1,7 +1,17 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::owl::{Annotation, ClassConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DisjointClasses(pub(crate) Vec<ClassConstructor>, pub(crate) Vec<Annotation>);
+
+#[wasm_bindgen(typescript_custom_section)]
+const WASM_API: &'static str = r#"
+/**
+ * [Array<ClassConstructor>, annotations]
+ */
+export type DisjointClasses = [Array<ClassConstructor>, Array<Annotation>];
+"#;
 
 impl From<DisjointClasses> for ClassConstructor {
     fn from(c: DisjointClasses) -> Self {

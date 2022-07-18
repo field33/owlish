@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.4.2 - 2022-07-18
+#### Bug Fixes
+- **(parser)** Ignore blank nodes instead of failing - (30ca15b) - Florian Loers
+
+- - -
+
 ## v0.4.1 - 2022-07-18
 #### Bug Fixes
 - Allow conditional wasm compilation - (6d4c7ec) - Florian Loers

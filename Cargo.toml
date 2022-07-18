@@ -1,6 +1,6 @@
 [package]
 name = "owlish"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 description = "OWL 2 implementation with wasm support and turtle parsing"
 authors = ["Field33", "Florian Loers <florianloers@mailbox.org>"]

@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.4.1 - 2022-07-18
+#### Bug Fixes
+- Allow conditional wasm compilation - (6d4c7ec) - Florian Loers
+#### Continuous Integration
+- Reintroduce precheck and test steps - (84977f6) - Florian Loers
+
+- - -
+
 ## v0.4.0 - 2022-07-17
 #### Features
 - Add proper WASM bindings - (9903344) - Florian Loers

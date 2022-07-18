@@ -185,7 +185,9 @@ fn parse_rdfs_range(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<ha
                 .into(),
             ),
             harriet::Object::Collection(_) => todo!(),
-            harriet::Object::BlankNodePropertyList(_) => todo!(),
+            harriet::Object::BlankNodePropertyList(_) => {
+                // TODO: implement
+            },
             harriet::Object::Literal(_) => todo!(),
         }
     }
@@ -291,7 +293,9 @@ fn parse_rdfs_sub_class_of(
                 }
             }
             harriet::Object::Collection(_) => todo!(),
-            harriet::Object::BlankNodePropertyList(_) => todo!(),
+            harriet::Object::BlankNodePropertyList(_) => {
+                // TODO: implement
+            },
             harriet::Object::Literal(_) => todo!(),
         }
     }

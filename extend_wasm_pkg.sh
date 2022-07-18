@@ -1,12 +1,6 @@
 #!/bin/sh
-# sed -i 's/declaration(): Array<any>;/declaration(): Array<Declaration>;/g' pkg/owlish.d.ts
-# sed -i 's/axioms(): Array<any>;/axioms(): Array<Axiom>;/g' pkg/owlish.d.ts
-
-# read -r '' MULTI_LINE_VAR << EOM
-
-
-
-# "
+sed -i 's/declarations(): Array<any>;/declarations(): Array<Declaration>;/g' pkg/owlish.d.ts
+sed -i 's/axioms(): Array<any>;/axioms(): Array<Axiom>;/g' pkg/owlish.d.ts
 
 API="
 // CUSTOM API FROM extend_wasm_pkg.sh
@@ -64,5 +58,4 @@ export function Iri(iri) {
     }
 }
 "
-# echo "$API"
 echo "$API" >> ./pkg/owlish.js

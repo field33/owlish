@@ -1,5 +1,3 @@
-use wasm_bindgen::prelude::wasm_bindgen;
-
 use crate::owl::{ClassIRI, DataPropertyIRI, Regards, IRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -20,10 +18,14 @@ impl Regards for DataPropertyDomain {
     }
 }
 
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API: &'static str = r#"
 /**
  * [DataProperty IRI, Class IRI]
  */
 export type DataPropertyDomain = [IRI, IRI];
 "#;
+}

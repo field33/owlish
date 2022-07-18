@@ -1,14 +1,7 @@
-use wasm_bindgen::prelude::wasm_bindgen;
-
 use crate::owl::{Annotation, ClassConstructor, ObjectPropertyConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectHasSelf(pub ObjectPropertyConstructor, pub Vec<Annotation>);
-
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
-export type ObjectHasSelf = [ObjectPropertyConstructor, Array<Annotation>];
-"#;
 
 impl From<ObjectHasSelf> for Box<ClassConstructor> {
     fn from(c: ObjectHasSelf) -> Self {
@@ -28,4 +21,13 @@ impl ClassConstructor {
             _ => None,
         }
     }
+}
+
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API: &'static str = r#"
+export type ObjectHasSelf = [ObjectPropertyConstructor, Array<Annotation>];
+"#;
 }

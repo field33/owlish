@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::owl::{Axiom, IndividualIRI, ObjectPropertyConstructor, IRI};
 
@@ -25,14 +24,6 @@ impl ObjectPropertyIRI {
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectPropertyAssertion(pub ObjectPropertyIRI, pub IndividualIRI, pub IndividualIRI);
 
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
-/**
- * [ObjectProperty IRI, Individual IRI, Individual IRI]
- */
-export type ObjectPropertyAssertion = [IRI, IRI, IRI]
-"#;
-
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct NegativeObjectPropertyAssertion(
     pub ObjectPropertyIRI,
@@ -40,16 +31,29 @@ pub struct NegativeObjectPropertyAssertion(
     pub IndividualIRI,
 );
 
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
+impl From<ObjectPropertyAssertion> for Axiom {
+    fn from(opa: ObjectPropertyAssertion) -> Self {
+        Self::ObjectPropertyAssertion(opa)
+    }
+}
+
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API1: &'static str = r#"
+/**
+ * [ObjectProperty IRI, Individual IRI, Individual IRI]
+ */
+export type ObjectPropertyAssertion = [IRI, IRI, IRI]
+"#;
+
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API2: &'static str = r#"
 /**
  * [ObjectProperty IRI, Individual IRI, Individual IRI]
  */
 export type NegativeObjectPropertyAssertion = [IRI, IRI, IRI]
 "#;
-
-impl From<ObjectPropertyAssertion> for Axiom {
-    fn from(opa: ObjectPropertyAssertion) -> Self {
-        Self::ObjectPropertyAssertion(opa)
-    }
 }

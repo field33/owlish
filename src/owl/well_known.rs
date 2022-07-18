@@ -1,5 +1,3 @@
-use wasm_bindgen::prelude::wasm_bindgen;
-
 use crate::owl::{AnnotationPropertyIRI, ClassIRI, DatatypeIRI, IRI};
 
 // Datatypes
@@ -112,9 +110,12 @@ pub fn owl_ObjectProperty() -> ClassIRI {
         .into()
 }
 
-// wasm api
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API: &'static str = r#"
 /**
  * All well known OWL-2 relevant IRIs.
  */
@@ -136,3 +137,4 @@ export const well_known: {
     owl_ObjectProperty: IRI,
 }
 "#;
+}

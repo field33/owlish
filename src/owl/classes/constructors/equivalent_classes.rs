@@ -1,5 +1,3 @@
-use wasm_bindgen::prelude::wasm_bindgen;
-
 use crate::owl::{Annotation, ClassConstructor, ClassIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -8,14 +6,6 @@ pub struct EquivalentClasses(
     pub(crate) Box<ClassConstructor>,
     pub(crate) Vec<Annotation>,
 );
-
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
-/**
- * [Class IRI, ClassConstructor, annotations]
- */
-export type EquivalentClasses = [IRI, ClassConstructor, Array<Annotation>];
-"#;
 
 impl From<EquivalentClasses> for Box<ClassConstructor> {
     fn from(c: EquivalentClasses) -> Self {
@@ -35,4 +25,17 @@ impl ClassConstructor {
             _ => None,
         }
     }
+}
+
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API: &'static str = r#"
+/**
+ * [Class IRI, ClassConstructor, annotations]
+ */
+export type EquivalentClasses = [IRI, ClassConstructor, Array<Annotation>];
+"#;
 }

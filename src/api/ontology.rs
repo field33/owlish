@@ -1,21 +1,19 @@
 use std::collections::HashMap;
 
-use wasm_bindgen::prelude::wasm_bindgen;
-
 use super::Individual;
 use crate::api::Class;
 use crate::owl::{Axiom, ClassIRI, Declaration, IRIBuilder, IndividualIRI, Regards, IRI};
 
-/// The field33 representation of an ontology
-///
-/// This is a concatenation of multiple concepts used by field33 to represent wisdom:
-/// - An OWL2 ontology that may contain
-///   - Classes
-///   - Individuals
-///   - Annotation(Properties)
-///   - DataProperties
-///   - ObjectProperties
-#[wasm_bindgen]
+#[cfg(feature = "wasm")]
+#[wasm_bindgen::prelude::wasm_bindgen]
+#[derive(Debug)]
+pub struct Ontology {
+    pub(crate) iri: IRI,
+    pub(crate) imports: HashMap<String, IRI>,
+    pub(crate) owl: crate::owl::Ontology,
+}
+
+#[cfg(not(feature = "wasm"))]
 #[derive(Debug)]
 pub struct Ontology {
     pub(crate) iri: IRI,

@@ -20,8 +20,8 @@ owlish provides two APIs:
 
 1. A low level representation of OWL based on functional syntax
    - This is exported in `owlish::owl::*`
-2. A conceptional field33-specific api that concatenates OWL data for relevant types.
-   - This is exported in `owlish::api::*`
+2. A conceptional api that concatenates OWL data for relevant types.
+   - TBD
 
 ## Dev stuff
 

@@ -15,7 +15,7 @@ impl Ontology {
         JsValue::from_serde(&self.iri).unwrap().into()
     }
 
-    #[wasm_bindgen(js_name = "declaration")]
+    #[wasm_bindgen(js_name = "declarations")]
     pub fn wasm_declarations(&self) -> Array {
         let array = Array::new();
         for d in self.declarations() {

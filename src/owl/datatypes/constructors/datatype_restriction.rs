@@ -1,27 +1,14 @@
-use serde_json::Value;
-use wasm_bindgen::prelude::wasm_bindgen;
-
-use crate::owl::{DatatypeIRI, Regards};
-
 use super::DatatypeDefinitionConstructor;
+use crate::owl::{DatatypeIRI, Regards};
+use serde_json::Value;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Restriction {
     Numeric(DatatypeIRI, Value),
 }
 
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
-export type Restriction = { Numeric: [IRI, number] };
-"#;
-
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DatatypeRestriction(pub(crate) DatatypeIRI, pub(crate) Vec<Restriction>);
-
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
-export type DatatypeRestriction = [IRI, Array<Restriction>];
-"#;
 
 impl From<DatatypeRestriction> for Box<DatatypeDefinitionConstructor> {
     fn from(c: DatatypeRestriction) -> Self {
@@ -50,4 +37,19 @@ impl Regards for DatatypeRestriction {
                 Restriction::Numeric(d, _) => d.as_iri() == iri,
             })
     }
+}
+
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API1: &'static str = r#"
+export type Restriction = { Numeric: [IRI, number] };
+"#;
+
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API2: &'static str = r#"
+export type DatatypeRestriction = [IRI, Array<Restriction>];
+"#;
 }

@@ -1,5 +1,3 @@
-use wasm_bindgen::prelude::wasm_bindgen;
-
 use crate::owl::{Annotation, Axiom, ClassConstructor, Regards, IRI};
 
 /// Defines that the subject is a sub class of the object.
@@ -13,14 +11,6 @@ pub struct SubClassOf(
     pub Box<ClassConstructor>,
     pub Vec<Annotation>,
 );
-
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
-/**
- * [ClassConstructor, ClassConstructor, Array<Annotation>]
- */
-export type SubClassOf = [ClassConstructor, ClassConstructor, Array<Annotation>];
-"#;
 
 impl SubClassOf {
     pub fn subject(&self) -> &ClassConstructor {
@@ -69,4 +59,16 @@ impl From<SubClassOf> for Axiom {
     fn from(sco: SubClassOf) -> Self {
         Axiom::SubClassOf(sco)
     }
+}
+
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API: &'static str = r#"
+/**
+ * [ClassConstructor, ClassConstructor, Array<Annotation>]
+ */
+export type SubClassOf = [ClassConstructor, ClassConstructor, Array<Annotation>];
+"#;
 }

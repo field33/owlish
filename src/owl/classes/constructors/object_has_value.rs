@@ -1,5 +1,4 @@
 use serde_json::Value;
-use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::owl::{Annotation, ClassConstructor, ObjectPropertyConstructor};
 
@@ -9,11 +8,6 @@ pub struct ObjectHasValue(
     pub Value,
     pub Vec<Annotation>,
 );
-
-#[wasm_bindgen(typescript_custom_section)]
-const WASM_API: &'static str = r#"
-export type ObjectHasValue = [ObjectPropertyConstructor, unknown, Array<Annotation>];
-"#;
 
 impl From<ObjectHasValue> for Box<ClassConstructor> {
     fn from(c: ObjectHasValue) -> Self {
@@ -33,4 +27,13 @@ impl ClassConstructor {
             _ => None,
         }
     }
+}
+
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+    #[wasm_bindgen(typescript_custom_section)]
+    const WASM_API: &'static str = r#"
+export type ObjectHasValue = [ObjectPropertyConstructor, unknown, Array<Annotation>];
+"#;
 }

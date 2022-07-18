@@ -1,10 +1,8 @@
 use std::{borrow::Cow, collections::HashMap, fmt::Display, str::FromStr};
 
+use super::{ClassIRI, ObjectPropertyIRI};
 use serde::{de::Visitor, ser::SerializeMap, Deserialize, Serialize};
 use serde_json::Value;
-use wasm_bindgen::prelude::wasm_bindgen;
-
-use super::{ClassIRI, ObjectPropertyIRI};
 
 pub fn iri<T: From<IRI>>(iri: &str) -> T {
     IRI::new(iri).unwrap().into()
@@ -34,7 +32,7 @@ impl<'de> Deserialize<'de> for IRI {
                 let value1: Option<&str> = map.next_value()?;
                 let key2: Option<&str> = map.next_key()?;
                 let value2: Option<&str> = map.next_value()?;
-                
+
                 if let (Some("string"), Some(iri)) = (key1, value1) {
                     IRI::try_from(iri).map_err(|_| {
                         serde::de::Error::custom(format!("Could not parse IRI {}", iri))
@@ -53,16 +51,6 @@ impl<'de> Deserialize<'de> for IRI {
         deserializer.deserialize_map(IRIVisitor)
     }
 }
-
-#[wasm_bindgen(typescript_custom_section)]
-const ONTOLOGY_TS_API: &'static str = r#"
-export interface IRI {
-    _type: "IRI",
-    string: string
-}
-
-export function Iri(iri: string): IRI
-"#;
 
 impl Serialize for IRI {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -231,6 +219,21 @@ impl From<IRI> for Value {
         Value::from(s.as_str())
     }
 }
+
+#[cfg(feature = "wasm")]
+mod wasm {
+    use wasm_bindgen::prelude::wasm_bindgen;
+    #[wasm_bindgen(typescript_custom_section)]
+    const ONTOLOGY_TS_API: &'static str = r#"
+export interface IRI {
+    _type: "IRI",
+    string: string
+}
+
+export function Iri(iri: string): IRI
+"#;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

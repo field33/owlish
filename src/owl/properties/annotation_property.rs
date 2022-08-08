@@ -24,17 +24,13 @@ impl Display for AnnotationPropertyIRI {
 }
 
 #[derive(Debug)]
-pub struct AnnotationPropertyDomain(pub(crate) AnnotationPropertyIRI, pub(crate) ClassIRI);
+pub struct AnnotationPropertyDomain(pub AnnotationPropertyIRI, pub ClassIRI);
 
 #[derive(Debug)]
-pub struct AnnotationPropertyRange(pub(crate) AnnotationPropertyIRI, pub(crate) DatatypeIRI);
+pub struct AnnotationPropertyRange(pub AnnotationPropertyIRI, pub DatatypeIRI);
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
-pub struct AnnotationAssertion(
-    pub(crate) AnnotationPropertyIRI,
-    pub(crate) IRI,
-    pub(crate) Value,
-);
+pub struct AnnotationAssertion(pub AnnotationPropertyIRI, pub IRI, pub Value);
 
 impl AnnotationAssertion {
     pub fn iri(&self) -> &AnnotationPropertyIRI {

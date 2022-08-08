@@ -11,6 +11,7 @@
 
 pub mod api;
 pub mod owl;
+pub mod error;
 
 pub mod examples;
 pub mod parser;

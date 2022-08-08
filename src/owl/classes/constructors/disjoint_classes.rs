@@ -1,7 +1,7 @@
 use crate::owl::{Annotation, ClassConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DisjointClasses(pub(crate) Vec<ClassConstructor>, pub(crate) Vec<Annotation>);
+pub struct DisjointClasses(pub Vec<ClassConstructor>, pub Vec<Annotation>);
 
 impl From<DisjointClasses> for ClassConstructor {
     fn from(c: DisjointClasses) -> Self {

@@ -8,7 +8,7 @@ pub enum Restriction {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DatatypeRestriction(pub(crate) DatatypeIRI, pub(crate) Vec<Restriction>);
+pub struct DatatypeRestriction(pub DatatypeIRI, pub Vec<Restriction>);
 
 impl From<DatatypeRestriction> for Box<DatatypeDefinitionConstructor> {
     fn from(c: DatatypeRestriction) -> Self {

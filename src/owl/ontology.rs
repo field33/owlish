@@ -1,7 +1,7 @@
 use crate::owl::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum Declaration {
     Class(ClassIRI),
     NamedIndividual(IndividualIRI),

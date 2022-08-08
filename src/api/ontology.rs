@@ -31,6 +31,10 @@ impl Ontology {
         }
     }
 
+    pub fn imports(&self) -> &HashMap<String, IRI> {
+        &self.imports
+    }
+
     pub fn set_owl(&mut self, owl: crate::owl::Ontology) {
         self.owl = owl
     }

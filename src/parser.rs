@@ -62,8 +62,9 @@ impl<'a> Parse<'a> for harriet::Directive<'a> {
     fn parse(&'a self, ontology: &mut Ontology) {
         match self {
             harriet::Directive::Base(base) => {
-                // todo: do not panic
-                ontology.iri = IRI::new(&base.iri.iri).unwrap()
+                if let Ok(iri) = IRI::new(&base.iri.iri) {
+                    ontology.iri = iri
+                }
             }
             harriet::Directive::Prefix(prefix) => {
                 //
@@ -152,8 +153,33 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                                     harriet::Object::BlankNodePropertyList(_) => {
                                                         todo!()
                                                     }
-                                                    harriet::Object::Literal(_l) => {
-                                                        // TODO: ignored
+                                                    harriet::Object::Literal(literal) => {
+                                                        match literal {
+                                                            harriet::Literal::RDFLiteral(
+                                                                rdf_lit,
+                                                            ) => ontology.owl.axioms.push(
+                                                                AnnotationAssertion(
+                                                                    prop_iri.clone().into(),
+                                                                    subject_iri.clone().into(),
+                                                                    rdf_lit
+                                                                        .string
+                                                                        .to_string()
+                                                                        .into(),
+                                                                )
+                                                                .into(),
+                                                            ),
+                                                            harriet::Literal::BooleanLiteral(b) => {
+                                                                ontology.owl.axioms.push(
+                                                                    AnnotationAssertion(
+                                                                        prop_iri.clone().into(),
+                                                                        subject_iri.clone().into(),
+                                                                        b.bool.into(),
+                                                                    )
+                                                                    .into(),
+                                                                )
+                                                            }
+                                                        }
+                                                        // println!("literal {:?} {:?}", prefix, name);
                                                     }
                                                 }
                                             }
@@ -185,9 +211,11 @@ fn parse_rdfs_range(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<ha
                 .into(),
             ),
             harriet::Object::Collection(_) => todo!(),
-            harriet::Object::BlankNodePropertyList(_) => {
-                // TODO: implement
-            },
+            harriet::Object::BlankNodePropertyList(bn) => {
+                for (prop_iri, object_list) in &bn.list.list {
+                    println!("{:?} {:?}", prop_iri, object_list)
+                }
+            }
             harriet::Object::Literal(_) => todo!(),
         }
     }
@@ -294,8 +322,8 @@ fn parse_rdfs_sub_class_of(
             }
             harriet::Object::Collection(_) => todo!(),
             harriet::Object::BlankNodePropertyList(_) => {
-                // TODO: implement
-            },
+                todo!()
+            }
             harriet::Object::Literal(_) => todo!(),
         }
     }
@@ -379,7 +407,7 @@ mod tests {
         );
 
         assert_eq!(o.classes().len(), 3);
-        assert_eq!(o.axioms().len(), 14);
+        assert_eq!(o.axioms().len(), 15);
     }
 
     #[test]
@@ -451,7 +479,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[1],
+            o.axioms()[14],
             ObjectPropertyAssertion(
                 o.iri_builder().from("meta", "hasNodeShape").unwrap(),
                 IRI::new("http://field33.com/ontologies/@fld33/process/")
@@ -464,7 +492,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[2],
+            o.axioms()[15],
             AnnotationAssertion(
                 well_known::rdfs_label(),
                 IRI::new("http://field33.com/ontologies/@fld33/process/").unwrap(),
@@ -473,7 +501,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[3],
+            o.axioms()[16],
             AnnotationAssertion(
                 well_known::rdfs_label(),
                 IRI::new("http://field33.com/ontologies/@fld33/process/#Activity").unwrap(),
@@ -482,7 +510,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[4],
+            o.axioms()[17],
             AnnotationAssertion(
                 well_known::rdfs_label(),
                 IRI::new("http://field33.com/ontologies/@fld33/process/#Process").unwrap(),
@@ -491,7 +519,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[5],
+            o.axioms()[18],
             ObjectPropertyDomain(
                 IRI::new("http://field33.com/ontologies/@fld33/process/#seriesOf")
                     .unwrap()
@@ -502,7 +530,7 @@ mod tests {
             )
             .into()
         );
-        assert_eq!(o.axioms().len(), 11);
+        assert_eq!(o.axioms().len(), 24);
     }
 
     #[test]
@@ -568,6 +596,6 @@ mod tests {
         );
 
         assert_eq!(o.declarations().len(), 0);
-        assert_eq!(o.axioms().len(), 21);
+        assert_eq!(o.axioms().len(), 34);
     }
 }

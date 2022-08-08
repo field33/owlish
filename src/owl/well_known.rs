@@ -110,6 +110,13 @@ pub fn owl_ObjectProperty() -> ClassIRI {
         .into()
 }
 
+#[allow(non_snake_case)]
+pub fn owl_AnnotationProperty() -> ClassIRI {
+    IRI::new("http://www.w3.org/2002/07/owl#AnnotationProperty")
+        .unwrap()
+        .into()
+}
+
 #[cfg(feature = "wasm")]
 mod wasm {
     use wasm_bindgen::prelude::wasm_bindgen;

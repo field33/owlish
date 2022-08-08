@@ -16,7 +16,7 @@ impl Ontology {
     }
 
     #[wasm_bindgen(js_name = "declarations")]
-    pub fn wasm_declarations(&self) -> Array {
+    pub fn wasm_declarations(&self) -> AxiomArray {
         let array = Array::new();
         for d in self.declarations() {
             if let Ok(value) = JsValue::from_serde(d) {
@@ -27,7 +27,7 @@ impl Ontology {
     }
 
     #[wasm_bindgen(js_name = "axioms")]
-    pub fn wasm_axioms(&self) -> Array {
+    pub fn wasm_axioms(&self) -> DeclarationArray {
         let array = Array::new();
         for a in self.axioms() {
             if let Ok(value) = JsValue::from_serde(a) {
@@ -36,6 +36,14 @@ impl Ontology {
         }
         array
     }
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "Array<Axiom>")]
+    pub type AxiomArray;
+    #[wasm_bindgen(typescript_type = "Array<Declaration>")]
+    pub type DeclarationArray;
 }
 
 #[wasm_bindgen(typescript_custom_section)]

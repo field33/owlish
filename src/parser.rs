@@ -29,7 +29,7 @@ impl<'a> From<harriet::TurtleDocument<'a>> for Ontology {
             imports: Default::default(),
         };
 
-        for item in turtle.items {
+        for item in turtle.statements {
             // parse_item(item, &mut ontology);
             item.parse(&mut ontology);
         }
@@ -38,16 +38,16 @@ impl<'a> From<harriet::TurtleDocument<'a>> for Ontology {
     }
 }
 
-impl<'a> Parse<'a> for harriet::Item<'a> {
-    fn parse(&'a self, ontology: &mut Ontology) {
-        match self {
-            harriet::Item::Statement(stmnt) => stmnt.parse(ontology),
-            harriet::Item::Comment(_) => {
-                // ignore comments
-            }
-        };
-    }
-}
+// impl<'a> Parse<'a> for harriet::Item<'a> {
+//     fn parse(&'a self, ontology: &mut Ontology) {
+//         match self {
+//             harriet::Statement(stmnt) => stmnt.parse(ontology),
+//             // harriet::Item::Comment(_) => {
+//             // ignore comments
+//             // }
+//         };
+//     }
+// }
 
 impl<'a> Parse<'a> for harriet::Statement<'a> {
     fn parse(&'a self, ontology: &mut Ontology) {
@@ -88,7 +88,7 @@ impl<'a> Parse<'a> for harriet::Directive<'a> {
 impl<'a> Parse<'a> for harriet::Triples<'a> {
     fn parse(&'a self, ontology: &mut Ontology) {
         match self {
-            harriet::Triples::Labeled(subject, pol) => {
+            harriet::Triples::Labeled(_, subject, pol) => {
                 let iri: Option<IRI> = match subject {
                     harriet::Subject::IRI(iri) => {
                         IRI::try_from((&ontology.iri_builder(), iri)).ok()
@@ -96,10 +96,22 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                     harriet::Subject::Collection(_col) => {
                         todo!()
                     }
+                    _ => {
+                        todo!()
+                    }
                 };
                 if let Some(subject_iri) = iri {
-                    for (predicate, object_list) in &pol.list {
+                    for (_, predicate, object_list, _) in &pol.list {
                         let objects = &object_list.list;
+
+                        let rdf_type = harriet::IRI::PrefixedName(harriet::PrefixedName {
+                            prefix: Some("rdf".into()),
+                            name: Some("type".into()),
+                        });
+                        let predicate = match predicate {
+                            harriet::Verb::IRI(iri) => iri,
+                            harriet::Verb::A => &rdf_type,
+                        };
 
                         match predicate {
                             harriet::IRI::PrefixedName(pn) => {
@@ -129,7 +141,7 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                         if let Some(prop_iri) =
                                             ontology.iri_builder().from::<IRI>(prefix, name)
                                         {
-                                            for object in objects {
+                                            for (_, _, object) in objects {
                                                 match object {
                                                     harriet::Object::IRI(iri) => {
                                                         match IRI::try_from((
@@ -178,8 +190,14 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                                                     .into(),
                                                                 )
                                                             }
+                                                            _ => {
+                                                                todo!()
+                                                            }
                                                         }
                                                         // println!("literal {:?} {:?}", prefix, name);
+                                                    }
+                                                    _ => {
+                                                        todo!()
                                                     }
                                                 }
                                             }
@@ -199,9 +217,17 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
     }
 }
 
-fn parse_rdfs_range(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<harriet::Object>) {
+fn parse_rdfs_range(
+    ontology: &mut Ontology,
+    subject_iri: &IRI,
+    objects: &Vec<(
+        Option<harriet::Whitespace>,
+        Option<harriet::Whitespace>,
+        harriet::Object,
+    )>,
+) {
     let iri_builder = ontology.iri_builder();
-    for obj in objects {
+    for (_, _, obj) in objects {
         match obj {
             harriet::Object::IRI(object_iri) => ontology.owl.axioms.push(
                 ObjectPropertyRange(
@@ -212,18 +238,27 @@ fn parse_rdfs_range(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<ha
             ),
             harriet::Object::Collection(_) => todo!(),
             harriet::Object::BlankNodePropertyList(bn) => {
-                for (prop_iri, object_list) in &bn.list.list {
+                for (_, prop_iri, object_list, _) in &bn.list.list {
                     println!("{:?} {:?}", prop_iri, object_list)
                 }
             }
             harriet::Object::Literal(_) => todo!(),
+            _ => {}
         }
     }
 }
 
-fn parse_rdfs_domain(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<harriet::Object>) {
+fn parse_rdfs_domain(
+    ontology: &mut Ontology,
+    subject_iri: &IRI,
+    objects: &Vec<(
+        Option<harriet::Whitespace>,
+        Option<harriet::Whitespace>,
+        harriet::Object,
+    )>,
+) {
     let iri_builder = ontology.iri_builder();
-    for obj in objects {
+    for (_, _, obj) in objects {
         match obj {
             harriet::Object::IRI(object_iri) => ontology.owl.axioms.push(
                 ObjectPropertyDomain(
@@ -235,12 +270,21 @@ fn parse_rdfs_domain(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<h
             harriet::Object::Collection(_) => todo!(),
             harriet::Object::BlankNodePropertyList(_) => todo!(),
             harriet::Object::Literal(_) => todo!(),
+            _ => {}
         }
     }
 }
 
-fn parse_rdfs_label(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<harriet::Object>) {
-    for obj in objects {
+fn parse_rdfs_label(
+    ontology: &mut Ontology,
+    subject_iri: &IRI,
+    objects: &Vec<(
+        Option<harriet::Whitespace>,
+        Option<harriet::Whitespace>,
+        harriet::Object,
+    )>,
+) {
+    for (_, _, obj) in objects {
         match obj {
             harriet::Object::Literal(label) => match label {
                 harriet::Literal::RDFLiteral(lit) => ontology.owl.axioms.push(
@@ -252,16 +296,26 @@ fn parse_rdfs_label(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<ha
                     .into(),
                 ),
                 harriet::Literal::BooleanLiteral(_) => todo!(),
+                _ => {}
             },
             harriet::Object::IRI(_) => todo!(),
             harriet::Object::Collection(_) => todo!(),
             harriet::Object::BlankNodePropertyList(_) => todo!(),
+            _ => {}
         }
     }
 }
 
-fn parse_rdf_type(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<harriet::Object>) {
-    for object in objects {
+fn parse_rdf_type(
+    ontology: &mut Ontology,
+    subject_iri: &IRI,
+    objects: &Vec<(
+        Option<harriet::Whitespace>,
+        Option<harriet::Whitespace>,
+        harriet::Object,
+    )>,
+) {
+    for (_, _, object) in objects {
         match object {
             harriet::Object::IRI(iri) => {
                 if let Ok(iri) = IRI::try_from((&ontology.iri_builder(), iri)) {
@@ -291,6 +345,7 @@ fn parse_rdf_type(ontology: &mut Ontology, subject_iri: &IRI, objects: &Vec<harr
             harriet::Object::Collection(_) => todo!(),
             harriet::Object::BlankNodePropertyList(_) => todo!(),
             harriet::Object::Literal(_) => todo!(),
+            _ => {}
         }
     }
 }
@@ -304,9 +359,13 @@ fn is_property(iri: &IRI) -> bool {
 fn parse_rdfs_sub_class_of(
     ontology: &mut Ontology,
     subject_iri: &IRI,
-    objects: &Vec<harriet::Object>,
+    objects: &Vec<(
+        Option<harriet::Whitespace>,
+        Option<harriet::Whitespace>,
+        harriet::Object,
+    )>,
 ) {
-    for object in objects {
+    for (_, _, object) in objects {
         match object {
             harriet::Object::IRI(iri) => {
                 if let Ok(iri) = IRI::try_from((&ontology.iri_builder(), iri)) {
@@ -325,6 +384,9 @@ fn parse_rdfs_sub_class_of(
                 todo!()
             }
             harriet::Object::Literal(_) => todo!(),
+            _ => {
+                todo!()
+            }
         }
     }
 }

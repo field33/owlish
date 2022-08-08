@@ -1,7 +1,4 @@
 #!/bin/sh
-sed -i 's/declarations(): Array<any>;/declarations(): Array<Declaration>;/g' pkg/owlish.d.ts
-sed -i 's/axioms(): Array<any>;/axioms(): Array<Axiom>;/g' pkg/owlish.d.ts
-
 API="
 // CUSTOM API FROM extend_wasm_pkg.sh
 // ------------------------------------------------------

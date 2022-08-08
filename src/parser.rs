@@ -468,7 +468,6 @@ mod tests {
             "http://field33.com/ontologies/@fld33/process/"
         );
 
-        assert_eq!(o.classes().len(), 3);
         assert_eq!(o.axioms().len(), 15);
     }
 
@@ -527,8 +526,6 @@ mod tests {
             o.iri.to_string(),
             "http://field33.com/ontologies/@fld33/process/"
         );
-
-        assert_eq!(o.classes().len(), 2);
 
         assert_eq!(
             o.axioms()[0],

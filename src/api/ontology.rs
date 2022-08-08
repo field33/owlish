@@ -1,12 +1,11 @@
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use super::Individual;
-use crate::api::Class;
-use crate::owl::{Axiom, ClassIRI, Declaration, IRIBuilder, IndividualIRI, Regards, IRI};
+use crate::owl::{Axiom, Declaration, IRIBuilder, IRI};
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen::prelude::wasm_bindgen]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Ontology {
     pub(crate) iri: IRI,
     pub(crate) imports: HashMap<String, IRI>,
@@ -14,7 +13,7 @@ pub struct Ontology {
 }
 
 #[cfg(not(feature = "wasm"))]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Ontology {
     pub(crate) iri: IRI,
     pub(crate) imports: HashMap<String, IRI>,
@@ -31,111 +30,48 @@ impl Ontology {
         }
     }
 
+    /// Get the map of all imports
     pub fn imports(&self) -> &HashMap<String, IRI> {
         &self.imports
     }
 
-    pub fn set_owl(&mut self, owl: crate::owl::Ontology) {
-        self.owl = owl
+    /// push the given iri with name as import.
+    /// If an import for this name already existed the old iri is returned.
+    pub fn push_import(&mut self, name: &str, iri: IRI) -> Option<IRI> {
+        self.imports.insert(name.into(), iri)
     }
 
+    /// Get a IRIBuilder to create new iris based on imports for this ontology.
     pub fn iri_builder(&self) -> IRIBuilder {
         IRIBuilder::construct(self.iri.clone(), &self.imports)
     }
 
-    /// Get the class of the given IRI.
-    pub fn class(&self, iri: &ClassIRI) -> Option<Class> {
-        let mut declaration = None;
-        for d in self.owl.declarations() {
-            if let Declaration::Class(class_iri) = d {
-                if class_iri == iri {
-                    declaration = Some(class_iri);
-                }
-            }
-        }
-        let mut axioms = Vec::new();
-        for axiom in self.owl.axioms() {
-            if axiom.regards(iri.as_iri()) {
-                axioms.push(axiom);
-            }
-        }
-        Some(Class {
-            iri: declaration?,
-            axioms,
-        })
-    }
-
-    /// Get all classes in this ontology.
-    pub fn classes(&self) -> Vec<Class> {
-        let mut classes = Vec::new();
-        for d in self.owl.declarations() {
-            if let Declaration::Class(class_iri) = d {
-                let mut axioms = Vec::new();
-                for axiom in self.owl.axioms() {
-                    if axiom.regards(class_iri.as_iri()) {
-                        axioms.push(axiom);
-                    }
-                }
-                classes.push(Class {
-                    iri: class_iri,
-                    axioms,
-                })
-            }
-        }
-        classes
-    }
-
-    /// Get the Individual with the given IRI.
-    pub fn individual(&self, iri: &IndividualIRI) -> Option<Individual> {
-        let mut declaration = None;
-        for d in self.owl.declarations() {
-            if let Declaration::NamedIndividual(individual_iri) = d {
-                if individual_iri == iri {
-                    declaration = Some(individual_iri);
-                }
-            }
-        }
-        let mut axioms = Vec::new();
-        for axiom in self.owl.axioms() {
-            if axiom.regards(iri.as_iri()) {
-                axioms.push(axiom);
-            }
-        }
-
-        Some(Individual {
-            iri: declaration?,
-            axioms,
-        })
-    }
-
-    /// Get all individuals in this ontology.
-    pub fn individuals(&self) -> Vec<Individual> {
-        let mut individuals = Vec::new();
-        for d in self.owl.declarations() {
-            if let Declaration::NamedIndividual(individual_iri) = d {
-                let mut axioms = Vec::new();
-                for axiom in self.owl.axioms() {
-                    if axiom.regards(individual_iri.as_iri()) {
-                        axioms.push(axiom);
-                    }
-                }
-                individuals.push(Individual {
-                    iri: individual_iri,
-                    axioms,
-                })
-            }
-        }
-        individuals
-    }
-}
-
-impl Ontology {
+    /// Get all OWL declarations of this ontology.
     pub fn declarations(&self) -> &Vec<Declaration> {
         &self.owl.declarations
     }
 
+    /// Get all OWL axioms of this ontology.
     pub fn axioms(&self) -> &Vec<Axiom> {
         &self.owl.axioms
+    }
+}
+
+/// mutation api
+impl Ontology {
+    /// Set the owl data
+    pub fn set_owl(&mut self, owl: crate::owl::Ontology) {
+        self.owl = owl
+    }
+
+    /// Push the given OWL axiom to this ontology
+    pub fn push_axiom(&mut self, axiom: Axiom) {
+        self.owl.axioms.push(axiom)
+    }
+
+    /// Push the given OWL declaration to this ontology
+    pub fn push_declaration(&mut self, declaration: Declaration) {
+        self.owl.declarations.push(declaration)
     }
 }
 

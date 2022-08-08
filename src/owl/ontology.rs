@@ -10,7 +10,7 @@ pub enum Declaration {
     Datatype(DatatypeIRI),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Ontology {
     pub(crate) declarations: Vec<Declaration>,
     pub(crate) axioms: Vec<Axiom>,
@@ -31,6 +31,9 @@ impl Ontology {
     }
     pub fn axioms_mut(&mut self) -> &mut Vec<Axiom> {
         &mut self.axioms
+    }
+    pub fn declarations_mut(&mut self) -> &mut Vec<Declaration> {
+        &mut self.declarations
     }
 }
 

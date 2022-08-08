@@ -2,39 +2,48 @@
 
 use super::Ontology;
 use js_sys::Array;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{prelude::*, JsCast};
 
 #[wasm_bindgen]
 impl Ontology {
+    /// Create an ontology based on a turtle formatted string.
     pub fn parseTurtle(ttl: String) -> Option<Ontology> {
         Ontology::parse(&ttl).ok()
     }
 
+    /// Create an ontology based on a json serialized owlish::Ontology.
+    pub fn parse_json(json: String) -> Option<Ontology> {
+        serde_json::from_str(&json).ok()
+    }
+
+    /// Get the IRI of this ontology.
     #[wasm_bindgen(getter)]
     pub fn iri(&self) -> IRI {
         JsValue::from_serde(&self.iri).unwrap().into()
     }
 
+    /// Get all OWL declarations of this ontology.
     #[wasm_bindgen(js_name = "declarations")]
-    pub fn wasm_declarations(&self) -> AxiomArray {
+    pub fn wasm_declarations(&self) -> DeclarationArray {
         let array = Array::new();
         for d in self.declarations() {
             if let Ok(value) = JsValue::from_serde(d) {
                 array.push(&value);
             }
         }
-        array
+        array.unchecked_into()
     }
 
+    /// Get all OWL axioms of this ontology.
     #[wasm_bindgen(js_name = "axioms")]
-    pub fn wasm_axioms(&self) -> DeclarationArray {
+    pub fn wasm_axioms(&self) -> AxiomArray {
         let array = Array::new();
         for a in self.axioms() {
             if let Ok(value) = JsValue::from_serde(a) {
                 array.push(&value);
             }
         }
-        array
+        array.unchecked_into()
     }
 }
 

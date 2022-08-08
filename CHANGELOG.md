@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.4.3 - 2022-08-08
+#### Bug Fixes
+- Support json deserialization and mutation API - (789c874) - Florian Loers
+#### Miscellaneous Chores
+- Bump harriet version - (79c06b1) - Florian Loers
+- Improve parser - (67e5a6d) - Florian Loers
+
+- - -
+
 ## v0.4.2 - 2022-07-18
 #### Bug Fixes
 - **(parser)** Ignore blank nodes instead of failing - (30ca15b) - Florian Loers

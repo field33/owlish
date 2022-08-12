@@ -29,3 +29,6 @@ pub use other::*;
 
 mod regards;
 pub use regards::*;
+
+mod lang;
+pub use lang::*;

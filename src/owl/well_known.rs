@@ -10,6 +10,13 @@ pub fn xsd_integer() -> DatatypeIRI {
 }
 
 #[allow(non_snake_case)]
+pub fn xsd_float() -> DatatypeIRI {
+    IRI::new("http://www.w3.org/2001/XMLSchema#float")
+        .unwrap()
+        .into()
+}
+
+#[allow(non_snake_case)]
 pub fn xsd_nonNegativeInteger() -> DatatypeIRI {
     IRI::new("http://www.w3.org/2001/XMLSchema#nonNegativeInteger")
         .unwrap()

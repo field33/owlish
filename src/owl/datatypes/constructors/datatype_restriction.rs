@@ -1,10 +1,9 @@
 use super::DatatypeDefinitionConstructor;
-use crate::owl::{DatatypeIRI, Regards};
-use serde_json::Value;
+use crate::owl::{DatatypeIRI, Regards, Literal};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Restriction {
-    Numeric(DatatypeIRI, Value),
+    Numeric(DatatypeIRI, Literal),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]

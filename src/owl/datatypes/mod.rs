@@ -3,7 +3,8 @@ use crate::owl::{IndividualIRI, IRI};
 mod constructors;
 pub use constructors::*;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+
+use super::{Annotation, Literal};
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct DatatypeIRI(pub IRI);
@@ -33,10 +34,50 @@ impl DataPropertyIRI {
     }
 }
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataPropertyAssertion(pub DataPropertyIRI, pub IndividualIRI, pub Value);
+pub struct DataPropertyAssertion(
+    pub DataPropertyIRI,
+    pub IndividualIRI,
+    pub Literal,
+    pub Vec<Annotation>,
+);
+
+impl DataPropertyAssertion {
+    pub fn iri(&self) -> &DataPropertyIRI {
+        &self.0
+    }
+    pub fn individual(&self) -> &IndividualIRI {
+        &self.1
+    }
+    pub fn value(&self) -> &Literal {
+        &self.2
+    }
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        &self.3
+    }
+}
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct NegativeDataPropertyAssertion(pub DataPropertyIRI, pub IndividualIRI, pub Value);
+pub struct NegativeDataPropertyAssertion(
+    pub DataPropertyIRI,
+    pub IndividualIRI,
+    pub Literal,
+    pub Vec<Annotation>,
+);
+
+impl NegativeDataPropertyAssertion {
+    pub fn iri(&self) -> &DataPropertyIRI {
+        &self.0
+    }
+    pub fn individual(&self) -> &IndividualIRI {
+        &self.1
+    }
+    pub fn value(&self) -> &Literal {
+        &self.2
+    }
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        &self.3
+    }
+}
 
 #[cfg(feature = "wasm")]
 mod wasm {

@@ -11,6 +11,9 @@ mod object_properties;
 pub use object_properties::*;
 use serde::{Deserialize, Serialize};
 
+mod annotation;
+pub use annotation::*;
+
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub enum ObjectPropertyConstructor {
     IRI(ObjectPropertyIRI),

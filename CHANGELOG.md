@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.5.0 - 2022-08-12
+#### Features
+- Support annotations in ObjectProperty, DataProperty and AnnotationProperty - (e3d84c3) - Florian Loers
+
+- - -
+
 ## v0.4.3 - 2022-08-08
 #### Bug Fixes
 - Support json deserialization and mutation API - (789c874) - Florian Loers

@@ -1,5 +1,3 @@
-use serde_json::Value;
-
 use crate::api::Ontology as ApiOntology;
 use crate::owl::well_known as wk;
 use crate::owl::*;
@@ -61,7 +59,8 @@ pub fn family() -> ApiOntology {
             Axiom::AnnotationAssertion(AnnotationAssertion(
                 iri.new("comment"),
                 iri.new("Person"),
-                Value::from("Represents the set of all people"),
+                LiteralOrIRI::from("Represents the set of all people"),
+                vec![],
             )),
             Axiom::SubObjectPropertyOf(SubObjectPropertyOf(
                 iri.new::<ObjectPropertyIRI>("hasWife").into(),
@@ -145,8 +144,8 @@ pub fn family() -> ApiOntology {
                     DatatypeRestriction(
                         wk::xsd_integer(),
                         vec![
-                            Restriction::Numeric(wk::xsd_minExclusive(), Value::from(12u8)),
-                            Restriction::Numeric(wk::xsd_maxInclusive(), Value::from(19u8)),
+                            Restriction::Numeric(wk::xsd_minExclusive(), Literal::from(12u8)),
+                            Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(19u8)),
                         ],
                     ),
                 )
@@ -158,7 +157,8 @@ pub fn family() -> ApiOntology {
                 iri.class("Person").into(),
                 vec![Annotation(
                     wk::rdfs_comment(),
-                    Value::from("States that every man is a person"),
+                    LiteralOrIRI::from("States that every man is a person"),
+                    vec![]
                 )],
             )),
             Axiom::SubClassOf(SubClassOf(
@@ -356,8 +356,8 @@ pub fn family() -> ApiOntology {
                 DatatypeRestriction(
                     wk::xsd_integer(),
                     vec![
-                        Restriction::Numeric(wk::xsd_minInclusive(), Value::from(0u8)),
-                        Restriction::Numeric(wk::xsd_maxInclusive(), Value::from(150u8)),
+                        Restriction::Numeric(wk::xsd_minInclusive(), Literal::from(0u8)),
+                        Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(150u8)),
                     ],
                 )
                 .into(),
@@ -368,8 +368,8 @@ pub fn family() -> ApiOntology {
                 DatatypeRestriction(
                     wk::xsd_integer(),
                     vec![
-                        Restriction::Numeric(wk::xsd_minExclusive(), Value::from(0u8)),
-                        Restriction::Numeric(wk::xsd_maxInclusive(), Value::from(18u8)),
+                        Restriction::Numeric(wk::xsd_minExclusive(), Literal::from(0u8)),
+                        Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(18u8)),
                     ],
                 )
                 .into(),
@@ -386,7 +386,7 @@ pub fn family() -> ApiOntology {
             )),
             Axiom::DatatypeDefinition(DatatypeDefinition(
                 iri.new("toddlerAge"),
-                DataOneOf(vec![Value::from(1u8), Value::from(2u8)]).into(),
+                DataOneOf(vec![Literal::from(1u8), Literal::from(2u8)]).into(),
                 vec![],
             )),
             //
@@ -429,26 +429,31 @@ pub fn family() -> ApiOntology {
                 iri.new("hasWife"),
                 iri.new("John"),
                 iri.new("Mary"),
+                vec![],
             )),
             Axiom::NegativeObjectPropertyAssertion(NegativeObjectPropertyAssertion(
                 iri.new("hasWife"),
                 iri.new("Bill"),
                 iri.new("Mary"),
+                vec![],
             )),
             Axiom::NegativeObjectPropertyAssertion(NegativeObjectPropertyAssertion(
                 iri.new("hasDaughter"),
                 iri.new("Bill"),
                 iri.new("Susan"),
+                vec![],
             )),
             Axiom::DataPropertyAssertion(DataPropertyAssertion(
                 iri.new("hasAge"),
                 iri.new("John"),
-                Value::from(51u8),
+                Literal::from(51u8),
+                vec![],
             )),
             Axiom::NegativeDataPropertyAssertion(NegativeDataPropertyAssertion(
                 iri.new("hasAge"),
                 iri.new("Jack"),
-                Value::from(53u8),
+                Literal::from(53u8),
+                vec![],
             )),
             Axiom::SameIndividual(SameIndividual(iri.new("James"), iri.new("Jim"))),
             Axiom::SameIndividual(SameIndividual(iri.new("John"), other_ont.new("JohnBrown"))),

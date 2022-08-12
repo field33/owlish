@@ -1,13 +1,23 @@
-use serde_json::Value;
-
-use crate::owl::{Annotation, ClassConstructor, ObjectPropertyConstructor};
+use crate::owl::{Annotation, ClassConstructor, ObjectPropertyConstructor, LiteralOrIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectHasValue(
     pub ObjectPropertyConstructor,
-    pub Value,
+    pub LiteralOrIRI,
     pub Vec<Annotation>,
 );
+
+impl ObjectHasValue {
+    pub fn object_property(&self) -> &ObjectPropertyConstructor {
+        &self.0
+    }
+    pub fn literal(&self) -> &LiteralOrIRI {
+        &self.1
+    }
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        &self.2
+    }
+}
 
 impl From<ObjectHasValue> for Box<ClassConstructor> {
     fn from(c: ObjectHasValue) -> Self {

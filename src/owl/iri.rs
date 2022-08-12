@@ -4,7 +4,6 @@ use crate::error::Error;
 
 use super::{ClassIRI, ObjectPropertyIRI};
 use serde::{de::Visitor, ser::SerializeMap, Deserialize, Serialize};
-use serde_json::Value;
 
 pub fn iri<T: From<IRI>>(iri: &str) -> T {
     IRI::new(iri).unwrap().into()
@@ -191,11 +190,6 @@ impl IRIBuilder {
     }
 }
 
-impl From<IRI> for Value {
-    fn from(s: IRI) -> Self {
-        Value::from(s.as_str())
-    }
-}
 
 #[cfg(feature = "wasm")]
 mod wasm {

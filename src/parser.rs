@@ -1,10 +1,8 @@
-use serde_json::Value;
-
 use crate::{
     api::Ontology,
     owl::{
         well_known, AnnotationAssertion, AsymmetricObjectProperty, ClassAssertion, ClassIRI,
-        Declaration, IRIBuilder, ObjectPropertyAssertion, ObjectPropertyDomain,
+        Declaration, IRIBuilder, LiteralOrIRI, ObjectPropertyAssertion, ObjectPropertyDomain,
         ObjectPropertyRange, SubClassOf, SymmetricObjectProperty, IRI,
     },
 };
@@ -154,6 +152,7 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                                                         prop_iri.clone().into(),
                                                                         subject_iri.clone().into(),
                                                                         object_iri.into(),
+                                                                        vec![],
                                                                     )
                                                                     .into(),
                                                                 )
@@ -177,6 +176,7 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                                                         .string
                                                                         .to_string()
                                                                         .into(),
+                                                                    vec![],
                                                                 )
                                                                 .into(),
                                                             ),
@@ -186,6 +186,7 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                                                         prop_iri.clone().into(),
                                                                         subject_iri.clone().into(),
                                                                         b.bool.into(),
+                                                                        vec![],
                                                                     )
                                                                     .into(),
                                                                 )
@@ -291,7 +292,8 @@ fn parse_rdfs_label(
                     AnnotationAssertion(
                         well_known::rdfs_label(),
                         subject_iri.clone(),
-                        Value::from(lit.string.to_string()),
+                        LiteralOrIRI::from(lit.string.to_string()),
+                        vec![],
                     )
                     .into(),
                 ),
@@ -547,6 +549,7 @@ mod tests {
                 IRI::new("http://field33.com/ontologies/@fld33/meta/#Triangle")
                     .unwrap()
                     .into(),
+                vec![]
             )
             .into()
         );
@@ -555,7 +558,8 @@ mod tests {
             AnnotationAssertion(
                 well_known::rdfs_label(),
                 IRI::new("http://field33.com/ontologies/@fld33/process/").unwrap(),
-                "Processes".into()
+                "Processes".into(),
+                vec![]
             )
             .into()
         );
@@ -564,7 +568,8 @@ mod tests {
             AnnotationAssertion(
                 well_known::rdfs_label(),
                 IRI::new("http://field33.com/ontologies/@fld33/process/#Activity").unwrap(),
-                "Activity".into()
+                "Activity".into(),
+                vec![]
             )
             .into()
         );
@@ -573,7 +578,8 @@ mod tests {
             AnnotationAssertion(
                 well_known::rdfs_label(),
                 IRI::new("http://field33.com/ontologies/@fld33/process/#Process").unwrap(),
-                "Process".into()
+                "Process".into(),
+                vec![]
             )
             .into()
         );

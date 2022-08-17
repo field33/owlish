@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.6.1 - 2022-08-17
+#### Bug Fixes
+- Fix broken wasm API for Iri handling - (cf6f89d) - Florian Loers
+
+- - -
+
 ## v0.6.0 - 2022-08-17
 #### Features
 - Provide Iri constructor with validation - (2292248) - Florian Loers

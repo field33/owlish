@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.6.0 - 2022-08-17
+#### Features
+- Provide Iri constructor with validation - (2292248) - Florian Loers
+- Allow annotations for Declarations - (011697c) - Florian Loers
+
+- - -
+
 ## v0.5.0 - 2022-08-12
 #### Features
 - Support annotations in ObjectProperty, DataProperty and AnnotationProperty - (e3d84c3) - Florian Loers

@@ -149,3 +149,11 @@ extern "C" {
     #[wasm_bindgen(typescript_type = "IRI")]
     pub type IRI;
 }
+
+#[wasm_bindgen]
+pub fn Iri(iri: &str) -> Option<IRI> {
+    crate::owl::IRI::new(iri)
+        .ok()
+        .and_then(|iri| JsValue::from_serde(&iri).ok())
+        .and_then(|iri| iri.dyn_into().ok())
+}

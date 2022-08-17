@@ -3,11 +3,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum Declaration {
-    Class(ClassIRI),
-    NamedIndividual(IndividualIRI),
-    ObjectProperty(ObjectPropertyIRI),
-    DataProperty(DataPropertyIRI),
-    Datatype(DatatypeIRI),
+    Class(ClassIRI, Vec<Annotation>),
+    NamedIndividual(IndividualIRI, Vec<Annotation>),
+    ObjectProperty(ObjectPropertyIRI, Vec<Annotation>),
+    DataProperty(DataPropertyIRI, Vec<Annotation>),
+    Datatype(DatatypeIRI, Vec<Annotation>),
+}
+
+impl Declaration {
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        match &self {
+            Declaration::Class(_, a) => a,
+            Declaration::NamedIndividual(_, a) => a,
+            Declaration::ObjectProperty(_, a) => a,
+            Declaration::DataProperty(_, a) => a,
+            Declaration::Datatype(_, a) => a,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

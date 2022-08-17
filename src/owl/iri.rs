@@ -3,6 +3,7 @@ use std::{borrow::Cow, collections::HashMap, fmt::Display, str::FromStr};
 use crate::error::Error;
 
 use super::{ClassIRI, ObjectPropertyIRI};
+use pct_str::{PctString, URIReserved};
 use serde::{de::Visitor, ser::SerializeMap, Deserialize, Serialize};
 
 pub fn iri<T: From<IRI>>(iri: &str) -> T {
@@ -83,6 +84,33 @@ impl IRI {
             iribuf: iref::IriBuf::from_str(prefix)?,
             imports: Default::default(),
         })
+    }
+
+    pub fn set_query_parameter(&mut self, name: &str, value: &str) -> Result<(), String> {
+        match self.0.query() {
+            Some(q) => {
+                let v = PctString::encode(value.chars(), URIReserved);
+                let query_str = format!("{}&{}={}", q.as_str(), name, v.as_str());
+                match iref::Query::try_from(query_str.as_str()) {
+                    Ok(q) => {
+                        self.0.set_query(Some(q));
+                        Ok(())
+                    }
+                    Err(e) => Err(format!("Failed to set iri query '{}': {}", query_str, e)),
+                }
+            }
+            None => {
+                let v = PctString::encode(value.chars(), URIReserved);
+                let query_str = format!("{}={}", name, v);
+                match iref::Query::try_from(query_str.as_str()) {
+                    Ok(q) => {
+                        self.0.set_query(Some(q));
+                        Ok(())
+                    }
+                    Err(e) => Err(format!("Failed to set iri query '{}': {}", query_str, e)),
+                }
+            }
+        }
     }
 
     pub fn as_str(&self) -> &str {
@@ -190,7 +218,6 @@ impl IRIBuilder {
     }
 }
 
-
 #[cfg(feature = "wasm")]
 mod wasm {
     use wasm_bindgen::prelude::wasm_bindgen;
@@ -221,5 +248,28 @@ mod tests {
         let iri1: IRI = serde_json::from_str(json).unwrap();
 
         assert_eq!(iri1, iri)
+    }
+
+    #[test]
+    pub fn test_iri_parameter() {
+        let mut iri = IRI::new("https://test.org#asdf").unwrap();
+        iri.set_query_parameter("test", "bla").unwrap();
+        assert_eq!(iri.as_str(), "https://test.org?test=bla#asdf");
+        iri.set_query_parameter("foo", "bar").unwrap();
+        assert_eq!(iri.as_str(), "https://test.org?test=bla&foo=bar#asdf");
+        iri.set_query_parameter("foo", "https://test.org#foo?test=false")
+            .unwrap();
+        assert_eq!(iri.as_str(), "https://test.org?test=bla&foo=bar&foo=https%3A%2F%2Ftest.org%23foo%3Ftest%3Dfalse#asdf");
+    }
+
+    #[test]
+    pub fn test_iri_parameter2() {
+        let mut iri = IRI::new("https://test.org#asdf").unwrap();
+        iri.set_query_parameter("source", "http://field33.com/dataset/p#11")
+            .unwrap();
+        assert_eq!(
+            iri.as_str(),
+            "https://test.org?source=http%3A%2F%2Ffield33.com%2Fdataset%2Fp%2311#asdf"
+        );
     }
 }

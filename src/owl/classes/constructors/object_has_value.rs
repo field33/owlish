@@ -1,4 +1,4 @@
-use crate::owl::{Annotation, ClassConstructor, ObjectPropertyConstructor, LiteralOrIRI};
+use crate::owl::{Annotation, ClassConstructor, LiteralOrIRI, ObjectPropertyConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectHasValue(

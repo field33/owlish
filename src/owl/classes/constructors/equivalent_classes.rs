@@ -1,11 +1,7 @@
 use crate::owl::{Annotation, ClassConstructor, ClassIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct EquivalentClasses(
-    pub ClassIRI,
-    pub Box<ClassConstructor>,
-    pub Vec<Annotation>,
-);
+pub struct EquivalentClasses(pub ClassIRI, pub Box<ClassConstructor>, pub Vec<Annotation>);
 
 impl From<EquivalentClasses> for Box<ClassConstructor> {
     fn from(c: EquivalentClasses) -> Self {

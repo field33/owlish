@@ -1,5 +1,5 @@
 use super::DatatypeDefinitionConstructor;
-use crate::owl::{DatatypeIRI, Regards, Literal};
+use crate::owl::{DatatypeIRI, Literal, Regards};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Restriction {

@@ -3,6 +3,7 @@
 use super::Ontology;
 use js_sys::Array;
 use wasm_bindgen::{prelude::*, JsCast};
+use web_sys::console::error_1;
 
 #[wasm_bindgen]
 impl Ontology {
@@ -142,6 +143,11 @@ interface DeclarationMatcher<R> {
 }
 
 export function matchDeclaration<R>(declaration: Declaration, matcher: DeclarationMatcher<R>): R
+
+export interface IRI {
+    _type: "IRI",
+    string: string
+}
 "#;
 
 #[wasm_bindgen]
@@ -152,8 +158,100 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn Iri(iri: &str) -> Option<IRI> {
-    crate::owl::IRI::new(iri)
-        .ok()
-        .and_then(|iri| JsValue::from_serde(&iri).ok())
-        .and_then(|iri| iri.dyn_into().ok())
+    match crate::owl::IRI::new(iri) {
+        Ok(iri) => iri_to_js_iri(&iri),
+        Err(e) => {
+            error_1(&format!("Failed to parse IRI {}: {}", iri, e).into());
+            None
+        }
+    }
+}
+
+fn iri_to_js_iri(iri: &crate::owl::IRI) -> Option<IRI> {
+    match JsValue::from_serde(iri) {
+        Ok(jsv) => Some(jsv.unchecked_into()),
+        Err(e) => {
+            error_1(&format!("Failed to create JS value from IRI {}: {}", iri, e).into());
+            None
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn set_query_parameter(iri: &IRI, name: &str, value: &str) -> Option<IRI> {
+    match iri.into_serde::<crate::owl::IRI>() {
+        Ok(mut iri) => {
+            if let Err(e) = iri.set_query_parameter(name, value) {
+                error_1(&e.into())
+            }
+            iri_to_js_iri(&iri)
+        }
+        Err(e) => {
+            error_1(&format!("Failed to parse JS IRI into Rust IRI: {:?}", e).into());
+            None
+        }
+    }
+}
+
+#[wasm_bindgen]
+#[allow(non_camel_case_types)]
+pub struct well_known {
+    // generate namespace in wasm
+}
+
+#[wasm_bindgen]
+impl well_known {
+    pub fn owl_AnnotationProperty() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_AnnotationProperty().as_iri()).unwrap()
+    }
+    pub fn owl_AsymmetricProperty() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_AsymmetricProperty().as_iri()).unwrap()
+    }
+    pub fn owl_Class() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_Class().as_iri()).unwrap()
+    }
+    pub fn owl_ObjectProperty() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_ObjectProperty().as_iri()).unwrap()
+    }
+    pub fn owl_Ontology() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_Ontology()).unwrap()
+    }
+    pub fn owl_SymmetricProperty() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_SymmetricProperty().as_iri()).unwrap()
+    }
+    pub fn owl_Thing() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_Thing().as_iri()).unwrap()
+    }
+
+    pub fn rdf_type() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::rdf_type().as_iri()).unwrap()
+    }
+    pub fn rdfs_comment() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::rdfs_comment().as_iri()).unwrap()
+    }
+    pub fn rdfs_label() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::rdfs_label().as_iri()).unwrap()
+    }
+
+    pub fn xsd_float() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_float().as_iri()).unwrap()
+    }
+    pub fn xsd_integer() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_integer().as_iri()).unwrap()
+    }
+    pub fn xsd_maxExclusive() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_maxExclusive().as_iri()).unwrap()
+    }
+    pub fn xsd_maxInclusive() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_maxInclusive().as_iri()).unwrap()
+    }
+    pub fn xsd_minExclusive() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_minExclusive().as_iri()).unwrap()
+    }
+    pub fn xsd_minInclusive() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_minInclusive().as_iri()).unwrap()
+    }
+    pub fn xsd_nonNegativeInteger() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_nonNegativeInteger().as_iri()).unwrap()
+    }
 }

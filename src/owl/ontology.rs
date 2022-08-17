@@ -55,11 +55,11 @@ mod tests {
 
     #[test]
     pub fn test_ser_de_declaration() {
-        let d = Declaration::Class(IRI::new("http://example.com").unwrap().into());
+        let d = Declaration::Class(IRI::new("http://example.com").unwrap().into(), vec![]);
         let json = serde_json::to_string(&d).unwrap();
         assert_eq!(
             json,
-            r#"{"Class":{"_type":"IRI","string":"http://example.com"}}"#
+            r#"{"Class":[{"_type":"IRI","string":"http://example.com"},[]]}"#
         );
     }
 }

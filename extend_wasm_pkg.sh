@@ -47,12 +47,5 @@ export const well_known = {
     owl_SymmetricProperty: Iri(\"http://www.w3.org/2002/07/owl#SymmetricProperty\"),
     owl_ObjectProperty: Iri(\"http://www.w3.org/2002/07/owl#ObjectProperty\"),
 }
-
-export function Iri(iri) {
-    return {
-        _type: \"IRI\",
-        string: iri,
-    }
-}
 "
 echo "$API" >> ./pkg/owlish.js

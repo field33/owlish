@@ -171,7 +171,7 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                                             ) => ontology.owl.axioms.push(
                                                                 AnnotationAssertion(
                                                                     prop_iri.clone().into(),
-                                                                    subject_iri.clone().into(),
+                                                                    subject_iri.clone(),
                                                                     rdf_lit
                                                                         .string
                                                                         .to_string()
@@ -184,7 +184,7 @@ impl<'a> Parse<'a> for harriet::Triples<'a> {
                                                                 ontology.owl.axioms.push(
                                                                     AnnotationAssertion(
                                                                         prop_iri.clone().into(),
-                                                                        subject_iri.clone().into(),
+                                                                        subject_iri.clone(),
                                                                         b.bool.into(),
                                                                         vec![],
                                                                     )
@@ -325,7 +325,7 @@ fn parse_rdf_type(
                         ontology
                             .owl
                             .declarations
-                            .push(Declaration::Class(subject_iri.clone().into()))
+                            .push(Declaration::Class(subject_iri.clone().into(), vec![]))
                     } else if well_known::owl_SymmetricProperty().as_iri() == &iri {
                         ontology
                             .owl

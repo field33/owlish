@@ -75,7 +75,7 @@ jobs:
           cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
           #
           # Release npm package
-          wasm-pack build --target web --release --features wasm,console_error_panic_hook,wee_alloc
+          wasm-pack build --target web --release --features wasm,console_error_panic_hook
           ./extend_wasm_pkg.sh
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > pkg/.npmrc
           cd pkg && npm publish --access public

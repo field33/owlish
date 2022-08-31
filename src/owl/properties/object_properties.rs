@@ -97,7 +97,7 @@ export type ObjectPropertyAssertion = {
      * The object Individual
      */
     object: IRI,
-    annotations: Vec<Annotation>,
+    annotations: Array<Annotation>,
 };
 "#;
 
@@ -119,7 +119,7 @@ export type NegativeObjectPropertyAssertion = {
      * The object Individual
      */
     object: IRI,
-    annotations: Vec<Annotation>,
+    annotations: Array<Annotation>,
 };
 "#;
 }

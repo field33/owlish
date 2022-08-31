@@ -42,7 +42,7 @@ mod wasm {
 export type DataSomeValuesFrom = {
     iri: IRI, 
     restriction: DatatypeRestriction,
-    annotations: Array<Annotations>,
+    annotations: Array<Annotation>,
 };
 "#;
 }

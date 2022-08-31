@@ -234,6 +234,7 @@ fn parse_rdfs_range(
                 ObjectPropertyRange(
                     subject_iri.clone().into(),
                     IRI::try_from((&iri_builder, object_iri)).unwrap().into(),
+                    vec![],
                 )
                 .into(),
             ),
@@ -265,6 +266,7 @@ fn parse_rdfs_domain(
                 ObjectPropertyDomain(
                     subject_iri.clone().into(),
                     IRI::try_from((&iri_builder, object_iri)).unwrap().into(),
+                    vec![],
                 )
                 .into(),
             ),
@@ -327,19 +329,21 @@ fn parse_rdf_type(
                             .declarations
                             .push(Declaration::Class(subject_iri.clone().into(), vec![]))
                     } else if well_known::owl_SymmetricProperty().as_iri() == &iri {
-                        ontology
-                            .owl
-                            .axioms
-                            .push(SymmetricObjectProperty(subject_iri.clone().into()).into());
+                        ontology.owl.axioms.push(
+                            SymmetricObjectProperty(subject_iri.clone().into(), vec![]).into(),
+                        );
                     } else if well_known::owl_AsymmetricProperty().as_iri() == &iri {
-                        ontology
-                            .owl
-                            .axioms
-                            .push(AsymmetricObjectProperty(subject_iri.clone().into()).into());
+                        ontology.owl.axioms.push(
+                            AsymmetricObjectProperty(subject_iri.clone().into(), vec![]).into(),
+                        );
                     } else if !is_property(&iri) {
                         ontology.owl.axioms.push(
-                            ClassAssertion(ClassIRI::from(iri).into(), subject_iri.clone().into())
-                                .into(),
+                            ClassAssertion(
+                                ClassIRI::from(iri).into(),
+                                subject_iri.clone().into(),
+                                vec![],
+                            )
+                            .into(),
                         )
                     }
                 }
@@ -535,7 +539,8 @@ mod tests {
                 ClassIRI::from(well_known::owl_Ontology()).into(),
                 IRI::new("http://field33.com/ontologies/@fld33/process/")
                     .unwrap()
-                    .into()
+                    .into(),
+                vec![]
             )
             .into()
         );
@@ -592,6 +597,7 @@ mod tests {
                 IRI::new("http://field33.com/ontologies/@fld33/process/#Process")
                     .unwrap()
                     .into(),
+                vec![]
             )
             .into()
         );

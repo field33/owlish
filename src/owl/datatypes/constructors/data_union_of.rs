@@ -1,8 +1,12 @@
 use super::DatatypeDefinitionConstructor;
-use crate::owl::DataPropertyIRI;
+use crate::owl::{Annotation, DataPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataUnionOf(pub DataPropertyIRI, pub Box<DatatypeDefinitionConstructor>);
+pub struct DataUnionOf(
+    #[serde(rename = "iri")] pub DataPropertyIRI,
+    #[serde(rename = "datatype")] pub Box<DatatypeDefinitionConstructor>,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
+);
 
 impl From<DataUnionOf> for Box<DatatypeDefinitionConstructor> {
     fn from(c: DataUnionOf) -> Self {
@@ -21,6 +25,10 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type DataUnionOf = [IRI, DatatypeDefinitionConstructor];
+export type DataUnionOf = {
+    iri: IRI, 
+    datatype: DatatypeDefinitionConstructor,
+    annotations: Array<Annotation>,
+};
 "#;
 }

@@ -35,17 +35,17 @@ impl DataPropertyIRI {
 }
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataPropertyAssertion(
-    pub DataPropertyIRI,
-    pub IndividualIRI,
-    pub Literal,
-    pub Vec<Annotation>,
+    #[serde(rename = "iri")] pub DataPropertyIRI,
+    #[serde(rename = "subject")] pub IndividualIRI,
+    #[serde(rename = "value")] pub Literal,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
 
 impl DataPropertyAssertion {
     pub fn iri(&self) -> &DataPropertyIRI {
         &self.0
     }
-    pub fn individual(&self) -> &IndividualIRI {
+    pub fn subject(&self) -> &IndividualIRI {
         &self.1
     }
     pub fn value(&self) -> &Literal {
@@ -58,17 +58,17 @@ impl DataPropertyAssertion {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct NegativeDataPropertyAssertion(
-    pub DataPropertyIRI,
-    pub IndividualIRI,
-    pub Literal,
-    pub Vec<Annotation>,
+    #[serde(rename = "iri")] pub DataPropertyIRI,
+    #[serde(rename = "subject")] pub IndividualIRI,
+    #[serde(rename = "value")] pub Literal,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
 
 impl NegativeDataPropertyAssertion {
     pub fn iri(&self) -> &DataPropertyIRI {
         &self.0
     }
-    pub fn individual(&self) -> &IndividualIRI {
+    pub fn subject(&self) -> &IndividualIRI {
         &self.1
     }
     pub fn value(&self) -> &Literal {
@@ -86,16 +86,38 @@ mod wasm {
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API_1: &'static str = r#"
 /**
- * [DataProperty IRI, Individual IRI, Value]
+ * Assigns a value (of the property with iri) to a subject Individual.
  */
-export type DataPropertyAssertion = [IRI, IRI, unknown]
+export type DataPropertyAssertion = {
+    /**
+     * IRI of the property.
+     */
+    iri: IRI,
+    /**
+     * IRI of the subject Individual.
+     */
+    subject: IRI,
+    value: unknown,
+    annotations: Array<Annotation>,
+};
 "#;
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API_2: &'static str = r#"
 /**
- * [DataProperty IRI, Individual IRI, Value]
+ * Opposite of DataPropertyAssertion.
  */
-export type NegativeDataPropertyAssertion = [IRI, IRI, unknown]
+export type NegativeDataPropertyAssertion = {
+    /**
+     * IRI of the property.
+     */
+    iri: IRI,
+    /**
+     * IRI of the subject Individual.
+     */
+    subject: IRI,
+    value: unknown,
+    annotations: Array<Annotation>,
+}
 "#;
 }

@@ -1,9 +1,21 @@
-use crate::owl::DataPropertyIRI;
+use crate::owl::{Annotation, DataPropertyIRI};
 
 use super::DatatypeDefinitionConstructor;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataComplementOf(pub DataPropertyIRI);
+pub struct DataComplementOf(
+    #[serde(rename = "iri")] pub DataPropertyIRI,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
+);
+
+impl DataComplementOf {
+    pub fn iri(&self) -> &DataPropertyIRI {
+        &self.0
+    }
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        &self.1
+    }
+}
 
 impl From<DataComplementOf> for Box<DatatypeDefinitionConstructor> {
     fn from(c: DataComplementOf) -> Self {
@@ -23,6 +35,9 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type DataComplementOf = IRI;
+export type DataComplementOf = {
+    iri: IRI,
+    annotations: Array<Annotation>,
+};
 "#;
 }

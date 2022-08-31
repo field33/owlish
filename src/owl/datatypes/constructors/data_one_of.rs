@@ -1,9 +1,21 @@
-use crate::owl::Literal;
+use crate::owl::{Annotation, Literal};
 
 use super::DatatypeDefinitionConstructor;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataOneOf(pub Vec<Literal>);
+pub struct DataOneOf(
+    #[serde(rename = "literals")] pub Vec<Literal>,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
+);
+
+impl DataOneOf {
+    pub fn literals(&self) -> &Vec<Literal> {
+        &self.0
+    }
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        &self.1
+    }
+}
 
 impl From<DataOneOf> for Box<DatatypeDefinitionConstructor> {
     fn from(c: DataOneOf) -> Self {
@@ -22,6 +34,12 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type DataOneOf = Array<unknown>;
+/**
+ * List of literals.
+ */
+export type DataOneOf = {
+    literals: Array<unknown>,
+    annotations: Array<Annotation>,
+};
 "#;
 }

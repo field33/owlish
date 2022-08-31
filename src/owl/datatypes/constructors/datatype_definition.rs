@@ -12,10 +12,22 @@ pub enum DatatypeDefinitionConstructor {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DatatypeDefinition(
-    pub DataPropertyIRI,
-    pub DatatypeDefinitionConstructor,
-    pub Vec<Annotation>,
+    #[serde(rename = "dataPropertyIRI")] pub DataPropertyIRI,
+    #[serde(rename = "datatypeDefinition")] pub DatatypeDefinitionConstructor,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
+
+impl DatatypeDefinition {
+    pub fn data_property_iri(&self) -> &DataPropertyIRI {
+        &self.0
+    }
+    pub fn datatype_definition(&self) -> &DatatypeDefinitionConstructor {
+        &self.1
+    }
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        &self.2
+    }
+}
 
 #[cfg(feature = "wasm")]
 mod wasm {
@@ -37,6 +49,10 @@ export interface DatatypeDefinitionConstructor {
 /**
  * [DataProperty IRI, DatatypeDefinitionConstructor, annotations]
  */
-export type DatatypeDefinition = [IRI, DatatypeDefinitionConstructor, Array<Annotation>];
+export type DatatypeDefinition = {
+    dataPropertyIRI: IRI, 
+    datatypeDefinition: DatatypeDefinitionConstructor, 
+    annotations: Array<Annotation>,
+};
 "#;
 }

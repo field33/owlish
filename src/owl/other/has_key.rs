@@ -1,7 +1,11 @@
-use crate::owl::{ClassIRI, ObjectPropertyIRI};
+use crate::owl::{Annotation, ClassIRI, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct HasKey(pub ClassIRI, pub Vec<ObjectPropertyIRI>);
+pub struct HasKey(
+    #[serde(rename = "iri")] pub ClassIRI,
+    #[serde(rename = "objectProperties")] pub Vec<ObjectPropertyIRI>,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
+);
 
 #[cfg(feature = "wasm")]
 mod wasm {
@@ -9,9 +13,10 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-/**
- * [Class IRI, Array<ObjectProperty IRI>]
- */
-export type HasKey = [IRI, Array<IRI>]
+export type HasKey = {
+    iri: IRI, 
+    objectProperties: Array<IRI>,
+    annotations: Array<Annotation>,
+}
 "#;
 }

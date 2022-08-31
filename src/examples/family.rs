@@ -65,58 +65,90 @@ pub fn family() -> ApiOntology {
             Axiom::SubObjectPropertyOf(SubObjectPropertyOf(
                 iri.new::<ObjectPropertyIRI>("hasWife").into(),
                 iri.new("hasSpouse"),
+                vec![],
             )),
             Axiom::SubObjectPropertyOf(SubObjectPropertyOf(
                 ObjectPropertyChain(vec![iri.new("hasParent"), iri.new("hasParent")]).into(),
                 iri.new("hasGrandparent"),
+                vec![],
             )),
             Axiom::SubObjectPropertyOf(SubObjectPropertyOf(
                 ObjectPropertyChain(vec![iri.new("hasFather"), iri.new("hasBrother")]).into(),
                 iri.new("hasUncle"),
+                vec![],
             )),
             Axiom::SubObjectPropertyOf(SubObjectPropertyOf(
                 iri.new::<ObjectPropertyIRI>("hasFather").into(),
                 iri.new("hasParent"),
+                vec![],
             )),
             //
             Axiom::EquivalentObjectProperties(EquivalentObjectProperties(
                 iri.new("hasChild"),
                 other_ont.new("child"),
+                vec![],
             )),
             Axiom::InverseObjectProperties(InverseObjectProperties(
                 iri.new("hasChild"),
                 other_ont.new("child"),
+                vec![],
             )),
             Axiom::EquivalentDataProperties(EquivalentDataProperties(
                 iri.new("hasAge"),
                 other_ont.new("age"),
+                vec![],
             )),
             Axiom::DisjointObjectProperties(DisjointObjectProperties(
                 iri.new("hasSon"),
                 iri.new("hasDaughter"),
+                vec![],
             )),
-            Axiom::ObjectPropertyDomain(ObjectPropertyDomain(iri.new("hasWife"), iri.new("Man"))),
-            Axiom::ObjectPropertyRange(ObjectPropertyRange(iri.new("hasWife"), iri.new("Woman"))),
-            Axiom::DataPropertyDomain(DataPropertyDomain(iri.new("hasAge"), iri.class("Person"))),
+            Axiom::ObjectPropertyDomain(ObjectPropertyDomain(
+                iri.new("hasWife"),
+                iri.new("Man"),
+                vec![],
+            )),
+            Axiom::ObjectPropertyRange(ObjectPropertyRange(
+                iri.new("hasWife"),
+                iri.new("Woman"),
+                vec![],
+            )),
+            Axiom::DataPropertyDomain(DataPropertyDomain(
+                iri.new("hasAge"),
+                iri.class("Person"),
+                vec![],
+            )),
             Axiom::DataPropertyRange(DataPropertyRange(
                 iri.new("hasAge"),
                 well_known::xsd_nonNegativeInteger(),
+                vec![],
             )),
             //
-            Axiom::SymmetricObjectProperty(SymmetricObjectProperty(iri.new("hasSpouse"))),
-            Axiom::AsymmetricObjectProperty(AsymmetricObjectProperty(iri.new("hasChild"))),
+            Axiom::SymmetricObjectProperty(SymmetricObjectProperty(iri.new("hasSpouse"), vec![])),
+            Axiom::AsymmetricObjectProperty(AsymmetricObjectProperty(iri.new("hasChild"), vec![])),
             Axiom::DisjointObjectProperties(DisjointObjectProperties(
                 iri.new("hasParent"),
                 iri.new("hasSpouse"),
+                vec![],
             )),
-            Axiom::ReflexiveObjectProperty(ReflexiveObjectProperty(iri.new("hasRelative"))),
-            Axiom::IrreflexiveObjectProperty(IrreflexiveObjectProperty(iri.new("parentOf"))),
-            Axiom::FunctionalObjectProperty(FunctionalObjectProperty(iri.new("hasHusband"))),
+            Axiom::ReflexiveObjectProperty(ReflexiveObjectProperty(iri.new("hasRelative"), vec![])),
+            Axiom::IrreflexiveObjectProperty(IrreflexiveObjectProperty(
+                iri.new("parentOf"),
+                vec![],
+            )),
+            Axiom::FunctionalObjectProperty(FunctionalObjectProperty(
+                iri.new("hasHusband"),
+                vec![],
+            )),
             Axiom::InverseFunctionalObjectProperty(InverseFunctionalObjectProperty(
                 iri.new("hasHusband"),
+                vec![],
             )),
-            Axiom::TransitiveObjectProperty(TransitiveObjectProperty(iri.new("hasAncestor"))),
-            Axiom::FunctionalDataProperty(FunctionalDataProperty(iri.new("hasAge"))),
+            Axiom::TransitiveObjectProperty(TransitiveObjectProperty(
+                iri.new("hasAncestor"),
+                vec![],
+            )),
+            Axiom::FunctionalDataProperty(FunctionalDataProperty(iri.new("hasAge"), vec![])),
             //
             Axiom::SubClassOf(SubClassOf(
                 iri.class("Woman").into(),
@@ -147,7 +179,9 @@ pub fn family() -> ApiOntology {
                             Restriction::Numeric(wk::xsd_minExclusive(), Literal::from(12u8)),
                             Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(19u8)),
                         ],
+                        vec![],
                     ),
+                    vec![],
                 )
                 .into(),
                 vec![],
@@ -349,7 +383,7 @@ pub fn family() -> ApiOntology {
                 ],
                 vec![],
             )),
-            Axiom::HasKey(HasKey(iri.class("Person"), vec![iri.new("hasSSN")])),
+            Axiom::HasKey(HasKey(iri.class("Person"), vec![iri.new("hasSSN")], vec![])),
             //
             Axiom::DatatypeDefinition(DatatypeDefinition(
                 iri.new("personAge"),
@@ -359,6 +393,7 @@ pub fn family() -> ApiOntology {
                         Restriction::Numeric(wk::xsd_minInclusive(), Literal::from(0u8)),
                         Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(150u8)),
                     ],
+                    vec![],
                 )
                 .into(),
                 vec![],
@@ -371,6 +406,7 @@ pub fn family() -> ApiOntology {
                         Restriction::Numeric(wk::xsd_minExclusive(), Literal::from(0u8)),
                         Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(18u8)),
                     ],
+                    vec![],
                 )
                 .into(),
                 vec![],
@@ -379,19 +415,28 @@ pub fn family() -> ApiOntology {
                 iri.new("majorAge"),
                 DataIntersectionOf(
                     iri.new("personAge"),
-                    DataComplementOf(iri.new("minorAge")).into(),
+                    DataComplementOf(iri.new("minorAge"), vec![]).into(),
+                    vec![],
                 )
                 .into(),
                 vec![],
             )),
             Axiom::DatatypeDefinition(DatatypeDefinition(
                 iri.new("toddlerAge"),
-                DataOneOf(vec![Literal::from(1u8), Literal::from(2u8)]).into(),
+                DataOneOf(vec![Literal::from(1u8), Literal::from(2u8)], vec![]).into(),
                 vec![],
             )),
             //
-            Axiom::ClassAssertion(ClassAssertion(iri.class("Person").into(), iri.new("Mary"))),
-            Axiom::ClassAssertion(ClassAssertion(iri.class("Woman").into(), iri.new("Mary"))),
+            Axiom::ClassAssertion(ClassAssertion(
+                iri.class("Person").into(),
+                iri.new("Mary"),
+                vec![],
+            )),
+            Axiom::ClassAssertion(ClassAssertion(
+                iri.class("Woman").into(),
+                iri.new("Mary"),
+                vec![],
+            )),
             Axiom::ClassAssertion(ClassAssertion(
                 ObjectIntersectionOf(
                     vec![
@@ -402,27 +447,37 @@ pub fn family() -> ApiOntology {
                 )
                 .into(),
                 iri.new("Jack"),
+                vec![],
             )),
             Axiom::ClassAssertion(ClassAssertion(
                 ObjectMaxCardinality(4, iri.new("hasChild"), iri.class("Parent").into()).into(),
                 iri.new("John"),
+                vec![],
             )),
             Axiom::ClassAssertion(ClassAssertion(
                 ObjectMinCardinality(2, iri.new("hasChild"), iri.class("Parent").into()).into(),
                 iri.new("john"),
+                vec![],
             )),
             Axiom::ClassAssertion(ClassAssertion(
                 ObjectExactCardinality(3, iri.new("hasChild"), iri.class("Parent").into()).into(),
                 iri.new("john"),
+                vec![],
             )),
             Axiom::ClassAssertion(ClassAssertion(
                 ObjectExactCardinality(5, iri.new("hasChild"), None).into(),
                 iri.new("john"),
+                vec![],
             )),
-            Axiom::ClassAssertion(ClassAssertion(iri.class("Father").into(), iri.new("John"))),
+            Axiom::ClassAssertion(ClassAssertion(
+                iri.class("Father").into(),
+                iri.new("John"),
+                vec![],
+            )),
             Axiom::ClassAssertion(ClassAssertion(
                 iri.class("SicialRole").into(),
                 iri.new("Father"),
+                vec![],
             )),
             //
             Axiom::ObjectPropertyAssertion(ObjectPropertyAssertion(
@@ -455,10 +510,22 @@ pub fn family() -> ApiOntology {
                 Literal::from(53u8),
                 vec![],
             )),
-            Axiom::SameIndividual(SameIndividual(iri.new("James"), iri.new("Jim"))),
-            Axiom::SameIndividual(SameIndividual(iri.new("John"), other_ont.new("JohnBrown"))),
-            Axiom::SameIndividual(SameIndividual(iri.new("Mary"), other_ont.new("MaryBrown"))),
-            Axiom::DifferentIndividuals(DifferentIndividuals(iri.new("John"), iri.new("Bill"))),
+            Axiom::SameIndividual(SameIndividual(iri.new("James"), iri.new("Jim"), vec![])),
+            Axiom::SameIndividual(SameIndividual(
+                iri.new("John"),
+                other_ont.new("JohnBrown"),
+                vec![],
+            )),
+            Axiom::SameIndividual(SameIndividual(
+                iri.new("Mary"),
+                other_ont.new("MaryBrown"),
+                vec![],
+            )),
+            Axiom::DifferentIndividuals(DifferentIndividuals(
+                iri.new("John"),
+                iri.new("Bill"),
+                vec![],
+            )),
         ],
     );
     ApiOntology::from((iri.base(), owl))

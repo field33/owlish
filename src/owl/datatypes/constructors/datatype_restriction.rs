@@ -1,13 +1,32 @@
 use super::DatatypeDefinitionConstructor;
-use crate::owl::{DatatypeIRI, Literal, Regards};
+use crate::owl::{Annotation, DatatypeIRI, Literal, Regards};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Restriction {
-    Numeric(DatatypeIRI, Literal),
+    Numeric(
+        #[serde(rename = "iri")] DatatypeIRI,
+        #[serde(rename = "value")] Literal,
+    ),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DatatypeRestriction(pub DatatypeIRI, pub Vec<Restriction>);
+pub struct DatatypeRestriction(
+    #[serde(rename = "datatypeIRI")] pub DatatypeIRI,
+    #[serde(rename = "restrictions")] pub Vec<Restriction>,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
+);
+
+impl DatatypeRestriction {
+    pub fn datatype_iri(&self) -> &DatatypeIRI {
+        &self.0
+    }
+    pub fn restrictions(&self) -> &Vec<Restriction> {
+        &self.1
+    }
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        &self.2
+    }
+}
 
 impl From<DatatypeRestriction> for Box<DatatypeDefinitionConstructor> {
     fn from(c: DatatypeRestriction) -> Self {
@@ -17,15 +36,6 @@ impl From<DatatypeRestriction> for Box<DatatypeDefinitionConstructor> {
 impl From<DatatypeRestriction> for DatatypeDefinitionConstructor {
     fn from(c: DatatypeRestriction) -> Self {
         DatatypeDefinitionConstructor::DatatypeRestriction(c)
-    }
-}
-
-impl DatatypeRestriction {
-    pub fn datatype_iri(&self) -> &DatatypeIRI {
-        &self.0
-    }
-    pub fn restrictions(&self) -> &Vec<Restriction> {
-        &self.1
     }
 }
 
@@ -44,11 +54,15 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API1: &'static str = r#"
-export type Restriction = { Numeric: [IRI, number] };
+export type Restriction = { Numeric: {iri: IRI, value: number} };
 "#;
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API2: &'static str = r#"
-export type DatatypeRestriction = [IRI, Array<Restriction>];
+export type DatatypeRestriction = {
+    datatypeIRI: IRI, 
+    restrictions: Array<Restriction>,
+    annotations: Array<Annotation>,
+};
 "#;
 }

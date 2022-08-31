@@ -4,9 +4,9 @@ use super::AnnotationPropertyIRI;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct Annotation(
-    pub AnnotationPropertyIRI,
-    pub LiteralOrIRI,
-    pub Vec<Box<Annotation>>,
+    #[serde(rename = "iri")] pub AnnotationPropertyIRI,
+    #[serde(rename = "value")] pub LiteralOrIRI,
+    #[serde(rename = "annotations")] pub Vec<Box<Annotation>>,
 );
 
 impl Annotation {

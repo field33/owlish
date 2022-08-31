@@ -1,7 +1,19 @@
 use crate::owl::{Annotation, ClassConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DisjointClasses(pub Vec<ClassConstructor>, pub Vec<Annotation>);
+pub struct DisjointClasses(
+    #[serde(rename = "classes")] pub Vec<ClassConstructor>,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
+);
+
+impl DisjointClasses {
+    pub fn classes(&self) -> &Vec<ClassConstructor> {
+        &self.0
+    }
+    pub fn annotations(&self) -> &Vec<Annotation> {
+        &self.1
+    }
+}
 
 impl From<DisjointClasses> for ClassConstructor {
     fn from(c: DisjointClasses) -> Self {
@@ -29,9 +41,9 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-    /**
-     * [Array<ClassConstructor>, annotations]
-     */
-    export type DisjointClasses = [Array<ClassConstructor>, Array<Annotation>];
+export type DisjointClasses = {
+    classes: Array<ClassConstructor>, 
+    annotations: Array<Annotation>,
+};
     "#;
 }

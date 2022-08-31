@@ -25,10 +25,10 @@ impl ObjectPropertyIRI {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectPropertyAssertion(
-    pub ObjectPropertyIRI,
-    pub IndividualIRI,
-    pub IndividualIRI,
-    pub Vec<Annotation>,
+    #[serde(rename = "iri")] pub ObjectPropertyIRI,
+    #[serde(rename = "subject")] pub IndividualIRI,
+    #[serde(rename = "object")] pub IndividualIRI,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
 
 impl ObjectPropertyAssertion {
@@ -48,10 +48,10 @@ impl ObjectPropertyAssertion {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct NegativeObjectPropertyAssertion(
-    pub ObjectPropertyIRI,
-    pub IndividualIRI,
-    pub IndividualIRI,
-    pub Vec<Annotation>,
+    #[serde(rename = "iri")] pub ObjectPropertyIRI,
+    #[serde(rename = "subject")] pub IndividualIRI,
+    #[serde(rename = "object")] pub IndividualIRI,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
 
 impl NegativeObjectPropertyAssertion {
@@ -82,16 +82,44 @@ mod wasm {
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API1: &'static str = r#"
 /**
- * [ObjectProperty IRI, Individual IRI, Individual IRI]
+ * Assigngs an ObjectProperty to two Individuals.
  */
-export type ObjectPropertyAssertion = [IRI, IRI, IRI]
+export type ObjectPropertyAssertion = {
+    /**
+     * The IRI of the property.
+     */
+    iri: IRI,
+    /**
+     * The subject Individual.
+     */
+    subject: IRI,
+    /**
+     * The object Individual
+     */
+    object: IRI,
+    annotations: Vec<Annotation>,
+};
 "#;
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API2: &'static str = r#"
 /**
- * [ObjectProperty IRI, Individual IRI, Individual IRI]
+ * Opposite of ObjectPropertyAssertion.
  */
-export type NegativeObjectPropertyAssertion = [IRI, IRI, IRI]
+export type NegativeObjectPropertyAssertion = {
+    /**
+     * The IRI of the property.
+     */
+    iri: IRI,
+    /**
+     * The subject Individual.
+     */
+    subject: IRI,
+    /**
+     * The object Individual
+     */
+    object: IRI,
+    annotations: Vec<Annotation>,
+};
 "#;
 }

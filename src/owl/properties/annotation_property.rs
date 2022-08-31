@@ -60,10 +60,10 @@ impl AnnotationPropertyRange {
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct AnnotationAssertion(
-    pub AnnotationPropertyIRI,
-    pub IRI,
-    pub LiteralOrIRI,
-    pub Vec<Annotation>,
+    #[serde(rename = "iri")] pub AnnotationPropertyIRI,
+    #[serde(rename = "subject")] pub IRI,
+    #[serde(rename = "value")] pub LiteralOrIRI,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
 
 impl AnnotationAssertion {
@@ -103,15 +103,39 @@ mod wasm {
     use wasm_bindgen::prelude::wasm_bindgen;
 
     #[wasm_bindgen(typescript_custom_section)]
-    const WASM_API1: &'static str = r#"
+    const WASM_API_ANNOTATION_ASSERTION: &'static str = r#"
 /**
- * [AnnotationProperty IRI, Subject IRI, value]
+ * Assertion of an AnnotationProperty to some subject 
  */
-export type AnnotationAssertion = [IRI, IRI, unknown];
+export type AnnotationAssertion = {
+    /**
+     * The IRI of this annoration.
+     */
+    iri: IRI, 
+    /**
+     * The subject IRI.
+     */
+    subject: IRI, 
+    /**
+     * The asserted value.
+     */
+    value: unknown, 
+    annotations: Array<Annotation>
+};
 "#;
 
     #[wasm_bindgen(typescript_custom_section)]
-    const WASM_API2: &'static str = r#"
-export type Annotation = [IRI, unknown];
+    const WASM_API_ANNOTATION: &'static str = r#"
+export type Annotation = {
+    /**
+     * The annotation IRI.
+     */
+    iri: IRI,
+    /**
+     * The annotated value.
+     */
+    value: unknown,
+    annotations: Array<Annotation>,
+};
 "#;
 }

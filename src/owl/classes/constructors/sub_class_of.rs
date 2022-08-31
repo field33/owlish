@@ -5,11 +5,9 @@ use crate::owl::{Annotation, Axiom, ClassConstructor, Regards, IRI};
 /// Structure `(subject, object, annotations)`.
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct SubClassOf(
-    /// subject
-    pub Box<ClassConstructor>,
-    /// object
-    pub Box<ClassConstructor>,
-    pub Vec<Annotation>,
+    #[serde(rename = "cls")] pub Box<ClassConstructor>,
+    #[serde(rename = "parentClass")] pub Box<ClassConstructor>,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
 
 impl SubClassOf {
@@ -34,11 +32,6 @@ impl From<SubClassOf> for ClassConstructor {
         ClassConstructor::SubClassOf(sco)
     }
 }
-// impl<'a> From<&'a SubClassOf> for &'a ClassConstructor {
-//     fn from(sco: &'a SubClassOf) -> Self {
-//         &ClassConstructor::SubClassOf(*sco)
-//     }
-// }
 
 impl Regards for SubClassOf {
     fn regards(&self, iri: &IRI) -> bool {
@@ -66,9 +59,10 @@ mod wasm {
     use wasm_bindgen::prelude::wasm_bindgen;
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-/**
- * [ClassConstructor, ClassConstructor, Array<Annotation>]
- */
-export type SubClassOf = [ClassConstructor, ClassConstructor, Array<Annotation>];
+export type SubClassOf = {
+    cls: ClassConstructor,
+    parentClass: ClassConstructor,
+    annotations: Array<Annotation>,
+};
 "#;
 }

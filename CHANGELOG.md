@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.6.2 - 2022-09-01
+#### Bug Fixes
+- Improve typescript types - (8c52359) - Florian Loers
+#### Miscellaneous Chores
+- Remove wee alloc - (e10a230) - Florian Loers
+
+- - -
+
 ## v0.6.1 - 2022-08-17
 #### Bug Fixes
 - Fix broken wasm API for Iri handling - (cf6f89d) - Florian Loers

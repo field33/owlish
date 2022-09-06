@@ -38,7 +38,7 @@ mod wasm {
  * List of literals.
  */
 export type DataOneOf = {
-    literals: Array<unknown>,
+    literals: Array<Value>,
     annotations: Array<Annotation>,
 };
 "#;

@@ -4,7 +4,7 @@ mod constructors;
 pub use constructors::*;
 use serde::{Deserialize, Serialize};
 
-use super::{Annotation, Literal};
+use super::{Annotation, Axiom, Literal};
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct DatatypeIRI(pub IRI);
@@ -40,6 +40,12 @@ pub struct DataPropertyAssertion(
     #[serde(rename = "value")] pub Literal,
     #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
+
+impl From<DataPropertyAssertion> for Axiom {
+    fn from(dpa: DataPropertyAssertion) -> Self {
+        Axiom::DataPropertyAssertion(dpa)
+    }
+}
 
 impl DataPropertyAssertion {
     pub fn iri(&self) -> &DataPropertyIRI {
@@ -97,7 +103,7 @@ export type DataPropertyAssertion = {
      * IRI of the subject Individual.
      */
     subject: IRI,
-    value: unknown,
+    value: Value,
     annotations: Array<Annotation>,
 };
 "#;
@@ -116,7 +122,7 @@ export type NegativeDataPropertyAssertion = {
      * IRI of the subject Individual.
      */
     subject: IRI,
-    value: unknown,
+    value: Value,
     annotations: Array<Annotation>,
 }
 "#;

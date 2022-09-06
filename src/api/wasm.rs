@@ -148,6 +148,39 @@ export interface IRI {
     _type: "IRI",
     string: string
 }
+
+export type Value = {
+    _type: "string",
+    value: string,
+    datatypeIri: string,
+    lang: null,
+} | {
+    _type: "raw",
+    value: Uint8Array,
+    datatypeIri: string,
+    lang: null,
+} | {
+    _type: "dateTime",
+    value: string,
+    datatypeIri: string,
+    lang: null,
+} | {
+    _type: "langString",
+    value: string,
+    datatypeIri: string,
+    lang: string,
+} | {
+    _type: "number",
+    value: number,
+    datatypeIri: string,
+    lang: null,
+} | {
+    _type: "boolean",
+    value: boolean,
+    datatypeIri: string,
+    lang: null,
+}
+
 "#;
 
 #[wasm_bindgen]
@@ -232,9 +265,21 @@ impl well_known {
     pub fn rdfs_label() -> IRI {
         iri_to_js_iri(&crate::owl::well_known::rdfs_label().as_iri()).unwrap()
     }
+    pub fn rdfs_subClassOf() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::rdfs_subClassOf().as_iri()).unwrap()
+    }
 
+    pub fn xsd_boolean() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_boolean().as_iri()).unwrap()
+    }
+    pub fn xsd_string() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_float().as_iri()).unwrap()
+    }
     pub fn xsd_float() -> IRI {
         iri_to_js_iri(&crate::owl::well_known::xsd_float().as_iri()).unwrap()
+    }
+    pub fn xsd_dateTime() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::xsd_dateTime().as_iri()).unwrap()
     }
     pub fn xsd_integer() -> IRI {
         iri_to_js_iri(&crate::owl::well_known::xsd_integer().as_iri()).unwrap()

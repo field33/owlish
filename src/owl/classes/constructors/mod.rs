@@ -1,4 +1,5 @@
 mod sub_class_of;
+
 pub use sub_class_of::*;
 
 mod equivalent_classes;
@@ -40,3 +41,20 @@ pub use object_has_self::*;
 /// Class construction based on instances
 mod object_one_of;
 pub use object_one_of::*;
+
+// #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+// pub enum Constructor {
+//     SubClassOf(SubClassOf),
+//     EquivalendClasses(EquivalentClasses),
+//     DisjointClasses(DisjointClasses),
+//     ObjectIntersectionOf(ObjectIntersectionOf),
+//     ObjectUnionOf(ObjectUnionOf),
+//     ObjectComplementOf(ObjectComplementOf),
+//     ObjectSomeValuesFrom(ObjectSomeValuesFrom),
+//     ObjectMaxCardinality(ObjectMaxCardinality),
+//     ObjectMinCardinality(ObjectMinCardinality),
+//     ObjectExactCardinality(ObjectExactCardinality),
+//     ObjectAllValuesFrom(ObjectAllValuesFrom),
+//     ObjectHasValaue(ObjectHasValue),
+//     ObjectHasSelf(ObjectHasSelf),
+// }

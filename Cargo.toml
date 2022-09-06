@@ -23,6 +23,7 @@ wasm-bindgen = { version = "0.2", features = [
 ], optional = true }
 js-sys = "0.3"
 web-sys = { version = "0.3", features = ["console"] }
+# harriet = { git = "https://github.com/field33/harriet" }
 harriet = "0.2"
 time = { version = "0.3", features = ["formatting"] }
 # The `console_error_panic_hook` crate provides better debugging of panics by
@@ -32,6 +33,8 @@ time = { version = "0.3", features = ["formatting"] }
 console_error_panic_hook = { version = "0.1", optional = true }
 
 pct-str = "1.1.0"
+log = "0.4"
+env_logger = "0.9"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.32"

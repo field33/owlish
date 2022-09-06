@@ -2,9 +2,9 @@ use crate::owl::{Annotation, ClassConstructor, LiteralOrIRI, ObjectPropertyConst
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectHasValue(
-    pub ObjectPropertyConstructor,
-    pub LiteralOrIRI,
-    pub Vec<Annotation>,
+    #[serde(rename = "objectProperty")] pub ObjectPropertyConstructor,
+    #[serde(rename = "valueOrIRI")] pub LiteralOrIRI,
+    #[serde(rename = "annotations")] pub Vec<Annotation>,
 );
 
 impl ObjectHasValue {
@@ -44,6 +44,10 @@ mod wasm {
     use wasm_bindgen::prelude::wasm_bindgen;
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type ObjectHasValue = [ObjectPropertyConstructor, unknown, Array<Annotation>];
+export type ObjectHasValue = {
+    objectProperty: ObjectPropertyConstructor, 
+    valueOrIRI: Value | IRI, 
+    annotations: Array<Annotation>
+};
 "#;
 }

@@ -7,6 +7,7 @@ pub enum Declaration {
     NamedIndividual(IndividualIRI, Vec<Annotation>),
     ObjectProperty(ObjectPropertyIRI, Vec<Annotation>),
     DataProperty(DataPropertyIRI, Vec<Annotation>),
+    AnnotationProperty(AnnotationPropertyIRI, Vec<Annotation>),
     Datatype(DatatypeIRI, Vec<Annotation>),
 }
 
@@ -17,6 +18,7 @@ impl Declaration {
             Declaration::NamedIndividual(_, a) => a,
             Declaration::ObjectProperty(_, a) => a,
             Declaration::DataProperty(_, a) => a,
+            Declaration::AnnotationProperty(_, a) => a,
             Declaration::Datatype(_, a) => a,
         }
     }

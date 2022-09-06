@@ -46,6 +46,16 @@ pub enum ClassConstructor {
     ObjectHasSelf(ObjectHasSelf),
 }
 
+impl From<IRI> for Box<ClassConstructor> {
+    fn from(iri: IRI) -> Self {
+        Box::new(ClassConstructor::IRI(iri.into()))
+    }
+}
+impl From<IRI> for ClassConstructor {
+    fn from(iri: IRI) -> Self {
+        ClassConstructor::IRI(iri.into())
+    }
+}
 impl From<ClassIRI> for Box<ClassConstructor> {
     fn from(iri: ClassIRI) -> Self {
         Box::new(ClassConstructor::IRI(iri))

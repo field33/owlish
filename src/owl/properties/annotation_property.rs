@@ -119,7 +119,7 @@ export type AnnotationAssertion = {
     /**
      * The asserted value.
      */
-    value: unknown, 
+    value: Value, 
     annotations: Array<Annotation>
 };
 "#;
@@ -134,7 +134,7 @@ export type Annotation = {
     /**
      * The annotated value.
      */
-    value: unknown,
+    value: Value,
     annotations: Array<Annotation>,
 };
 "#;

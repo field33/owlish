@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.7.0 - 2022-09-08
+#### Features
+- Add spec-based rdf triple parser - (dd00a40) - Florian Loers
+
+- - -
+
 ## v0.6.2 - 2022-09-01
 #### Bug Fixes
 - Improve typescript types - (8c52359) - Florian Loers

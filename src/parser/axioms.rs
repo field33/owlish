@@ -12,8 +12,8 @@ use crate::parser::matcher::Value;
 use crate::rdf_match;
 use std::collections::HashMap;
 
-pub(crate) fn match_axioms(
-    matchers: &mut Vec<(RdfMatcher, MatcherHandler)>,
+pub(crate) fn match_axioms<'a>(
+    matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
     prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
     matchers.push((

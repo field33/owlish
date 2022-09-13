@@ -23,14 +23,13 @@ const WELL_KNOWN_ANNOTATIONS: [&str; 2] = [
 
 /// annotations
 /// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Parsing_of_Annotations
-pub(crate) fn match_annotations(
-    matchers: &mut Vec<(RdfMatcher, MatcherHandler)>,
+pub(crate) fn match_annotations<'a>(
+    matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
     prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
     // annotations on things
     matchers.push((
         rdf_match!("Annotation", prefixes,
-            [:subject] [*:predicate] [:object] .
             [iob:a] [rdf:type] [owl:Axiom] .
             [iob:a] [owl:annotatedSource] [:subject] .
             [iob:a] [owl:annotatedProperty] [*:predicate] .
@@ -198,7 +197,7 @@ fn handle_annotation_on_bn(
             Axiom::AnnotationAssertion(aa) => {
                 if aa.subject() == &IRI::new(&subject)?
                     && aa.iri() == &IRI::new(&predicate)?.into()
-                    && aa.value() == &Literal::String(object.clone()).into()
+                    && aa.value() == &Literal::String(object.to_string()).into()
                 {
                     aa.3.push(Annotation(predicate_iri.into(), value.into(), vec![]));
                     return Ok(true);
@@ -290,7 +289,7 @@ fn handle_like_blank_but_with_iri(
             Axiom::AnnotationAssertion(aa) => {
                 if aa.subject() == &IRI::new(&subject)?
                     && aa.iri() == &IRI::new(&predicate)?.into()
-                    && aa.value() == &Literal::String(object.clone()).into()
+                    && aa.value() == &Literal::String(object.to_string()).into()
                 {
                     aa.3.push(Annotation(predicate_iri.into(), value.into(), vec![]));
                     return Ok(true);
@@ -401,7 +400,7 @@ fn handle_annotation_on_iri(
                         if let Ok(iri) = IRI::new(lexical_form) {
                             LiteralOrIRI::IRI(iri)
                         } else {
-                            LiteralOrIRI::Literal(Literal::String(lexical_form.clone()))
+                            LiteralOrIRI::Literal(Literal::String(lexical_form.to_string()))
                         }
                     }
                 };

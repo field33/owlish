@@ -11,7 +11,7 @@ use crate::{
 };
 
 use super::{
-    collector::{get_iri_var, BlankNodeHandle, MatcherHandler, OntologyCollector},
+    collector::{get_iri_var, Ann, Annotate, MatcherHandler, OntologyCollector},
     matcher::MatcherState,
 };
 
@@ -25,13 +25,93 @@ const WELL_KNOWN_ANNOTATIONS: [&str; 2] = [
 /// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Parsing_of_Annotations
 pub(crate) fn match_annotations(
     matchers: &mut Vec<(RdfMatcher, MatcherHandler)>,
-    _prefixes: &HashMap<String, String>,
+    prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
+    // annotations on things
+    matchers.push((
+        rdf_match!("Annotation", prefixes,
+            [:subject] [*:predicate] [:object] .
+            [iob:a] [rdf:type] [owl:Axiom] .
+            [iob:a] [owl:annotatedSource] [:subject] .
+            [iob:a] [owl:annotatedProperty] [*:predicate] .
+            [iob:a] [owl:annotatedTarget] [:object] .
+        )?,
+        Box::new(|mstate, o, _| {
+            if let Some(bn) = mstate.last("a") {
+                match bn {
+                    Value::Blank(bn) => {
+                        if let Some(Value::Iri(subject)) = mstate.last("subject") {
+                            if let Some(Value::Iri(predicate)) = mstate.last("predicate") {
+                                match mstate.last("object") {
+                                    Some(Value::Iri(object)) => o.insert_annotation(
+                                        Ann::Bn(bn.clone()),
+                                        Annotate {
+                                            subject: subject.clone(),
+                                            predicate: predicate.clone(),
+                                            object: object.clone(),
+                                        },
+                                    ),
+                                    Some(Value::Literal {
+                                        lexical_form,
+                                        datatype_iri: _,
+                                        language_tag: _,
+                                    }) => {
+                                        o.insert_annotation(
+                                            Ann::Bn(bn.clone()),
+                                            Annotate {
+                                                subject: subject.clone(),
+                                                predicate: predicate.clone(),
+                                                object: lexical_form.clone(),
+                                            },
+                                        );
+                                    }
+                                    _ => todo!(),
+                                }
+                            }
+                        }
+                    }
+                    Value::Iri(iri) => {
+                        if let Some(Value::Iri(subject)) = mstate.last("subject") {
+                            if let Some(Value::Iri(predicate)) = mstate.last("predicate") {
+                                match mstate.last("object") {
+                                    Some(Value::Iri(object)) => o.insert_annotation(
+                                        Ann::Iri(iri.clone()),
+                                        Annotate {
+                                            subject: subject.clone(),
+                                            predicate: predicate.clone(),
+                                            object: object.clone(),
+                                        },
+                                    ),
+                                    Some(Value::Literal {
+                                        lexical_form,
+                                        datatype_iri: _,
+                                        language_tag: _,
+                                    }) => {
+                                        o.insert_annotation(
+                                            Ann::Iri(iri.clone()),
+                                            Annotate {
+                                                subject: subject.clone(),
+                                                predicate: predicate.clone(),
+                                                object: lexical_form.clone(),
+                                            },
+                                        );
+                                    }
+                                    _ => todo!(),
+                                }
+                            }
+                        }
+                    }
+                    _ => todo!(),
+                }
+            }
+            Ok(false)
+        }),
+    ));
+
     matchers.push((
         rdf_match!("AnnotationAssertion", _prefixes, 
             [iob:subject] [*:predicate] [lt:object] .)?,
-        Box::new(|mstate, o| {
-            println!("{:#?}", mstate);
+        Box::new(|mstate, o, options| {
             if let Some(obj) = mstate.get("object") {
                 let value: Literal = match obj.clone().try_into() {
                     Ok(l) => l,
@@ -39,11 +119,26 @@ pub(crate) fn match_annotations(
                 };
                 if let Some(predicate_iri) = get_iri_var("predicate", mstate)? {
                     if o.annotation_property(&predicate_iri).is_some()
+                        || options.is_annotation(predicate_iri.as_str())
                         || WELL_KNOWN_ANNOTATIONS.contains(&predicate_iri.as_str())
                     {
                         if let Some(subject) = mstate.get("subject") {
                             match subject {
                                 Value::Iri(subject_iri) => {
+                                    if o.annotation(Ann::Iri(subject_iri.clone())).is_some() {
+                                        return Ok(false);
+                                    }
+                                    if let Some(annotate) =
+                                        o.annotation(Ann::Iri(subject_iri.clone())).cloned()
+                                    {
+                                        return handle_like_blank_but_with_iri(
+                                            o,
+                                            annotate,
+                                            predicate_iri,
+                                            value,
+                                        );
+                                    }
+
                                     return handle_annotation_on_iri(
                                         subject_iri,
                                         value,
@@ -55,7 +150,7 @@ pub(crate) fn match_annotations(
                                 Value::Blank(subject_bn) => {
                                     return handle_annotation_on_bn(
                                         o,
-                                        subject_bn,
+                                        subject_bn.clone(),
                                         predicate_iri,
                                         value,
                                     );
@@ -75,107 +170,191 @@ pub(crate) fn match_annotations(
 
 fn handle_annotation_on_bn(
     o: &mut OntologyCollector,
-    subject_bn: &harriet::triple_production::RdfBlankNode,
+    subject_bn: harriet::triple_production::RdfBlankNode,
     predicate_iri: IRI,
     value: Literal,
 ) -> Result<bool, Error> {
-    let bnh = if let Some(bnh) = o.get_blank(subject_bn) {
-        bnh.clone()
-    } else {
+    let annotate = o.annotation(Ann::Bn(subject_bn)).cloned();
+    if annotate.is_none() {
         return Ok(false);
-    };
-    match bnh {
-        BlankNodeHandle::Annotate {
-            subject,
-            predicate,
-            object,
-        } => {
-            for a in o.axioms_mut() {
-                match a {
-                    Axiom::SubClassOf(sco) => {
-                        if sco.subject() == &ClassConstructor::IRI(IRI::new(&subject)?.into())
-                            && predicate == well_known::rdfs_subClassOf().as_iri().as_str()
-                            && sco.parent() == &ClassConstructor::IRI(IRI::new(&object)?.into())
-                        {
-                            sco.2
-                                .push(Annotation(predicate_iri.into(), value.into(), vec![]));
-                            return Ok(true);
-                        }
-                    }
-                    Axiom::AnnotationAssertion(aa) => {
-                        if aa.subject() == &IRI::new(&subject)?
-                            && aa.iri() == &IRI::new(&predicate)?.into()
-                            && aa.value() == &Literal::String(object.clone()).into()
-                        {
-                            aa.3.push(Annotation(predicate_iri.into(), value.into(), vec![]));
-                            return Ok(true);
-                        }
-                    }
-                    Axiom::SubObjectPropertyOf(_) => todo!(),
-                    Axiom::EquivalentObjectProperties(_) => {
-                        todo!()
-                    }
-                    Axiom::EquivalentDataProperties(_) => {
-                        todo!()
-                    }
-                    Axiom::InverseObjectProperties(_) => {
-                        todo!()
-                    }
-                    Axiom::DisjointObjectProperties(_) => {
-                        todo!()
-                    }
-                    Axiom::ObjectPropertyDomain(_) => todo!(),
-                    Axiom::ObjectPropertyRange(_) => todo!(),
-                    Axiom::DataPropertyDomain(_) => todo!(),
-                    Axiom::DataPropertyRange(_) => todo!(),
-                    Axiom::SymmetricObjectProperty(_) => {
-                        todo!()
-                    }
-                    Axiom::AsymmetricObjectProperty(_) => {
-                        todo!()
-                    }
-                    Axiom::ReflexiveObjectProperty(_) => {
-                        todo!()
-                    }
-                    Axiom::IrreflexiveObjectProperty(_) => {
-                        todo!()
-                    }
-                    Axiom::FunctionalObjectProperty(_) => {
-                        todo!()
-                    }
-                    Axiom::InverseFunctionalObjectProperty(_) => {
-                        todo!()
-                    }
-                    Axiom::TransitiveObjectProperty(_) => {
-                        todo!()
-                    }
-                    Axiom::FunctionalDataProperty(_) => todo!(),
-                    Axiom::EquivalentClasses(_) => todo!(),
-                    Axiom::DisjointClasses(_) => todo!(),
-                    Axiom::DatatypeDefinition(_) => todo!(),
-                    Axiom::ClassAssertion(_) => todo!(),
-                    Axiom::SameIndividual(_) => todo!(),
-                    Axiom::DifferentIndividuals(_) => todo!(),
-                    Axiom::ObjectPropertyAssertion(_) => {
-                        todo!()
-                    }
-                    Axiom::NegativeObjectPropertyAssertion(_) => {
-                        todo!()
-                    }
-                    Axiom::DataPropertyAssertion(_) => todo!(),
-                    Axiom::NegativeDataPropertyAssertion(_) => {
-                        todo!()
-                    }
-                    Axiom::HasKey(_) => todo!(),
+    }
+    let annotate = annotate.unwrap();
+    let subject = annotate.subject;
+    let predicate = annotate.predicate;
+    let object = annotate.object;
+
+    for a in o.axioms_mut() {
+        match a {
+            Axiom::SubClassOf(sco) => {
+                if sco.subject() == &ClassConstructor::IRI(IRI::new(&subject)?.into())
+                    && predicate == well_known::rdfs_subClassOf().as_iri().as_str()
+                    && sco.parent() == &ClassConstructor::IRI(IRI::new(&object)?.into())
+                {
+                    sco.2
+                        .push(Annotation(predicate_iri.into(), value.into(), vec![]));
+                    return Ok(true);
                 }
             }
-            Ok(false)
-        }
-        _ => {
-            //ignore
-            Ok(false)
+            Axiom::AnnotationAssertion(aa) => {
+                if aa.subject() == &IRI::new(&subject)?
+                    && aa.iri() == &IRI::new(&predicate)?.into()
+                    && aa.value() == &Literal::String(object.clone()).into()
+                {
+                    aa.3.push(Annotation(predicate_iri.into(), value.into(), vec![]));
+                    return Ok(true);
+                }
+            }
+            Axiom::SubObjectPropertyOf(_) => todo!(),
+            Axiom::EquivalentObjectProperties(_) => {
+                todo!()
+            }
+            Axiom::EquivalentDataProperties(_) => {
+                todo!()
+            }
+            Axiom::InverseObjectProperties(_) => {
+                todo!()
+            }
+            Axiom::DisjointObjectProperties(_) => {
+                todo!()
+            }
+            Axiom::ObjectPropertyDomain(_) => todo!(),
+            Axiom::ObjectPropertyRange(_) => todo!(),
+            Axiom::DataPropertyDomain(_) => todo!(),
+            Axiom::DataPropertyRange(_) => todo!(),
+            Axiom::SymmetricObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::AsymmetricObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::ReflexiveObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::IrreflexiveObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::FunctionalObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::InverseFunctionalObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::TransitiveObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::FunctionalDataProperty(_) => todo!(),
+            Axiom::EquivalentClasses(_) => todo!(),
+            Axiom::DisjointClasses(_) => todo!(),
+            Axiom::DatatypeDefinition(_) => todo!(),
+            Axiom::ClassAssertion(_) => todo!(),
+            Axiom::SameIndividual(_) => todo!(),
+            Axiom::DifferentIndividuals(_) => todo!(),
+            Axiom::ObjectPropertyAssertion(_) => {
+                todo!()
+            }
+            Axiom::NegativeObjectPropertyAssertion(_) => {
+                todo!()
+            }
+            Axiom::DataPropertyAssertion(_) => todo!(),
+            Axiom::NegativeDataPropertyAssertion(_) => {
+                todo!()
+            }
+            Axiom::HasKey(_) => todo!(),
         }
     }
+    Ok(false)
+}
+
+fn handle_like_blank_but_with_iri(
+    o: &mut OntologyCollector,
+    annotate: Annotate,
+    predicate_iri: IRI,
+    value: Literal,
+) -> Result<bool, Error> {
+    let subject = annotate.subject;
+    let predicate = annotate.predicate;
+    let object = annotate.object;
+
+    for a in o.axioms_mut() {
+        match a {
+            Axiom::SubClassOf(sco) => {
+                if sco.subject() == &ClassConstructor::IRI(IRI::new(&subject)?.into())
+                    && predicate == well_known::rdfs_subClassOf().as_iri().as_str()
+                    && sco.parent() == &ClassConstructor::IRI(IRI::new(&object)?.into())
+                {
+                    sco.2
+                        .push(Annotation(predicate_iri.into(), value.into(), vec![]));
+                    return Ok(true);
+                }
+            }
+            Axiom::AnnotationAssertion(aa) => {
+                if aa.subject() == &IRI::new(&subject)?
+                    && aa.iri() == &IRI::new(&predicate)?.into()
+                    && aa.value() == &Literal::String(object.clone()).into()
+                {
+                    aa.3.push(Annotation(predicate_iri.into(), value.into(), vec![]));
+                    return Ok(true);
+                }
+            }
+            Axiom::SubObjectPropertyOf(_) => todo!(),
+            Axiom::EquivalentObjectProperties(_) => {
+                todo!()
+            }
+            Axiom::EquivalentDataProperties(_) => {
+                todo!()
+            }
+            Axiom::InverseObjectProperties(_) => {
+                todo!()
+            }
+            Axiom::DisjointObjectProperties(_) => {
+                todo!()
+            }
+            Axiom::ObjectPropertyDomain(_) => todo!(),
+            Axiom::ObjectPropertyRange(_) => todo!(),
+            Axiom::DataPropertyDomain(_) => todo!(),
+            Axiom::DataPropertyRange(_) => todo!(),
+            Axiom::SymmetricObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::AsymmetricObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::ReflexiveObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::IrreflexiveObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::FunctionalObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::InverseFunctionalObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::TransitiveObjectProperty(_) => {
+                todo!()
+            }
+            Axiom::FunctionalDataProperty(_) => todo!(),
+            Axiom::EquivalentClasses(_) => todo!(),
+            Axiom::DisjointClasses(_) => todo!(),
+            Axiom::DatatypeDefinition(_) => todo!(),
+            Axiom::ClassAssertion(_) => todo!(),
+            Axiom::SameIndividual(_) => todo!(),
+            Axiom::DifferentIndividuals(_) => todo!(),
+            Axiom::ObjectPropertyAssertion(_) => {
+                todo!()
+            }
+            Axiom::NegativeObjectPropertyAssertion(_) => {
+                todo!()
+            }
+            Axiom::DataPropertyAssertion(_) => todo!(),
+            Axiom::NegativeDataPropertyAssertion(_) => {
+                todo!()
+            }
+            Axiom::HasKey(_) => todo!(),
+        }
+    }
+    Ok(false)
 }
 
 fn handle_annotation_on_iri(

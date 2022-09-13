@@ -4,20 +4,28 @@ use harriet::triple_production::RdfBlankNode;
 
 use crate::{api::Ontology, error::Error, owl::*, parser::matcher::Value};
 
-use super::matcher::MatcherState;
+use super::{matcher::MatcherState, ParserOptions};
 
 /// Handle when a matcher matched. Returns whether the matched rules where actually
 pub(crate) type MatcherHandler =
-    Box<dyn Fn(&MatcherState, &mut OntologyCollector) -> Result<bool, Error>>;
+    Box<dyn Fn(&MatcherState, &mut OntologyCollector, &ParserOptions) -> Result<bool, Error>>;
 
 #[derive(Debug, Clone)]
 pub(crate) enum BlankNodeHandle {
-    Annotate {
-        subject: String,
-        predicate: String,
-        object: String,
-    },
     ClassConstructor(Box<ClassConstructor>),
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub(crate) enum Ann {
+    Bn(RdfBlankNode),
+    Iri(String),
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct Annotate {
+    pub(crate) subject: String,
+    pub(crate) predicate: String,
+    pub(crate) object: String,
 }
 
 #[derive(Debug, Default)]
@@ -30,6 +38,7 @@ pub(crate) struct OntologyCollector {
     // child node -> root node
     sequence_tree: HashMap<RdfBlankNode, Option<RdfBlankNode>>,
 
+    annotations: HashMap<Ann, Annotate>,
     blank_nodes: HashMap<RdfBlankNode, BlankNodeHandle>,
 }
 
@@ -62,6 +71,14 @@ impl OntologyCollector {
 
     pub(crate) fn insert_blank_node(&mut self, bn: RdfBlankNode, bnh: BlankNodeHandle) {
         self.blank_nodes.insert(bn, bnh);
+    }
+
+    pub(crate) fn insert_annotation(&mut self, key: Ann, value: Annotate) {
+        self.annotations.insert(key, value);
+    }
+
+    pub(crate) fn annotation(&self, ann: Ann) -> Option<&Annotate> {
+        self.annotations.get(&ann)
     }
 
     pub(crate) fn ontology(self) -> Ontology {

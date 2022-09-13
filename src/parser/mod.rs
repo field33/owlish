@@ -1,11 +1,13 @@
-use std::rc::Rc;
+use std::{collections::HashMap, rc::Rc};
 
 use harriet::triple_production::RdfTriple;
 use log::debug;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     api::Ontology,
     error::Error,
+    owl::{well_known, Declaration},
     parser::matcher::{display, IRIOrBlank, MatchResult, RdfMatcher},
 };
 
@@ -35,7 +37,7 @@ macro_rules! parser_debug {
 }
 
 impl Ontology {
-    pub fn parse(ttl: &str) -> Result<Self, Error> {
+    pub fn parse(ttl: &str, options: ParserOptions) -> Result<Self, Error> {
         let ttl =
             harriet::TurtleDocument::parse_full(ttl).map_err(|e| Error::new(format!("{:?}", e)))?;
 
@@ -48,7 +50,20 @@ impl Ontology {
 
         let mut collector = OntologyCollector::new();
 
-        let prefixes = get_prefixes(ttl);
+        let mut prefixes = get_prefixes(ttl);
+        // handle non-existing well known prefixes
+        if !prefixes.contains_key("rdf") {
+            prefixes.insert("rdf".into(), well_known::rdf_base_str.into());
+        }
+        if !prefixes.contains_key("rdfs") {
+            prefixes.insert("rdfs".into(), well_known::rdfs_base_str.into());
+        }
+        if !prefixes.contains_key("xsd") {
+            prefixes.insert("xsd".into(), well_known::xsd_base_str.into());
+        }
+        if !prefixes.contains_key("owl") {
+            prefixes.insert("owl".into(), well_known::owl_base_str.into());
+        }
 
         let mut matchers: Vec<(RdfMatcher, MatcherHandler)> = Vec::new();
 
@@ -104,7 +119,7 @@ impl Ontology {
                 for (mid, _, mstate, finished) in &started_matches {
                     if *finished {
                         let (_m, handler) = &matchers[*mid];
-                        if !handler(mstate, &mut collector)? {
+                        if !handler(mstate, &mut collector, &options)? {
                             // todo: did not meet semantic criteria
                         }
                     }
@@ -123,6 +138,66 @@ impl From<Vec<String>> for Error {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ParserOption {
+    Known(Vec<Declaration>),
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ParserOptionKey {
+    Known,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ParserOptions {
+    entries: HashMap<ParserOptionKey, ParserOption>,
+}
+
+impl ParserOptions {
+    pub fn is_annotation(&self, iri: &str) -> bool {
+        if let Some(ParserOption::Known(declarations)) = self.entries.get(&ParserOptionKey::Known) {
+            for d in declarations {
+                if let Declaration::AnnotationProperty(anno, _) = d {
+                    if anno.as_iri().as_str() == iri {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    pub fn builder() -> ParserOptionsBuilder {
+        ParserOptionsBuilder {
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct ParserOptionsBuilder {
+    options: ParserOptions,
+}
+
+impl ParserOptionsBuilder {
+    pub fn known(mut self, declaration: Declaration) -> Self {
+        if let Some(ParserOption::Known(known)) =
+            self.options.entries.get_mut(&ParserOptionKey::Known)
+        {
+            known.push(declaration);
+        } else {
+            self.options.entries.insert(
+                ParserOptionKey::Known,
+                ParserOption::Known(vec![declaration]),
+            );
+        }
+        self
+    }
+    pub fn build(self) -> ParserOptions {
+        self.options
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{
@@ -132,6 +207,7 @@ mod tests {
             DataPropertyAssertion, Declaration, Literal, LiteralOrIRI, ObjectIntersectionOf,
             SubClassOf, IRI,
         },
+        parser::ParserOptions,
     };
 
     #[test]
@@ -148,7 +224,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o: Ontology = Ontology::parse(turtle).unwrap();
+        let o: Ontology = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.iri.to_string(), "http://test#");
     }
 
@@ -170,7 +246,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o: Ontology = Ontology::parse(turtle).unwrap();
+        let o: Ontology = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 5);
         assert_eq!(
             *o.declarations().get(0).unwrap(),
@@ -212,7 +288,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 5);
     }
 
@@ -234,7 +310,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 5);
     }
 
@@ -261,7 +337,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 10);
         assert_eq!(
             o.declarations().iter().fold(0, |acc, x| {
@@ -301,7 +377,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 5);
     }
 
@@ -322,7 +398,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 1);
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
@@ -361,7 +437,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
 
         assert_eq!(o.declarations().len(), 3);
         assert_eq!(o.axioms().len(), 1);
@@ -401,7 +477,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
 
         assert_eq!(o.declarations().len(), 2);
         assert_eq!(o.axioms().len(), 1);
@@ -440,7 +516,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
 
         assert_eq!(o.declarations().len(), 2);
         assert_eq!(o.axioms().len(), 1);
@@ -484,7 +560,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
 
         assert_eq!(o.declarations().len(), 1);
         assert_eq!(o.axioms().len(), 1);
@@ -526,7 +602,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
 
         assert_eq!(o.declarations().len(), 2);
         assert_eq!(o.axioms().len(), 1);
@@ -562,7 +638,7 @@ mod tests {
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
 
         assert_eq!(o.declarations().len(), 3);
         assert_eq!(o.axioms().len(), 2);
@@ -578,73 +654,101 @@ mod tests {
         );
     }
 
-    // #[test]
-    // fn computations_with_blank() {
-    //     env_logger::try_init().ok();
-    //     let turtle = r#"
-    //     @prefix onto1: <http://example.com/ONTO1/> .
-    //     @prefix query_server: <http://query-server.field33.com/ontology/> .
-    //     @prefix owl: <http://www.w3.org/2002/07/owl#> .
-    //     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-    //     @prefix xml: <http://www.w3.org/XML/1998/namespace> .
-    //     @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-    //     @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    #[test]
+    fn triples_from_max() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+            <http://field33.com/query_result/4eb9ec44-48b7-4685-b339-c8360537e63e> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+            <http://field33.com/datasets/jira_ticket/321ab1e1f1768ea927d713a6d56967918ec94999> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+            <http://field33.com/datasets/jira_ticket/3f702a411ac5e6bedc299c2b9696a52c6f65cabf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+            <http://field33.com/datasets/jira_ticket/04946d96206da9de9c8428dda36e6de32b7efbc3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+            <http://field33.com/datasets/jira_ticket/9b50f3c4cd1b7ebb24a893c4dd60ab436da6e1c6> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+        "##;
 
-    //     <http://query-server.field33.com/query/aaaa-bbbb-ccc-dddd> rdf:type owl:Ontology .
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
 
-    //     onto1:Individual1 rdf:type owl:NamedIndividual .
-    //     onto1:Individual1 rdfs:label "Person 1" .
+        assert_eq!(o.declarations().len(), 4);
+        assert_eq!(o.axioms().len(), 0);
+    }
 
-    //     []   rdf:type                  owl:Axiom ;
-    //          owl:annotatedSource       onto1:Individual1 ;
-    //          owl:annotatedProperty     rdfs:label ;
-    //          owl:annotatedTarget       "Person 1" ;
-    //          query_server:query-field  "my_label"^^xsd:string .
-    //     "#;
+    #[test]
+    fn computations_with_blank() {
+        env_logger::try_init().ok();
+        let turtle = r#"
+        @prefix onto1: <http://example.com/ONTO1/> .
+        @prefix query_server: <http://query-server.field33.com/ontology/> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix xml: <http://www.w3.org/XML/1998/namespace> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-    //     harriet::TurtleDocument::parse_full(turtle).unwrap();
-    //     let o = Ontology::parse(turtle).unwrap();
+        <http://query-server.field33.com/query/aaaa-bbbb-ccc-dddd> rdf:type owl:Ontology .
 
-    //     println!("{:#?}", o);
+        onto1:Individual1 rdf:type owl:NamedIndividual .
+        onto1:Individual1 rdfs:label "Person 1" .
 
-    //     assert_eq!(
-    //         o.iri.as_str(),
-    //         "http://query-server.field33.com/query/aaaa-bbbb-ccc-dddd"
-    //     );
+        []   rdf:type                  owl:Axiom ;
+             owl:annotatedSource       onto1:Individual1 ;
+             owl:annotatedProperty     rdfs:label ;
+             owl:annotatedTarget       "Person 1" ;
+             query_server:query-field  "my_label"^^xsd:string .
+        "#;
 
-    //     assert_eq!(o.declarations().len(), 1);
-    //     assert_eq!(
-    //         o.declarations()[0],
-    //         Declaration::NamedIndividual(
-    //             IRI::new("http://example.com/ONTO1/Individual1")
-    //                 .unwrap()
-    //                 .into(),
-    //             vec![]
-    //         )
-    //     );
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
 
-    //     assert_eq!(o.axioms().len(), 1);
-    //     assert_eq!(
-    //         o.axioms()[0],
-    //         AnnotationAssertion(
-    //             well_known::rdfs_label(),
-    //             IRI::new("http://example.com/ONTO1/Individual1")
-    //                 .unwrap(),
-    //             Literal::String("Person 1".into()).into(),
-    //             vec![Annotation(
-    //                 IRI::new("http://query-server.field33.com/ontology/query-field")
-    //                     .unwrap()
-    //                     .into(),
-    //                 Literal::String("my_label".into()).into(),
-    //                 vec![]
-    //             )]
-    //         )
-    //         .into()
-    //     );
-    // }
+        let options = ParserOptions::builder()
+            .known(Declaration::AnnotationProperty(
+                IRI::new("http://query-server.field33.com/ontology/query-field")
+                    .unwrap()
+                    .into(),
+                vec![],
+            ))
+            .build();
 
+        let o = Ontology::parse(turtle, options).unwrap();
+
+        assert_eq!(
+            o.iri.as_str(),
+            "http://query-server.field33.com/query/aaaa-bbbb-ccc-dddd"
+        );
+
+        assert_eq!(o.declarations().len(), 1);
+        assert_eq!(
+            o.declarations()[0],
+            Declaration::NamedIndividual(
+                IRI::new("http://example.com/ONTO1/Individual1")
+                    .unwrap()
+                    .into(),
+                vec![]
+            )
+        );
+
+        assert_eq!(o.axioms().len(), 1);
+        assert_eq!(
+            o.axioms()[0],
+            AnnotationAssertion(
+                well_known::rdfs_label(),
+                IRI::new("http://example.com/ONTO1/Individual1").unwrap(),
+                Literal::String("Person 1".into()).into(),
+                vec![Annotation(
+                    IRI::new("http://query-server.field33.com/ontology/query-field")
+                        .unwrap()
+                        .into(),
+                    Literal::String("my_label".into()).into(),
+                    vec![]
+                )]
+            )
+            .into()
+        );
+    }
+
+    // TODO: Support this
     // #[test]
     // fn computations() {
+    //     env_logger::try_init().ok();
+
     //     let turtle = r#"
     //     @prefix onto1: <http://example.com/ONTO1/> .
     //     @prefix query_server: <http://query-server.field33.com/ontology/> .
@@ -666,7 +770,17 @@ mod tests {
     //     "#;
 
     //     harriet::TurtleDocument::parse_full(turtle).unwrap();
-    //     let o = Ontology::parse(turtle).unwrap();
+    //     let options = ParserOptions::builder()
+    //     .known(Declaration::AnnotationProperty(
+    //         IRI::new("http://query-server.field33.com/ontology/query-field")
+    //             .unwrap()
+    //             .into(),
+    //         vec![],
+    //     ))
+    //     .build();
+    //     let o = Ontology::parse(turtle, options).unwrap();
+
+    //     println!("{:#?}", o);
 
     //     assert_eq!(
     //         o.iri.as_str(),
@@ -684,18 +798,102 @@ mod tests {
     //         )
     //     );
 
-    //     assert_eq!(o.axioms().len(), 1);
+    //     assert_eq!(o.axioms().len(), 2);
     //     assert_eq!(
     //         o.axioms()[0],
     //         AnnotationAssertion(
     //             well_known::rdfs_label(),
-    //             IRI::new("http://example.com/ONTO1/Individual1")
-    //                 .unwrap()
-    //                 .into(),
+    //             IRI::new("http://example.com/ONTO1/Individual1").unwrap(),
     //             Literal::String("Person 1".into()).into(),
-    //             vec![]
+    //             vec![Annotation(
+    //                 IRI::new("http://query-server.field33.com/ontology/query-field")
+    //                     .unwrap()
+    //                     .into(),
+    //                 Literal::String("my_label".into()).into(),
+    //                 vec![]
+    //             )]
     //         )
     //         .into()
     //     );
     // }
+
+    #[test]
+    fn meta_ontology() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        @prefix : <http://field33.com/ontologies/@fld33/meta#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+        @prefix registry: <http://field33.com/ontologies/REGISTRY/> .
+
+        <http://field33.com/ontologies/@fld33/meta#> rdf:type owl:Ontology ;
+            registry:packageName "@fld33/meta" ;
+            rdfs:label "Meta"@en .
+
+        # We need to know that Ontology is a thing
+        owl:Ontology rdf:type owl:Class ;
+            rdfs:label "Ontology"@en .
+
+        # Graph styles
+
+        :NodeShape rdf:type owl:Class ;
+            rdfs:label "NodeShape" .
+
+        :hasNodeShape rdf:type owl:ObjectProperty ;
+            rdfs:domain owl:Thing ;
+            rdfs:range :NodeShape ;
+            rdfs:label "hasNodeShape" .
+
+        :Circle rdf:type :NodeShape ;
+            rdfs:label "Circle" .
+
+        :Triangle rdf:type :NodeShape ;
+            rdfs:label "Triangle" .
+
+        :Square rdf:type :NodeShape ;
+            rdfs:label "Square" .
+
+        :Pill rdf:type :NodeShape ;
+            rdfs:label "Pill" .
+
+        # layout stuff
+
+        :Layout rdf:type :owl:Class ;
+            rdfs:label "Layout" .
+
+        :FcoseLayout rdf:type :Layout ;
+            rdfs:label "Fcose" .
+        :TreeLayout rdf:type :Layout ;
+            rdfs:label "Fcose" .
+        :RandomLayout rdf:type :Layout ;
+            rdfs:label "Fcose" .
+
+        :hasLayout rdf:type owl:ObjectProperty ;
+            rdfs:domain: owl:Ontology ;
+            rdfs:range: :Layout ;
+            rdfs:label "has layout" .
+
+        # Facets
+
+        :Facet rdf:type owl:Class .
+        
+        :Processes rdf:type :Facet .
+        :BusinessObjects rdf:type :Facet .
+        :OrganisationalAssets rdf:type :Facet .
+        :Metrics rdf:type :Facet .
+        :Objectives rdf:type :Facet .
+
+        :hasFacet rdf:type owl:ObjectProperty ;
+            rdfs:domain owl:Thing ;
+            rdfs:range :Facet .
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 6);
+        assert_eq!(o.axioms().len(), 22);
+    }
 }

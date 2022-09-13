@@ -1,15 +1,28 @@
 #![allow(non_snake_case)]
 
+use crate::owl::Literal;
+
 use super::Ontology;
-use js_sys::Array;
+use js_sys::{Array, Number};
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::console::error_1;
 
 #[wasm_bindgen]
 impl Ontology {
     /// Create an ontology based on a turtle formatted string.
-    pub fn parseTurtle(ttl: String) -> Option<Ontology> {
-        Ontology::parse(&ttl).ok()
+    pub fn parseTurtle(ttl: String, options: ParserOptions) -> Option<Ontology> {
+        if let Some(json) = js_sys::JSON::stringify(&options)
+            .ok()
+            .and_then(|s| s.as_string())
+        {
+            if let Ok(options) = serde_json::from_str(&json) {
+                Ontology::parse(&ttl, options).ok()
+            } else {
+                None
+            }
+        } else {
+            None
+        }
     }
 
     /// Create an ontology based on a json serialized owlish::Ontology.
@@ -181,12 +194,121 @@ export type Value = {
     lang: null,
 }
 
+
+type ValueMatcher<R> =
+    | {
+          string?: (
+              value:
+                  | Extract<
+                        Value,
+                        {
+                            _type: 'string'
+                        }
+                    >
+                  | Extract<
+                        Value,
+                        {
+                            _type: 'langString'
+                        }
+                    >
+          ) => R
+          raw?: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'raw'
+                  }
+              >
+          ) => R
+          dateTime?: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'dateTime'
+                  }
+              >
+          ) => R
+          number?: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'number'
+                  }
+              >
+          ) => R
+          boolean?: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'boolean'
+                  }
+              >
+          ) => R
+          default: (value: Value) => R
+      }
+    | {
+          string: (
+              value:
+                  | Extract<
+                        Value,
+                        {
+                            _type: 'string'
+                        }
+                    >
+                  | Extract<
+                        Value,
+                        {
+                            _type: 'langString'
+                        }
+                    >
+          ) => R
+          raw: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'raw'
+                  }
+              >
+          ) => R
+          dateTime: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'dateTime'
+                  }
+              >
+          ) => R
+          number: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'number'
+                  }
+              >
+          ) => R
+          boolean: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'boolean'
+                  }
+              >
+          ) => R
+          default?: (value: Value) => R
+      }
+
+export function matchValue<R>(value: Value, matcher: ValueMatcher<R>): R;
 "#;
 
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(typescript_type = "IRI")]
     pub type IRI;
+    #[wasm_bindgen(typescript_type = "Value")]
+    pub type Value;
+    #[wasm_bindgen(typescript_type = "ParserOptions")]
+    pub type ParserOptions;
+
 }
 
 #[wasm_bindgen]
@@ -235,68 +357,142 @@ pub struct well_known {
 #[wasm_bindgen]
 impl well_known {
     pub fn owl_AnnotationProperty() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::owl_AnnotationProperty().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::owl_AnnotationProperty().as_iri()).unwrap()
     }
     pub fn owl_AsymmetricProperty() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::owl_AsymmetricProperty().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::owl_AsymmetricProperty().as_iri()).unwrap()
     }
     pub fn owl_Class() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::owl_Class().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::owl_Class().as_iri()).unwrap()
     }
     pub fn owl_ObjectProperty() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::owl_ObjectProperty().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::owl_ObjectProperty().as_iri()).unwrap()
     }
     pub fn owl_Ontology() -> IRI {
         iri_to_js_iri(&crate::owl::well_known::owl_Ontology()).unwrap()
     }
     pub fn owl_SymmetricProperty() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::owl_SymmetricProperty().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::owl_SymmetricProperty().as_iri()).unwrap()
     }
     pub fn owl_Thing() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::owl_Thing().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::owl_Thing().as_iri()).unwrap()
     }
 
     pub fn rdf_type() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::rdf_type().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::rdf_type().as_iri()).unwrap()
     }
     pub fn rdfs_comment() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::rdfs_comment().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::rdfs_comment().as_iri()).unwrap()
     }
     pub fn rdfs_label() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::rdfs_label().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::rdfs_label().as_iri()).unwrap()
     }
     pub fn rdfs_subClassOf() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::rdfs_subClassOf().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::rdfs_subClassOf().as_iri()).unwrap()
     }
 
     pub fn xsd_boolean() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_boolean().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_boolean().as_iri()).unwrap()
     }
     pub fn xsd_string() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_float().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_float().as_iri()).unwrap()
     }
     pub fn xsd_float() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_float().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_float().as_iri()).unwrap()
     }
     pub fn xsd_dateTime() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_dateTime().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_dateTime().as_iri()).unwrap()
     }
     pub fn xsd_integer() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_integer().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_integer().as_iri()).unwrap()
     }
     pub fn xsd_maxExclusive() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_maxExclusive().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_maxExclusive().as_iri()).unwrap()
     }
     pub fn xsd_maxInclusive() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_maxInclusive().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_maxInclusive().as_iri()).unwrap()
     }
     pub fn xsd_minExclusive() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_minExclusive().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_minExclusive().as_iri()).unwrap()
     }
     pub fn xsd_minInclusive() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_minInclusive().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_minInclusive().as_iri()).unwrap()
     }
     pub fn xsd_nonNegativeInteger() -> IRI {
-        iri_to_js_iri(&crate::owl::well_known::xsd_nonNegativeInteger().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_nonNegativeInteger().as_iri()).unwrap()
     }
 }
+
+fn value_to_js_value(value: &crate::owl::Literal) -> Option<Value> {
+    match JsValue::from_serde(value) {
+        Ok(jsv) => Some(jsv.unchecked_into()),
+        Err(e) => {
+            error_1(&format!("Failed to create JS value from value {:?}: {}", value, e).into());
+            None
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn StringValue(value: &str) -> Option<Value> {
+    let lit = Literal::String(value.into());
+    value_to_js_value(&lit)
+}
+
+#[wasm_bindgen]
+pub fn DateTimeValue(value: &str) -> Option<Value> {
+    let lit = Literal::DateTime(value.into());
+    value_to_js_value(&lit)
+}
+
+#[wasm_bindgen]
+pub fn NumericValue(value: Number) -> Option<Value> {
+    let number = if let Some(f) = value.as_f64() { f } else { 0.0 };
+    if number.is_nan() {
+        return None;
+    }
+    let lit = if number.fract() == 0.0 {
+        Literal::Number {
+            number: serde_json::Number::from_f64(number).unwrap(), // NAN is handled above
+            type_iri: crate::owl::well_known::xsd_integer().into(),
+        }
+    } else {
+        Literal::Number {
+            number: serde_json::Number::from_f64(number).unwrap(), // NAN is handled above
+            type_iri: crate::owl::well_known::xsd_float().into(),
+        }
+    };
+    value_to_js_value(&lit)
+}
+
+#[wasm_bindgen]
+pub fn NonNegativeNumericValue(value: Number) -> Option<Value> {
+    let number = if let Some(f) = value.as_f64() { f } else { 0.0 };
+    if number.is_nan() {
+        return None;
+    }
+    let lit = if number.fract() == 0.0 {
+        Literal::Number {
+            number: serde_json::Number::from_f64(number).unwrap(), // NAN is handled above
+            type_iri: crate::owl::well_known::xsd_nonNegativeInteger().into(),
+        }
+    } else {
+        Literal::Number {
+            number: serde_json::Number::from_f64(number).unwrap(), // NAN is handled above
+            type_iri: crate::owl::well_known::xsd_float().into(),
+        }
+    };
+    value_to_js_value(&lit)
+}
+
+#[wasm_bindgen(typescript_custom_section)]
+const PARSER_OPTIONS_TS_API: &'static str = r#"
+interface ParserOptions {
+    entries: Record<ParserOptionKey, ParserOptionValue>
+}
+
+type ParserOptionKey = "Known"
+interface ParserOptionValue { 
+    Known?: Array<Declaration>
+}
+"#;

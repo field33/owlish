@@ -20,7 +20,7 @@ pub(crate) fn match_axioms(
         rdf_match!("DataProperty", prefixes,
             [+:x] [*:predicate] [lt:value] .
         )?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(predicate) = mstate.last_iri("predicate") {
                 let predicate_iri = IRI::new(predicate)?;
                 if let Some(subject) = mstate.last("x") {
@@ -62,7 +62,7 @@ pub(crate) fn match_axioms(
         rdf_match!("ClassAssertions", prefixes,
             [*:x] [rdf:type] [*:cls] .
         )?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(individual_iri) = mstate.last_iri("x") {
                 if let Some(cls) = mstate.last_iri("cls") {
                     let individual_iri = IRI::new(individual_iri)?;
@@ -82,7 +82,7 @@ pub(crate) fn match_axioms(
         rdf_match!("SubClassOf", prefixes,
             [:x] [rdfs:subClassOf] [:object] .
         )?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(vars) = get_vars!(mstate, x, object) {
                 match vars.x {
                     Value::Iri(subject_iri_str) => match vars.object {
@@ -112,7 +112,6 @@ pub(crate) fn match_axioms(
                                             .into(),
                                         );
                                     }
-                                    _ => todo!(),
                                 }
                             }
                         }

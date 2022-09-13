@@ -1,22 +1,8 @@
 use crate::owl::{AnnotationPropertyIRI, ClassIRI, DatatypeIRI, IRI};
 
-// pub fn get(pre: &str, suf: &str) -> Option<&'static str> {
-//     match pre {
-//         "xsd" => match suf {
-//             "integer" => Some(xsd_integer_str),
-//             "float" => Some(xsd_float_str),
-//             "nonNegativeInteger" => Some(xsd_nonNegativeInteger_str),
-//             "minExclusive" => Some(xsd_minExclusive_str),
-//             "minInclusive" => Some(xsd_minInclusive_str),
-//             "maxExclusive" => Some(xsd_maxExclusive_str),
-//         },
-//         "rdfs" => match suf {
-//             "comment" => Some(rdfs_comment_str),
-//         },
-//     }
-// }
-
 // Datatypes
+#[allow(non_upper_case_globals)]
+pub const xsd_base_str: &str = "http://www.w3.org/2001/XMLSchema#";
 
 #[allow(non_upper_case_globals)]
 pub const xsd_string_str: &str = "http://www.w3.org/2001/XMLSchema#string";
@@ -99,6 +85,8 @@ pub fn xsd_maxExclusive() -> DatatypeIRI {
 }
 
 // RDFS
+#[allow(non_upper_case_globals)]
+pub const rdfs_base_str: &str = "http://www.w3.org/2000/01/rdf-schema#";
 
 #[allow(non_upper_case_globals)]
 pub const rdfs_comment_str: &str = "http://www.w3.org/2000/01/rdf-schema#comment";
@@ -127,6 +115,9 @@ pub fn rdfs_subClassOf() -> AnnotationPropertyIRI {
 
 // RDF
 #[allow(non_upper_case_globals)]
+pub const rdf_base_str: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+
+#[allow(non_upper_case_globals)]
 pub const rdf_type_str: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
 #[allow(non_snake_case)]
@@ -135,6 +126,9 @@ pub fn rdf_type() -> AnnotationPropertyIRI {
 }
 
 // OWL
+#[allow(non_upper_case_globals)]
+pub const owl_base_str: &str = "http://www.w3.org/2002/07/owl#";
+
 #[allow(non_upper_case_globals)]
 pub const owl_Ontology_str: &str = "http://www.w3.org/2002/07/owl#Ontology";
 

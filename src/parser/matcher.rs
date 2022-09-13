@@ -681,7 +681,7 @@ macro_rules! matcher_or_var {
                 $crate::parser::matcher::MatchOrVar::Iri(format!("{}{}", prefix, suffix)),
             )
         } else {
-            Err(format!("Unkonwn prefix: {}", prefix))
+            Err(format!("Unkonwn prefix: '{}'", prefix))
         }
 
     }};

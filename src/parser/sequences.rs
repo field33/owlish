@@ -18,7 +18,7 @@ pub(crate) fn match_sequences(
         rdf_match!("sequences_first", prefixes,
             [:x] [rdf:first] [:object] .
         )?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(Value::Blank(bn)) = mstate.get("x") {
                 if let Some(object) = mstate.get("object").cloned() {
                     if let Some(sequence) = o.get_sequence(bn) {
@@ -35,7 +35,7 @@ pub(crate) fn match_sequences(
         rdf_match!("sequences_rest", prefixes,
             [:x] [rdf:rest] [:object] .
         )?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(Value::Blank(bn)) = mstate.get("x") {
                 if let Some(Value::Blank(rest)) = mstate.get("object").cloned() {
                     o.set_sequence_tree(bn, rest)?;

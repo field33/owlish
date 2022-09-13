@@ -13,7 +13,7 @@ pub(crate) fn match_declarations(
 ) -> Result<(), Error> {
     matchers.push((
         rdf_match!("OntologyIRI", prefixes, [*:subject] [rdf:type] [owl:Ontology] .)?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
                 o.set_iri(iri);
             }
@@ -22,7 +22,7 @@ pub(crate) fn match_declarations(
     ));
     matchers.push((
         rdf_match!("Class", prefixes, [*:subject] [rdf:type] [owl:Class] .)?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
                 o.push_declaration(Declaration::Class(iri.into(), vec![]));
             }
@@ -31,7 +31,7 @@ pub(crate) fn match_declarations(
     ));
     matchers.push((
         rdf_match!("Datatype",prefixes, [*:subject] [rdf:type] [rdfs:Datatype] .)?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
                 o.push_declaration(Declaration::Datatype(iri.into(), vec![]));
             }
@@ -40,7 +40,7 @@ pub(crate) fn match_declarations(
     ));
     matchers.push((
         rdf_match!("ObjectProperty", prefixes, [*:subject] [rdf:type] [owl:ObjectProperty] .)?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
                 o.push_declaration(Declaration::ObjectProperty(iri.into(), vec![]));
             }
@@ -49,7 +49,7 @@ pub(crate) fn match_declarations(
     ));
     matchers.push((
         rdf_match!("DataProperty", prefixes, [*:subject] [rdf:type] [owl:DatatypeProperty] .)?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
                 o.push_declaration(Declaration::DataProperty(iri.into(), vec![]));
             }
@@ -58,7 +58,7 @@ pub(crate) fn match_declarations(
     ));
     matchers.push((
         rdf_match!("AnnotationProperty", prefixes, [*:subject] [rdf:type] [owl:AnnotationProperty] .)?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
                 o.push_declaration(Declaration::AnnotationProperty(iri.into(), vec![]));
             }
@@ -67,7 +67,7 @@ pub(crate) fn match_declarations(
     ));
     matchers.push((
         rdf_match!("NamedIndividual", prefixes, [*:subject] [rdf:type] [owl:NamedIndividual] .)?,
-        Box::new(|mstate, o| {
+        Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
                 o.push_declaration(Declaration::NamedIndividual(iri.into(), vec![]));
             }

@@ -112,7 +112,6 @@ pub fn rdfs_subClassOf() -> AnnotationPropertyIRI {
     IRI::new(rdfs_subClassOf_str).unwrap().into()
 }
 
-
 // RDF
 #[allow(non_upper_case_globals)]
 pub const rdf_base_str: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";

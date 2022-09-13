@@ -76,6 +76,7 @@ interface Declaration {
     NamedIndividual?: IRI,
     ObjectProperty?: IRI,
     DataProperty?: IRI,
+    AnnotationProperty?: IRI,
     Datatype?: IRI,
 }
 

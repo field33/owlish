@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{borrow::Cow, collections::HashMap};
 
 use harriet::triple_production::RdfBlankNode;
 
@@ -7,8 +7,9 @@ use crate::{api::Ontology, error::Error, owl::*, parser::matcher::Value};
 use super::{matcher::MatcherState, ParserOptions};
 
 /// Handle when a matcher matched. Returns whether the matched rules where actually
-pub(crate) type MatcherHandler =
-    Box<dyn Fn(&MatcherState, &mut OntologyCollector, &ParserOptions) -> Result<bool, Error>>;
+pub(crate) type MatcherHandler<'a> = Box<
+    dyn Fn(&MatcherState<'a>, &mut OntologyCollector<'a>, &ParserOptions) -> Result<bool, Error>,
+>;
 
 #[derive(Debug, Clone)]
 pub(crate) enum BlankNodeHandle {
@@ -16,33 +17,33 @@ pub(crate) enum BlankNodeHandle {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub(crate) enum Ann {
+pub(crate) enum Ann<'a> {
     Bn(RdfBlankNode),
-    Iri(String),
+    Iri(Cow<'a, str>),
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct Annotate {
-    pub(crate) subject: String,
-    pub(crate) predicate: String,
-    pub(crate) object: String,
+pub(crate) struct Annotate<'a> {
+    pub(crate) subject: Cow<'a, str>,
+    pub(crate) predicate: Cow<'a, str>,
+    pub(crate) object: Cow<'a, str>,
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct OntologyCollector {
+pub(crate) struct OntologyCollector<'a> {
     iri: Option<IRI>,
     declarations: Vec<Declaration>,
     axioms: Vec<Axiom>,
     // blank node -> IRI
-    sequences: HashMap<RdfBlankNode, Vec<Value>>,
+    sequences: HashMap<RdfBlankNode, Vec<Value<'a>>>,
     // child node -> root node
     sequence_tree: HashMap<RdfBlankNode, Option<RdfBlankNode>>,
 
-    annotations: HashMap<Ann, Annotate>,
+    annotations: HashMap<Ann<'a>, Annotate<'a>>,
     blank_nodes: HashMap<RdfBlankNode, BlankNodeHandle>,
 }
 
-impl OntologyCollector {
+impl<'a> OntologyCollector<'a> {
     pub(crate) fn new() -> Self {
         Self {
             ..Default::default()
@@ -73,11 +74,11 @@ impl OntologyCollector {
         self.blank_nodes.insert(bn, bnh);
     }
 
-    pub(crate) fn insert_annotation(&mut self, key: Ann, value: Annotate) {
+    pub(crate) fn insert_annotation(&mut self, key: Ann<'a>, value: Annotate<'a>) {
         self.annotations.insert(key, value);
     }
 
-    pub(crate) fn annotation(&self, ann: Ann) -> Option<&Annotate> {
+    pub(crate) fn annotation(&self, ann: Ann<'a>) -> Option<&Annotate<'a>> {
         self.annotations.get(&ann)
     }
 
@@ -94,12 +95,12 @@ impl OntologyCollector {
         o
     }
 
-    pub(crate) fn set_sequence_root(&mut self, root: &RdfBlankNode, value: Value) {
+    pub(crate) fn set_sequence_root(&mut self, root: &RdfBlankNode, value: Value<'a>) {
         self.sequence_tree.insert(root.clone(), None);
         self.sequences.insert(root.clone(), vec![value]);
     }
 
-    pub(crate) fn get_sequence(&mut self, bn: &RdfBlankNode) -> Option<&mut Vec<Value>> {
+    pub(crate) fn get_sequence(&mut self, bn: &RdfBlankNode) -> Option<&mut Vec<Value<'a>>> {
         match self.sequence_tree.get(bn) {
             Some(Some(root)) => self.sequences.get_mut(root),
             Some(None) => self.sequences.get_mut(bn),
@@ -134,7 +135,7 @@ impl OntologyCollector {
         &self,
         iri: &IRI,
     ) -> Option<(&AnnotationPropertyIRI, &Vec<Annotation>)> {
-        self.declarations.iter().find_map(|d| match d {
+        self.declarations.iter().rev().find_map(|d| match d {
             Declaration::AnnotationProperty(a, annotations) => {
                 if a.as_iri() == iri {
                     Some((a, annotations))
@@ -147,13 +148,13 @@ impl OntologyCollector {
     }
 
     pub(crate) fn class_declaration(&self, cls: &IRI) -> Option<&Declaration> {
-        self.declarations.iter().find(|d| match d {
+        self.declarations.iter().rev().find(|d| match d {
             Declaration::Class(iri, _) => iri.as_iri() == cls,
             _ => false,
         })
     }
     pub(crate) fn data_property_declaration(&self, dp: &IRI) -> Option<&Declaration> {
-        self.declarations.iter().find(|d| match d {
+        self.declarations.iter().rev().find(|d| match d {
             Declaration::DataProperty(iri, _) => iri.as_iri() == dp,
             _ => false,
         })
@@ -192,7 +193,7 @@ macro_rules! get_vars {
         )+
         struct Vars<'a> {
             $(
-                $($variable)+: &'a Value,
+                $($variable)+: &'a Value<'a>,
             )+
         }
         if result {

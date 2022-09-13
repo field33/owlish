@@ -1,7 +1,7 @@
 use std::{collections::HashMap, rc::Rc};
 
 use harriet::triple_production::RdfTriple;
-use log::debug;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -23,15 +23,22 @@ mod blank_nodes;
 mod declarations;
 mod sequences;
 
+static mut RDF_MATCHER: Option<Option<String>> = None;
+
 #[macro_export]
 macro_rules! parser_debug {
     ($m:ident, $($tokens:tt)*) => {{
-        if let Ok(name) = std::env::var("RDF_MATCHER") {
-            if name == $m.name() {
-                debug!($($tokens)*);
+        unsafe {
+            if $crate::parser::RDF_MATCHER.is_none() {
+                $crate::parser::RDF_MATCHER = Some(std::env::var("RDF_MATCHER").ok());
             }
-        } else {
-            debug!($($tokens)*);
+            if let Some(Some(name)) = &$crate::parser::RDF_MATCHER {
+                if name == $m.name() {
+                    log::debug!($($tokens)*);
+                }
+            } else {
+                log::debug!($($tokens)*);
+            }
         }
     }};
 }
@@ -74,26 +81,30 @@ impl Ontology {
         annotations::match_annotations(&mut matchers, &prefixes)?;
 
         type MatcherID = usize;
-        type TripleID = usize;
-
+        type MatcherStateEntry<'a> = (MatcherID, Vec<Rc<RdfTriple<'a>>>, MatcherState<'a>, bool);
         // let mut finished_matches: Vec<(MatcherID, Vec<TripleID>, MatcherState)> = Vec::new();
         // subject node -> [matcher_id, matched_triples]
-        let mut started_matches: Vec<(MatcherID, Vec<TripleID>, MatcherState, bool)> = Vec::new();
+        let mut started_matches: HashMap<usize, MatcherStateEntry> = HashMap::new();
 
         let print_triples = if let Ok(a) = std::env::var("RDF_TRIPLES") {
             a == "1"
         } else {
             false
         };
-        for (triple_id, triple) in triples.iter().enumerate() {
+
+        let mut matcher_instance_id = 0;
+
+        for triple in triples.iter() {
             if print_triples {
                 println!("{}", display(triple));
             }
+            println!("started_matches {}", started_matches.len());
+
             for (matcher_id, (m, _)) in matchers.iter().enumerate() {
                 let subject: IRIOrBlank = triple.subject.clone().into();
 
                 // (1) Take each ongoing matcher state and check whether it matches this new triple
-                for (matcher_id, triples, mstate, finished) in started_matches.iter_mut() {
+                for (_, (matcher_id, triples, mstate, finished)) in started_matches.iter_mut() {
                     let (m, _) = &matchers[*matcher_id];
                     parser_debug!(
                         m,
@@ -104,28 +115,53 @@ impl Ontology {
 
                     // (1) If so, keep matching. Maybe mark as finished.
                     if let MatchResult::Matched(f) = m.matches(triple.clone(), mstate) {
-                        triples.push(triple_id);
                         *finished = f;
-                    }
-                }
-
-                // (1) Anyways match with new state and add to started if it matches
-                let mut mstate = MatcherState::new();
-                if let MatchResult::Matched(finished) = m.matches(triple.clone(), &mut mstate) {
-                    parser_debug!(m, "New matching state for ({:?}, {})", &subject, m.name());
-                    started_matches.push((matcher_id, vec![triple_id], mstate, finished));
-                }
-
-                for (mid, _, mstate, finished) in &started_matches {
-                    if *finished {
-                        let (_m, handler) = &matchers[*mid];
-                        if !handler(mstate, &mut collector, &options)? {
-                            // todo: did not meet semantic criteria
+                        if !triples.iter().any(|t| Rc::ptr_eq(t, triple)) {
+                            triples.push(triple.clone());
                         }
                     }
                 }
 
-                started_matches.retain_mut(|(_, _, _, f)| !*f);
+                // (1) If there is nothing still matching the current triple, match with new state and add to started if it matches
+                let mut mstate = MatcherState::new();
+                if let MatchResult::Matched(finished) = m.matches(triple.clone(), &mut mstate) {
+                    parser_debug!(m, "New matching state for ({:?}, {})", &subject, m.name());
+                    started_matches.insert(
+                        matcher_instance_id,
+                        (matcher_id, vec![triple.clone()], mstate, finished),
+                    );
+                    matcher_instance_id += 1;
+                }
+            }
+            let mut finished_matcher_instances = Vec::new();
+            let mut resolved_triples = Vec::new();
+            for (matcher_ins_id, (mid, triples, mstate, finished)) in started_matches.iter() {
+                if *finished {
+                    finished_matcher_instances.push(*matcher_ins_id);
+                    for _t in triples {
+                        if !resolved_triples.iter().any(|t| Rc::ptr_eq(t, triple)) {
+                            resolved_triples.push(triple.clone());
+                        }
+                    }
+                    let (_m, handler) = &matchers[*mid];
+                    if !handler(mstate, &mut collector, &options)? {
+                        // todo: did not meet semantic criteria
+                    }
+                }
+            }
+            if !finished_matcher_instances.is_empty() {
+                for (matcher_ins_id, (mid, triples, _, _)) in started_matches.iter() {
+                    let (_matcher, _) = &matchers[*mid];
+                    let obsolete = triples
+                        .iter()
+                        .all(|t1| resolved_triples.iter().any(|t2| Rc::ptr_eq(t1, t2)));
+                    if obsolete {
+                        finished_matcher_instances.push(*matcher_ins_id);
+                    }
+                }
+            }
+            for matcher_ins_id in finished_matcher_instances {
+                started_matches.remove(&matcher_ins_id);
             }
         }
         Ok(collector.ontology())
@@ -652,24 +688,6 @@ mod tests {
             )
             .into()
         );
-    }
-
-    #[test]
-    fn triples_from_max() {
-        env_logger::try_init().ok();
-        let turtle = r##"
-            <http://field33.com/query_result/4eb9ec44-48b7-4685-b339-c8360537e63e> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
-            <http://field33.com/datasets/jira_ticket/321ab1e1f1768ea927d713a6d56967918ec94999> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-            <http://field33.com/datasets/jira_ticket/3f702a411ac5e6bedc299c2b9696a52c6f65cabf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-            <http://field33.com/datasets/jira_ticket/04946d96206da9de9c8428dda36e6de32b7efbc3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-            <http://field33.com/datasets/jira_ticket/9b50f3c4cd1b7ebb24a893c4dd60ab436da6e1c6> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-        "##;
-
-        harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle, Default::default()).unwrap();
-
-        assert_eq!(o.declarations().len(), 4);
-        assert_eq!(o.axioms().len(), 0);
     }
 
     #[test]

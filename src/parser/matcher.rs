@@ -1,12 +1,12 @@
 use std::{
-    collections::{HashMap, HashSet},
+    borrow::Cow,
+    collections::{HashMap, LinkedList},
     convert::TryInto,
     hash::Hash,
     rc::Rc,
 };
 
 use harriet::triple_production::{RdfBlankNode, RdfLiteral, RdfObject, RdfSubject, RdfTriple};
-use log::debug;
 
 use crate::{
     owl::{well_known, Literal, IRI},
@@ -14,17 +14,17 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub enum Value {
-    Iri(String),
+pub enum Value<'a> {
+    Iri(Cow<'a, str>),
     Blank(RdfBlankNode),
     Literal {
-        lexical_form: String,
-        datatype_iri: Option<String>,
-        language_tag: Option<String>,
+        lexical_form: Cow<'a, str>,
+        datatype_iri: Option<Cow<'a, str>>,
+        language_tag: Option<Cow<'a, str>>,
     },
 }
 
-impl TryInto<Literal> for Value {
+impl<'a> TryInto<Literal> for Value<'a> {
     type Error = ();
 
     fn try_into(self) -> Result<Literal, Self::Error> {
@@ -34,28 +34,33 @@ impl TryInto<Literal> for Value {
                 datatype_iri,
                 language_tag: _,
             } => {
-                if let Some(s) = datatype_iri {
-                    match s.as_str() {
-                        well_known::xsd_string_str => Ok(Literal::String(lexical_form)),
-                        well_known::xsd_integer_str => serde_json::from_str(&lexical_form)
+                if let Some(datatype_iri) = datatype_iri {
+                    if datatype_iri == well_known::xsd_string_str {
+                        Ok(Literal::String(lexical_form.to_string()))
+                    } else if datatype_iri == well_known::xsd_integer_str {
+                        serde_json::from_str(&lexical_form)
                             .map_err(|_| ())
                             .map(|n| Literal::Number {
                                 number: n,
                                 type_iri: well_known::xsd_integer().into(),
-                            }),
-                        well_known::xsd_float_str => serde_json::from_str(&lexical_form)
+                            })
+                    } else if datatype_iri == well_known::xsd_float_str {
+                        serde_json::from_str(&lexical_form)
                             .map_err(|_| ())
                             .map(|n| Literal::Number {
                                 number: n,
                                 type_iri: well_known::xsd_float().into(),
-                            }),
-                        iri => IRI::new(iri).map_err(|_| ()).map(|iri| Literal::Raw {
-                            data: lexical_form.as_bytes().to_vec(),
-                            type_iri: iri.into(),
-                        }),
+                            })
+                    } else {
+                        IRI::new(&datatype_iri)
+                            .map_err(|_| ())
+                            .map(|iri| Literal::Raw {
+                                data: lexical_form.as_bytes().to_vec(),
+                                type_iri: iri.into(),
+                            })
                     }
                 } else {
-                    Ok(Literal::String(lexical_form))
+                    Ok(Literal::String(lexical_form.to_string()))
                 }
             }
             Value::Iri(_) => Err(()),
@@ -64,17 +69,17 @@ impl TryInto<Literal> for Value {
     }
 }
 
-impl<'a> From<RdfLiteral<'a>> for Value {
+impl<'a> From<RdfLiteral<'a>> for Value<'a> {
     fn from(lit: RdfLiteral<'a>) -> Self {
         Value::Literal {
-            lexical_form: lit.lexical_form.into(),
-            datatype_iri: lit.datatype_iri.map(|d| d.iri.into()),
-            language_tag: lit.language_tag.map(|t| t.into()),
+            lexical_form: lit.lexical_form,
+            datatype_iri: lit.datatype_iri.map(|d| d.iri),
+            language_tag: lit.language_tag,
         }
     }
 }
 
-impl std::fmt::Display for Value {
+impl<'a> std::fmt::Display for Value<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::Iri(iri) => write!(f, "{}", iri),
@@ -101,13 +106,13 @@ pub enum MatchOrVar {
 }
 
 #[derive(Debug, Hash, Clone, PartialEq, Eq)]
-pub enum IRIOrBlank {
-    Iri(String),
+pub enum IRIOrBlank<'a> {
+    Iri(Cow<'a, str>),
     Blank(RdfBlankNode),
 }
 
-impl From<IRIOrBlank> for Value {
-    fn from(iob: IRIOrBlank) -> Self {
+impl<'a> From<IRIOrBlank<'a>> for Value<'a> {
+    fn from(iob: IRIOrBlank<'a>) -> Self {
         match iob {
             IRIOrBlank::Iri(iri) => Value::Iri(iri),
             IRIOrBlank::Blank(b) => Value::Blank(b),
@@ -116,12 +121,12 @@ impl From<IRIOrBlank> for Value {
 }
 
 #[derive(Debug, Clone)]
-pub struct MatcherState {
-    variables: HashMap<String, Vec<Value>>,
-    matches: Vec<usize>,
+pub struct MatcherState<'a> {
+    variables: HashMap<String, Vec<Value<'a>>>,
+    matches: LinkedList<usize>,
 }
 
-impl MatcherState {
+impl<'a> MatcherState<'a> {
     pub fn new() -> Self {
         Self {
             variables: Default::default(),
@@ -129,24 +134,21 @@ impl MatcherState {
         }
     }
 
-    pub fn len(&self) -> usize {
-        self.variables.len()
-    }
-    pub fn push(&mut self, var: &str, value: Value) {
+    pub fn push(&mut self, var: &str, value: Value<'a>) {
         if let Some(values) = self.variables.get_mut(var) {
             values.push(value);
         } else {
             self.variables.insert(var.into(), vec![value]);
         }
     }
-    pub fn get(&self, key: &str) -> Option<&Value> {
+    pub fn get(&self, key: &str) -> Option<&Value<'a>> {
         self.variables.get(key).and_then(|v| v.last())
     }
-    pub fn last(&self, key: &str) -> Option<&Value> {
+    pub fn last(&self, key: &str) -> Option<&Value<'a>> {
         self.variables.get(key).and_then(|v| v.last())
     }
 
-    pub fn last_iri(&self, name: &str) -> Option<&String> {
+    pub fn last_iri(&self, name: &str) -> Option<&Cow<'a, str>> {
         self.variables.get(name).and_then(|vs| {
             let mut value = None;
             for v in vs {
@@ -171,16 +173,21 @@ impl MatcherState {
     }
 
     pub(crate) fn matched(&mut self, matcher_id: usize) {
-        if let Some(last) = self.matches.last() {
+        if let Some(last) = self.matches.back() {
             if *last != matcher_id {
-                self.matches.push(matcher_id);
+                self.matches.push_back(matcher_id);
             }
         } else {
-            self.matches.push(matcher_id);
+            self.matches.push_back(matcher_id);
         }
     }
 
-    pub(crate) fn check_var(&self, var: &str, value: Value) -> (bool, Option<(String, Value)>) {
+    // TODO: This needs to be improved
+    pub(crate) fn check_var<'b>(
+        &self,
+        var: &'b str,
+        value: Value<'a>,
+    ) -> (bool, Option<(&'b str, Value<'a>)>) {
         if let Some(variable) = self.variables.get(var).and_then(|v| v.last()) {
             (variable == &value, None)
         } else {
@@ -195,7 +202,7 @@ impl MatcherState {
             if value_in_other_variable {
                 (false, None)
             } else {
-                (true, Some((var.to_string(), value)))
+                (true, Some((var, value)))
             }
         }
     }
@@ -210,10 +217,10 @@ impl<'a> From<RdfSubject<'a>> for MatchOrVar {
     }
 }
 
-impl<'a> From<RdfSubject<'a>> for IRIOrBlank {
+impl<'a> From<RdfSubject<'a>> for IRIOrBlank<'a> {
     fn from(s: RdfSubject<'a>) -> Self {
         match s {
-            RdfSubject::IRI(iri) => IRIOrBlank::Iri(iri.iri.into()),
+            RdfSubject::IRI(iri) => IRIOrBlank::Iri(iri.iri),
             RdfSubject::BlankNode(b) => IRIOrBlank::Blank(b),
         }
     }
@@ -223,16 +230,6 @@ pub enum MatchResult {
     Matched(bool),
     Nope,
 }
-
-// impl std::fmt::Display for RdfMatcher {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         writeln!(f, "Matcher {} {{", self.name)?;
-//         for t in &self.match_triples {
-//             writeln!(f, "  [{}] [{}] [{}] .", t.0, t.1, t.2)?;
-//         }
-//         write!(f, "}}")
-//     }
-// }
 
 impl std::fmt::Display for MatchOrVar {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -253,7 +250,7 @@ impl std::fmt::Display for MatchOrVar {
 pub fn print(matcher: &RdfMatcher, mstate: &MatcherState) -> String {
     let mut s = format!("Matcher {} {{\n", matcher.name);
     for (i, t) in matcher.match_triples.iter().enumerate() {
-        if let Some(l) = mstate.matches.last() {
+        if let Some(l) = mstate.matches.back() {
             if l + 1 == i {
                 s = format!("{}> [{}] [{}] [{}] .\n", s, t.0, t.1, t.2);
             } else {
@@ -308,73 +305,14 @@ impl RdfMatcher {
         &self.name
     }
 
-    pub fn matches<'a>(&self, triple: Rc<RdfTriple<'a>>, mstate: &mut MatcherState) -> MatchResult {
+    pub fn matches<'a>(
+        &self,
+        triple: Rc<RdfTriple<'a>>,
+        mstate: &mut MatcherState<'a>,
+    ) -> MatchResult {
         let triple_matches = self.match_triple(triple, mstate);
 
-        let mut expected_variables = HashSet::new();
-        for triple in &self.match_triples {
-            let (s, p, o) = triple;
-            match s {
-                MatchOrVar::Var(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::IriVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::LitVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::BlankVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::IriOrBlankVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::Iri(_) => {}
-                MatchOrVar::Blank(_) => {}
-            }
-            match p {
-                MatchOrVar::Var(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::IriVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::LitVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::BlankVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::IriOrBlankVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::Iri(_) => {}
-                MatchOrVar::Blank(_) => {}
-            }
-            match o {
-                MatchOrVar::Var(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::IriVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::LitVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::BlankVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::IriOrBlankVar(var) => {
-                    expected_variables.insert(var.to_string());
-                }
-                MatchOrVar::Iri(_) => {}
-                MatchOrVar::Blank(_) => {}
-            }
-        }
-
-        let finished = expected_variables.len() == mstate.len()
-            && mstate.matches.len() == self.match_triples.len();
+        let finished = mstate.matches.len() == self.match_triples.len();
 
         parser_debug!(self, "{:?}", finished);
 
@@ -389,7 +327,7 @@ impl RdfMatcher {
         }
     }
 
-    fn match_triple<'a>(&self, triple: Rc<RdfTriple<'a>>, mstate: &mut MatcherState) -> bool {
+    fn match_triple<'a>(&self, triple: Rc<RdfTriple<'a>>, mstate: &mut MatcherState<'a>) -> bool {
         parser_debug!(
             self,
             "#############################################################"
@@ -407,15 +345,15 @@ impl RdfMatcher {
                     MatchOrVar::Iri(p_iri) => (*p_iri == iri.iri, None),
                     MatchOrVar::Blank(_) => (false, None),
                     MatchOrVar::Var(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::IriOrBlankVar(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::IriVar(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::BlankVar(_) => (false, None),
@@ -447,15 +385,15 @@ impl RdfMatcher {
                     MatchOrVar::Iri(p_iri) => (*p_iri == iri.iri, None),
                     MatchOrVar::Blank(_) => (false, None),
                     MatchOrVar::Var(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::IriOrBlankVar(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::IriVar(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::BlankVar(_) => (false, None),
@@ -469,15 +407,15 @@ impl RdfMatcher {
                     MatchOrVar::Iri(p_iri) => (*p_iri == iri.iri, None),
                     MatchOrVar::Blank(_) => (false, None),
                     MatchOrVar::Var(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::IriOrBlankVar(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::IriVar(var) => {
-                        let value = Value::Iri(iri.iri.to_string());
+                        let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::BlankVar(_) => (false, None),
@@ -521,17 +459,16 @@ impl RdfMatcher {
             if subject_matches && predicate_matches && object_matches {
                 parser_debug!(self, "Matched: #{}", matcher_id);
                 if let Some(v) = subject_variable {
-                    mstate.push(&v.0, v.1);
+                    mstate.push(v.0, v.1);
                 }
                 if let Some(v) = predicate_variable {
-                    mstate.push(&v.0, v.1);
+                    mstate.push(v.0, v.1);
                 }
                 if let Some(v) = object_variable {
-                    mstate.push(&v.0, v.1);
+                    mstate.push(v.0, v.1);
                 }
                 triple_matches = true;
                 mstate.matched(matcher_id);
-                // parser_debug!(self, "{:?}", mstate);
             } else {
                 parser_debug!(self, "{} No match. Next...", matcher_id);
             }

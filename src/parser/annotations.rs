@@ -106,7 +106,15 @@ pub(crate) fn match_annotations<'a>(
             Ok(false)
         }),
     ));
+    Ok(())
+}
 
+/// annotations
+/// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Parsing_of_Annotations
+pub(crate) fn match_annotation_assertions<'a>(
+    matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
+    _prefixes: &HashMap<String, String>,
+) -> Result<(), Error> {
     matchers.push((
         rdf_match!("AnnotationAssertion", _prefixes, 
             [iob:subject] [*:predicate] [lt:object] .)?,

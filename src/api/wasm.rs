@@ -72,12 +72,12 @@ extern "C" {
 #[wasm_bindgen(typescript_custom_section)]
 const ONTOLOGY_TS_API: &'static str = r#"
 interface Declaration {
-    Class?: IRI,
-    NamedIndividual?: IRI,
-    ObjectProperty?: IRI,
-    DataProperty?: IRI,
-    AnnotationProperty?: IRI,
-    Datatype?: IRI,
+    Class?: [IRI, Array<Annotation>],
+    NamedIndividual?: [IRI, Array<Annotation>],
+    ObjectProperty?: [IRI, Array<Annotation>],
+    DataProperty?: [IRI, Array<Annotation>],
+    AnnotationProperty?: [IRI, Array<Annotation>],
+    Datatype?: [IRI, Array<Annotation>],
 }
 
 interface Axiom {

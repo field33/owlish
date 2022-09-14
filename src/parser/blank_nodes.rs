@@ -16,8 +16,8 @@ use crate::parser::matcher::RdfMatcher;
 use super::collector::BlankNodeHandle;
 use super::collector::MatcherHandler;
 
-pub(crate) fn match_blank_nodes<'a>(
-    matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
+pub(crate) fn match_blank_nodes(
+    matchers: &mut Vec<(RdfMatcher, MatcherHandler)>,
     prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
     // TODO: parse all kinds of blank nodes to something like `Map<blank_node, AxiomOrDecl>`.

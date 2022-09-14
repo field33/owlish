@@ -10,8 +10,8 @@ use super::collector::MatcherHandler;
 
 use crate::parser::matcher::RdfMatcher;
 
-pub(crate) fn match_sequences<'a>(
-    matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
+pub(crate) fn match_sequences(
+    matchers: &mut Vec<(RdfMatcher, MatcherHandler)>,
     prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
     matchers.push((

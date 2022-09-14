@@ -74,12 +74,6 @@ impl Ontology {
 
         let mut matchers: Vec<(RdfMatcher, MatcherHandler)> = Vec::new();
 
-        declarations::match_declarations(&mut matchers, &prefixes)?;
-        sequences::match_sequences(&mut matchers, &prefixes)?;
-        blank_nodes::match_blank_nodes(&mut matchers, &prefixes)?;
-        axioms::match_axioms(&mut matchers, &prefixes)?;
-        annotations::match_annotations(&mut matchers, &prefixes)?;
-
         type MatcherID = usize;
         type MatcherStateEntry<'a> = (MatcherID, Vec<Rc<RdfTriple<'a>>>, MatcherState<'a>, bool);
         // let mut finished_matches: Vec<(MatcherID, Vec<TripleID>, MatcherState)> = Vec::new();
@@ -94,74 +88,90 @@ impl Ontology {
 
         let mut matcher_instance_id = 0;
 
-        for triple in triples.iter() {
-            if print_triples {
-                println!("{}", display(triple));
+        for phase in 0..2 {
+            matchers.clear();
+            started_matches.clear();
+            match phase {
+                0 => {
+                    declarations::match_declarations(&mut matchers, &prefixes)?;
+                    sequences::match_sequences(&mut matchers, &prefixes)?;
+                    blank_nodes::match_blank_nodes(&mut matchers, &prefixes)?;
+                    annotations::match_annotations(&mut matchers, &prefixes)?;
+                }
+                _ => {
+                    axioms::match_axioms(&mut matchers, &prefixes)?;
+                    annotations::match_annotation_assertions(&mut matchers, &prefixes)?;
+                }
             }
-            println!("started_matches {}", started_matches.len());
 
-            for (matcher_id, (m, _)) in matchers.iter().enumerate() {
-                let subject: IRIOrBlank = triple.subject.clone().into();
+            for triple in triples.iter() {
+                if print_triples {
+                    println!("{}", display(triple));
+                }
 
-                // (1) Take each ongoing matcher state and check whether it matches this new triple
-                for (_, (matcher_id, triples, mstate, finished)) in started_matches.iter_mut() {
-                    let (m, _) = &matchers[*matcher_id];
-                    parser_debug!(
-                        m,
-                        "         ################### Matching ({:?}, {})",
-                        &subject,
-                        m.name()
-                    );
+                for (matcher_id, (m, _)) in matchers.iter().enumerate() {
+                    let subject: IRIOrBlank = triple.subject.clone().into();
 
-                    // (1) If so, keep matching. Maybe mark as finished.
-                    if let MatchResult::Matched(f) = m.matches(triple.clone(), mstate) {
-                        *finished = f;
-                        if !triples.iter().any(|t| Rc::ptr_eq(t, triple)) {
-                            triples.push(triple.clone());
+                    // (1) Take each ongoing matcher state and check whether it matches this new triple
+                    for (_, (matcher_id, triples, mstate, finished)) in started_matches.iter_mut() {
+                        let (m, _) = &matchers[*matcher_id];
+                        parser_debug!(
+                            m,
+                            "         ################### Matching ({:?}, {})",
+                            &subject,
+                            m.name()
+                        );
+
+                        // (1) If so, keep matching. Maybe mark as finished.
+                        if let MatchResult::Matched(f) = m.matches(triple.clone(), mstate) {
+                            *finished = f;
+                            if !triples.iter().any(|t| Rc::ptr_eq(t, triple)) {
+                                triples.push(triple.clone());
+                            }
                         }
                     }
-                }
 
-                // (1) If there is nothing still matching the current triple, match with new state and add to started if it matches
-                let mut mstate = MatcherState::new();
-                if let MatchResult::Matched(finished) = m.matches(triple.clone(), &mut mstate) {
-                    parser_debug!(m, "New matching state for ({:?}, {})", &subject, m.name());
-                    started_matches.insert(
-                        matcher_instance_id,
-                        (matcher_id, vec![triple.clone()], mstate, finished),
-                    );
-                    matcher_instance_id += 1;
-                }
-            }
-            let mut finished_matcher_instances = Vec::new();
-            let mut resolved_triples = Vec::new();
-            for (matcher_ins_id, (mid, triples, mstate, finished)) in started_matches.iter() {
-                if *finished {
-                    finished_matcher_instances.push(*matcher_ins_id);
-                    for _t in triples {
-                        if !resolved_triples.iter().any(|t| Rc::ptr_eq(t, triple)) {
-                            resolved_triples.push(triple.clone());
-                        }
-                    }
-                    let (_m, handler) = &matchers[*mid];
-                    if !handler(mstate, &mut collector, &options)? {
-                        // todo: did not meet semantic criteria
+                    // (1) If there is nothing still matching the current triple, match with new state and add to started if it matches
+                    let mut mstate = MatcherState::new();
+                    if let MatchResult::Matched(finished) = m.matches(triple.clone(), &mut mstate) {
+                        parser_debug!(m, "New matching state for ({:?}, {})", &subject, m.name());
+                        started_matches.insert(
+                            matcher_instance_id,
+                            (matcher_id, vec![triple.clone()], mstate, finished),
+                        );
+                        matcher_instance_id += 1;
                     }
                 }
-            }
-            if !finished_matcher_instances.is_empty() {
-                for (matcher_ins_id, (mid, triples, _, _)) in started_matches.iter() {
-                    let (_matcher, _) = &matchers[*mid];
-                    let obsolete = triples
-                        .iter()
-                        .all(|t1| resolved_triples.iter().any(|t2| Rc::ptr_eq(t1, t2)));
-                    if obsolete {
+                let mut finished_matcher_instances = Vec::new();
+                let mut resolved_triples = Vec::new();
+                for (matcher_ins_id, (mid, triples, mstate, finished)) in started_matches.iter() {
+                    if *finished {
                         finished_matcher_instances.push(*matcher_ins_id);
+                        for _t in triples {
+                            if !resolved_triples.iter().any(|t| Rc::ptr_eq(t, triple)) {
+                                resolved_triples.push(triple.clone());
+                            }
+                        }
+                        let (_m, handler) = &matchers[*mid];
+                        if !handler(mstate, &mut collector, &options)? {
+                            // todo: did not meet semantic criteria
+                        }
                     }
                 }
-            }
-            for matcher_ins_id in finished_matcher_instances {
-                started_matches.remove(&matcher_ins_id);
+                if !finished_matcher_instances.is_empty() {
+                    for (matcher_ins_id, (mid, triples, _, _)) in started_matches.iter() {
+                        let (_matcher, _) = &matchers[*mid];
+                        let obsolete = triples
+                            .iter()
+                            .all(|t1| resolved_triples.iter().any(|t2| Rc::ptr_eq(t1, t2)));
+                        if obsolete {
+                            finished_matcher_instances.push(*matcher_ins_id);
+                        }
+                    }
+                }
+                for matcher_ins_id in finished_matcher_instances {
+                    started_matches.remove(&matcher_ins_id);
+                }
             }
         }
         Ok(collector.ontology())
@@ -620,6 +630,56 @@ mod tests {
     }
 
     #[test]
+    fn annotations_on_annotations_2() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+            <http://field33.com/query_result/bd9f41bc-7cb4-465f-b798-7c4e0b7c52cc> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+
+            <http://field33.com/dataset/example#Indi1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+            
+            _:31813c8fd03c79c26a58033340b50ec7 <http://www.w3.org/2002/07/owl#annotatedSource> <http://field33.com/dataset/example#Indi1> .
+            <http://field33.com/dataset/example#Indi1> <http://www.w3.org/2000/01/rdf-schema#label> "Value1" .
+            _:31813c8fd03c79c26a58033340b50ec7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
+            _:31813c8fd03c79c26a58033340b50ec7 <http://query-server.field33.com/ontology/query-field> "labels" .
+            _:31813c8fd03c79c26a58033340b50ec7 <http://www.w3.org/2002/07/owl#annotatedProperty> <http://www.w3.org/2000/01/rdf-schema#label> .
+            _:31813c8fd03c79c26a58033340b50ec7 <http://www.w3.org/2002/07/owl#annotatedTarget> "Value1" .
+            
+
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let options = ParserOptions::builder()
+            .known(Declaration::AnnotationProperty(
+                IRI::new("http://query-server.field33.com/ontology/query-field")
+                    .unwrap()
+                    .into(),
+                vec![],
+            ))
+            .build();
+
+        let o = Ontology::parse(turtle, options).unwrap();
+        assert_eq!(o.declarations().len(), 1);
+        assert_eq!(o.axioms().len(), 1);
+        assert_eq!(
+            o.axioms()[0],
+            Axiom::AnnotationAssertion(AnnotationAssertion(
+                IRI::new("http://www.w3.org/2000/01/rdf-schema#label")
+                    .unwrap()
+                    .into(),
+                IRI::new("http://field33.com/dataset/example#Indi1").unwrap(),
+                Literal::String("Value1".into()).into(),
+                vec![Annotation(
+                    IRI::new("http://query-server.field33.com/ontology/query-field")
+                        .unwrap()
+                        .into(),
+                    LiteralOrIRI::Literal(Literal::String("labels".into())),
+                    vec![]
+                )]
+            ))
+        );
+    }
+
+    #[test]
     fn class_assertion() {
         env_logger::try_init().ok();
         let turtle = r##"
@@ -912,6 +972,6 @@ mod tests {
         let o = Ontology::parse(turtle, Default::default()).unwrap();
         println!("{:#?}", o);
         assert_eq!(o.declarations().len(), 6);
-        assert_eq!(o.axioms().len(), 22);
+        assert_eq!(o.axioms().len(), 23);
     }
 }

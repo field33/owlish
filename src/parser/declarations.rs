@@ -7,8 +7,8 @@ use super::collector::{get_iri_var, MatcherHandler};
 /// declarations
 /// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Analyzing_Declarations
 /// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Parsing_of_Axioms
-pub(crate) fn match_declarations<'a>(
-    matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
+pub(crate) fn match_declarations(
+    matchers: &mut Vec<(RdfMatcher, MatcherHandler)>,
     prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
     matchers.push((

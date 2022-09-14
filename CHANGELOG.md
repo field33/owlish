@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.1 - 2022-09-14
+#### Bug Fixes
+- Improve owlish parser performance - (f5e8467) - Florian Loers
+
+- - -
+
 ## v0.8.0 - 2022-09-13
 #### Features
 - Improve owlish parser for computation logic - (47b73b3) - Florian Loers

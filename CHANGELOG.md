@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.3 - 2022-09-14
+#### Bug Fixes
+- RDF Parser ignores order of triples - (ae037d6) - Florian Loers
+
+- - -
+
 ## v0.8.2 - 2022-09-14
 #### Bug Fixes
 - Patch package.json in release action - (c283249) - Maximilian Goisser

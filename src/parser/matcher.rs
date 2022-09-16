@@ -250,16 +250,10 @@ impl std::fmt::Display for MatchOrVar {
 pub fn print(matcher: &RdfMatcher, mstate: &MatcherState) -> String {
     let mut s = format!("Matcher {} {{\n", matcher.name);
     for (i, t) in matcher.match_triples.iter().enumerate() {
-        if let Some(l) = mstate.matches.back() {
-            if l + 1 == i {
-                s = format!("{}> [{}] [{}] [{}] .\n", s, t.0, t.1, t.2);
-            } else {
-                s = format!("{}  [{}] [{}] [{}] .\n", s, t.0, t.1, t.2);
-            }
-        } else if i == 0 {
-            s = format!("{}> [{}] [{}] [{}] .\n", s, t.0, t.1, t.2);
+        if mstate.matches.contains(&i) {
+            s = format!("{}[✓] [{}] [{}] [{}] .\n", s, t.0, t.1, t.2);
         } else {
-            s = format!("{}  [{}] [{}] [{}] .\n", s, t.0, t.1, t.2);
+            s = format!("{}[ ] [{}] [{}] [{}] .\n", s, t.0, t.1, t.2);
         }
     }
     format!("{} }}", s)

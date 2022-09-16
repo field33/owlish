@@ -11,17 +11,27 @@ use web_sys::console::error_1;
 impl Ontology {
     /// Create an ontology based on a turtle formatted string.
     pub fn parseTurtle(ttl: String, options: ParserOptions) -> Option<Ontology> {
-        if let Some(json) = js_sys::JSON::stringify(&options)
-            .ok()
-            .and_then(|s| s.as_string())
-        {
-            if let Ok(options) = serde_json::from_str(&json) {
-                Ontology::parse(&ttl, options).ok()
-            } else {
+        match js_sys::JSON::stringify(&options) {
+            Ok(json) => match json.as_string() {
+                Some(json) => match serde_json::from_str(&json) {
+                    Ok(options) => Ontology::parse(&ttl, options).ok(),
+                    Err(e) => {
+                        error_1(&format!("Invalid parser options: {}", e).into());
+                        None
+                    }
+                },
+                None => {
+                    error_1(
+                        &format!("Invalid parser options: Could not stringify provided object")
+                            .into(),
+                    );
+                    None
+                }
+            },
+            Err(e) => {
+                error_1(&format!("Invalid parser options: {:?}", e).into());
                 None
             }
-        } else {
-            None
         }
     }
 
@@ -489,11 +499,6 @@ pub fn NonNegativeNumericValue(value: Number) -> Option<Value> {
 #[wasm_bindgen(typescript_custom_section)]
 const PARSER_OPTIONS_TS_API: &'static str = r#"
 interface ParserOptions {
-    entries: Record<ParserOptionKey, ParserOptionValue>
-}
-
-type ParserOptionKey = "Known"
-interface ParserOptionValue { 
-    Known?: Array<Declaration>
+    known: Array<Declaration>
 }
 "#;

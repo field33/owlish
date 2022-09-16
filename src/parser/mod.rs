@@ -184,29 +184,17 @@ impl From<Vec<String>> for Error {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum ParserOption {
-    Known(Vec<Declaration>),
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub enum ParserOptionKey {
-    Known,
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ParserOptions {
-    entries: HashMap<ParserOptionKey, ParserOption>,
+    known: Vec<Declaration>,
 }
 
 impl ParserOptions {
     pub fn is_annotation(&self, iri: &str) -> bool {
-        if let Some(ParserOption::Known(declarations)) = self.entries.get(&ParserOptionKey::Known) {
-            for d in declarations {
-                if let Declaration::AnnotationProperty(anno, _) = d {
-                    if anno.as_iri().as_str() == iri {
-                        return true;
-                    }
+        for d in &self.known {
+            if let Declaration::AnnotationProperty(anno, _) = d {
+                if anno.as_iri().as_str() == iri {
+                    return true;
                 }
             }
         }
@@ -227,16 +215,7 @@ pub struct ParserOptionsBuilder {
 
 impl ParserOptionsBuilder {
     pub fn known(mut self, declaration: Declaration) -> Self {
-        if let Some(ParserOption::Known(known)) =
-            self.options.entries.get_mut(&ParserOptionKey::Known)
-        {
-            known.push(declaration);
-        } else {
-            self.options.entries.insert(
-                ParserOptionKey::Known,
-                ParserOption::Known(vec![declaration]),
-            );
-        }
+        self.options.known.push(declaration);
         self
     }
     pub fn build(self) -> ParserOptions {
@@ -630,24 +609,21 @@ mod tests {
     }
 
     #[test]
-    fn annotations_on_annotations_2() {
+    fn annotations_on_annotations_unsorted() {
         env_logger::try_init().ok();
         let turtle = r##"
-            <http://field33.com/query_result/bd9f41bc-7cb4-465f-b798-7c4e0b7c52cc> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
-
-            <http://field33.com/dataset/example#Indi1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+            <http://field33.com/query_result/bcb90f6f-d1bf-42ea-b5f3-249d7d56fad1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
             
-            _:31813c8fd03c79c26a58033340b50ec7 <http://www.w3.org/2002/07/owl#annotatedSource> <http://field33.com/dataset/example#Indi1> .
-            <http://field33.com/dataset/example#Indi1> <http://www.w3.org/2000/01/rdf-schema#label> "Value1" .
-            _:31813c8fd03c79c26a58033340b50ec7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
-            _:31813c8fd03c79c26a58033340b50ec7 <http://query-server.field33.com/ontology/query-field> "labels" .
-            _:31813c8fd03c79c26a58033340b50ec7 <http://www.w3.org/2002/07/owl#annotatedProperty> <http://www.w3.org/2000/01/rdf-schema#label> .
-            _:31813c8fd03c79c26a58033340b50ec7 <http://www.w3.org/2002/07/owl#annotatedTarget> "Value1" .
+            <http://field33.com/dataset/foobar#7025935> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
             
-
+            <http://field33.com/dataset/foobar#7025935> <http://www.w3.org/2000/01/rdf-schema#label> "Lorem Ipsum" .
+            _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
+            _:e8ba5acdba3222687d32b847815b45f9 <http://query-server.field33.com/ontology/query-field> "labels" .
+            _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/2002/07/owl#annotatedTarget> "Lorem Ipsum" .
+            _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/2002/07/owl#annotatedProperty> <http://www.w3.org/2000/01/rdf-schema#label> .
+            _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/2002/07/owl#annotatedSource> <http://field33.com/dataset/foobar#7025935> .
         "##;
 
-        harriet::TurtleDocument::parse_full(turtle).unwrap();
         let options = ParserOptions::builder()
             .known(Declaration::AnnotationProperty(
                 IRI::new("http://query-server.field33.com/ontology/query-field")
@@ -657,25 +633,27 @@ mod tests {
             ))
             .build();
 
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, options).unwrap();
+
+        println!("{:#?}", o);
         assert_eq!(o.declarations().len(), 1);
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            Axiom::AnnotationAssertion(AnnotationAssertion(
-                IRI::new("http://www.w3.org/2000/01/rdf-schema#label")
-                    .unwrap()
-                    .into(),
-                IRI::new("http://field33.com/dataset/example#Indi1").unwrap(),
-                Literal::String("Value1".into()).into(),
+            AnnotationAssertion(
+                well_known::rdfs_label(),
+                IRI::new("http://field33.com/dataset/foobar#7025935").unwrap(),
+                Literal::String("Lorem Ipsum".into()).into(),
                 vec![Annotation(
                     IRI::new("http://query-server.field33.com/ontology/query-field")
                         .unwrap()
                         .into(),
-                    LiteralOrIRI::Literal(Literal::String("labels".into())),
+                    Literal::String("labels".into()).into(),
                     vec![]
                 )]
-            ))
+            )
+            .into()
         );
     }
 

@@ -308,7 +308,7 @@ impl RdfMatcher {
 
         let finished = mstate.matches.len() == self.match_triples.len();
 
-        parser_debug!(self, "{:?}", finished);
+        parser_debug!(self, "Finished: {:?}", finished);
 
         if triple_matches {
             if finished {

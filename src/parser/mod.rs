@@ -8,7 +8,7 @@ use crate::{
     api::Ontology,
     error::Error,
     owl::{well_known, Declaration},
-    parser::matcher::{display, IRIOrBlank, MatchResult, RdfMatcher},
+    parser::matcher::{IRIOrBlank, MatchResult, RdfMatcher},
 };
 
 use self::matcher::{get_prefixes, MatcherState};
@@ -32,8 +32,8 @@ macro_rules! parser_debug {
             if $crate::parser::RDF_MATCHER.is_none() {
                 $crate::parser::RDF_MATCHER = Some(std::env::var("RDF_MATCHER").ok());
             }
-            if let Some(Some(name)) = &$crate::parser::RDF_MATCHER {
-                if name == $m.name() {
+            if let Some(Some(names)) = &$crate::parser::RDF_MATCHER {
+                if names.split(",").find(|n| n.trim() == $m.name()).is_some() {
                     log::debug!($($tokens)*);
                 }
             } else {
@@ -88,6 +88,7 @@ impl Ontology {
                     declarations::match_declarations(&mut matchers, &prefixes)?;
                     sequences::match_sequences(&mut matchers, &prefixes)?;
                     blank_nodes::match_blank_nodes(&mut matchers, &prefixes)?;
+                    annotations::match_simple_annotation_assertions(&mut matchers, &prefixes)?;
                 }
                 1 => {
                     annotations::match_annotations(&mut matchers, &prefixes)?;
@@ -123,7 +124,9 @@ impl Ontology {
 
                     // (1) Start matcher with new state (if there is no current matcher state)
                     let mut mstate = MatcherState::new();
-                    if !matcher_instances.contains_key(&matcher_id) {
+                    if let std::collections::hash_map::Entry::Vacant(e) =
+                        matcher_instances.entry(matcher_id)
+                    {
                         if let MatchResult::Matched(finished) =
                             m.matches(triple.clone(), &mut mstate)
                         {
@@ -133,10 +136,7 @@ impl Ontology {
                                 &subject,
                                 m.name()
                             );
-                            matcher_instances.insert(
-                                matcher_id,
-                                (matcher_id, vec![triple.clone()], mstate, finished),
-                            );
+                            e.insert((matcher_id, vec![triple.clone()], mstate, finished));
                         }
                     }
                 }
@@ -144,7 +144,8 @@ impl Ontology {
                 // (2) Handle matchers that fully matched a set of triples
                 let mut finished_matcher_instances = Vec::new();
                 // let mut resolved_triples = Vec::new();
-                for (matcher_ins_id, (mid, triples, mstate, finished)) in matcher_instances.iter() {
+                for (matcher_ins_id, (mid, _triples, mstate, finished)) in matcher_instances.iter()
+                {
                     if *finished {
                         finished_matcher_instances.push(*matcher_ins_id);
                         let (_m, handler) = &matchers[*mid];
@@ -601,11 +602,11 @@ mod tests {
             
             _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/2002/07/owl#annotatedSource> <http://field33.com/dataset/foobar#7025935> .
             
-            _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
-            <http://field33.com/dataset/foobar#7025935> <http://www.w3.org/2000/01/rdf-schema#label> "Lorem Ipsum" .
             _:e8ba5acdba3222687d32b847815b45f9 <http://query-server.field33.com/ontology/query-field> "labels" .
             _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/2002/07/owl#annotatedTarget> "Lorem Ipsum" .
             _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/2002/07/owl#annotatedProperty> <http://www.w3.org/2000/01/rdf-schema#label> .
+            _:e8ba5acdba3222687d32b847815b45f9 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
+            <http://field33.com/dataset/foobar#7025935> <http://www.w3.org/2000/01/rdf-schema#label> "Lorem Ipsum" .
             <http://field33.com/dataset/foobar#7025935> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
         "##;
 

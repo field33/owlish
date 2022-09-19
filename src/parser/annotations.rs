@@ -109,7 +109,52 @@ pub(crate) fn match_annotations<'a>(
     Ok(())
 }
 
-/// annotations
+/// simple annotation assertions without blank nodes
+/// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Parsing_of_Annotations
+pub(crate) fn match_simple_annotation_assertions<'a>(
+    matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
+    _prefixes: &HashMap<String, String>,
+) -> Result<(), Error> {
+    matchers.push((
+        rdf_match!("AnnotationAssertionSimple", _prefixes, 
+            [iob:subject] [*:predicate] [lt:object] .)?,
+        Box::new(|mstate, o, options| {
+            if let Some(obj) = mstate.get("object") {
+                let value: Literal = match obj.clone().try_into() {
+                    Ok(l) => l,
+                    Err(_) => unreachable!(),
+                };
+                if let Some(predicate_iri) = get_iri_var("predicate", mstate)? {
+                    if o.annotation_property(&predicate_iri).is_some()
+                        || options.is_annotation(predicate_iri.as_str())
+                        || WELL_KNOWN_ANNOTATIONS.contains(&predicate_iri.as_str())
+                    {
+                        if let Some(subject) = mstate.get("subject") {
+                            match subject {
+                                Value::Iri(subject_iri) => {
+                                    return push_annotation_assertion(
+                                        subject_iri,
+                                        value,
+                                        predicate_iri,
+                                        mstate,
+                                        o,
+                                    );
+                                }
+                                Value::Blank(_subject_bn) => {}
+                                Value::Literal { .. } => unreachable!(),
+                            }
+                        }
+                    }
+                }
+            }
+
+            Ok(false)
+        }),
+    ));
+    Ok(())
+}
+
+/// annotation assertions
 /// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Parsing_of_Annotations
 pub(crate) fn match_annotation_assertions<'a>(
     matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
@@ -131,28 +176,21 @@ pub(crate) fn match_annotation_assertions<'a>(
                     {
                         if let Some(subject) = mstate.get("subject") {
                             match subject {
-                                Value::Iri(subject_iri) => {
-                                    if o.annotation(Ann::Iri(subject_iri.clone())).is_some() {
-                                        return Ok(false);
-                                    }
-                                    if let Some(annotate) =
-                                        o.annotation(Ann::Iri(subject_iri.clone())).cloned()
-                                    {
-                                        return handle_like_blank_but_with_iri(
-                                            o,
-                                            annotate,
-                                            predicate_iri,
-                                            value,
-                                        );
-                                    }
-
-                                    return handle_annotation_on_iri(
-                                        subject_iri,
-                                        value,
-                                        predicate_iri,
-                                        mstate,
-                                        o,
-                                    );
+                                Value::Iri(_subject_iri) => {
+                                    // if o.annotation(Ann::Iri(subject_iri.clone())).is_some() {
+                                    //     return Ok(false);
+                                    // }
+                                    // if let Some(annotate) =
+                                    //     o.annotation(Ann::Iri(subject_iri.clone())).cloned()
+                                    // {
+                                    //     return handle_like_blank_but_with_iri(
+                                    //         o,
+                                    //         annotate,
+                                    //         predicate_iri,
+                                    //         value,
+                                    //     );
+                                    // }
+                                    // TODO
                                 }
                                 Value::Blank(subject_bn) => {
                                     return handle_annotation_on_bn(
@@ -272,7 +310,7 @@ fn handle_annotation_on_bn(
     Ok(false)
 }
 
-fn handle_like_blank_but_with_iri(
+fn _handle_like_blank_but_with_iri(
     o: &mut OntologyCollector,
     annotate: Annotate,
     predicate_iri: IRI,
@@ -364,7 +402,7 @@ fn handle_like_blank_but_with_iri(
     Ok(false)
 }
 
-fn handle_annotation_on_iri(
+fn push_annotation_assertion(
     subject_iri: &str,
     _value: Literal,
     predicate_iri: IRI,

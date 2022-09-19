@@ -6,6 +6,9 @@ description = "OWL 2 implementation with wasm support and turtle parsing"
 authors = ["Field33", "Florian Loers <florianloers@mailbox.org>"]
 readme = "README.md"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/field33/owlish"
+documentation = "https://docs.rs/owlish"
+keywords = ["owl", "rdf", "semantic-web"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]

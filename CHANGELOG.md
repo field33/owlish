@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.6 - 2022-09-19
+#### Bug Fixes
+- Bump harriet to allow parsing of utf strings - (426fabb) - Florian Loers
+
+- - -
+
 ## v0.8.5 - 2022-09-19
 #### Bug Fixes
 - Parse triples in any order - (433ae93) - Florian Loers

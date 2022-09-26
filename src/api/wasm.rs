@@ -43,7 +43,8 @@ impl Ontology {
     /// Get the IRI of this ontology.
     #[wasm_bindgen(getter)]
     pub fn iri(&self) -> IRI {
-        serde_wasm_bindgen::to_value(&self.iri).unwrap().into()
+        let s = serde_json::to_string(&self.iri).unwrap();
+        JSON::parse(&s).unwrap().into()
     }
 
     /// Get all OWL declarations of this ontology.
@@ -51,8 +52,10 @@ impl Ontology {
     pub fn wasm_declarations(&self) -> DeclarationArray {
         let array = Array::new();
         for d in self.declarations() {
-            if let Ok(value) = serde_wasm_bindgen::to_value(d) {
-                array.push(&value);
+            if let Ok(s) = serde_json::to_string(&d) {
+                if let Ok(value) = JSON::parse(&s) {
+                    array.push(&value);
+                }
             }
         }
         array.unchecked_into()
@@ -63,8 +66,10 @@ impl Ontology {
     pub fn wasm_axioms(&self) -> AxiomArray {
         let array = Array::new();
         for a in self.axioms() {
-            if let Ok(value) = serde_wasm_bindgen::to_value(a) {
-                array.push(&value);
+            if let Ok(s) = serde_json::to_string(&a) {
+                if let Ok(value) = JSON::parse(&s) {
+                    array.push(&value);
+                }
             }
         }
         array.unchecked_into()
@@ -336,8 +341,14 @@ pub fn Iri(iri: &str) -> Option<IRI> {
 }
 
 fn iri_to_js_iri(iri: &crate::owl::IRI) -> Option<IRI> {
-    match serde_wasm_bindgen::to_value(iri) {
-        Ok(jsv) => Some(jsv.unchecked_into()),
+    match serde_json::to_string(iri) {
+        Ok(s) => match JSON::parse(&s) {
+            Ok(v) => Some(v.into()),
+            Err(e) => {
+                error_1(&format!("Failed to create JS value from IRI {}: {:?}", iri, e).into());
+                None
+            }
+        },
         Err(e) => {
             error_1(&format!("Failed to create JS value from IRI {}: {}", iri, e).into());
             None
@@ -452,8 +463,14 @@ impl well_known {
 }
 
 fn value_to_js_value(value: &crate::owl::Literal) -> Option<Value> {
-    match serde_wasm_bindgen::to_value(value) {
-        Ok(jsv) => Some(jsv.unchecked_into()),
+    match serde_json::to_string(value) {
+        Ok(s) => match JSON::parse(&s) {
+            Ok(value) => Some(value.unchecked_into()),
+            Err(e) => {
+                error_1(&format!("Failed to create JS value from value {:?}: {:?}", value, e).into());
+                None
+            }
+        },
         Err(e) => {
             error_1(&format!("Failed to create JS value from value {:?}: {}", value, e).into());
             None

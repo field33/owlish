@@ -3,7 +3,7 @@
 use crate::owl::Literal;
 
 use super::Ontology;
-use js_sys::{Array, Number};
+use js_sys::{Array, Number, JSON};
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::console::error_1;
 
@@ -43,7 +43,7 @@ impl Ontology {
     /// Get the IRI of this ontology.
     #[wasm_bindgen(getter)]
     pub fn iri(&self) -> IRI {
-        JsValue::from_serde(&self.iri).unwrap().into()
+        serde_wasm_bindgen::to_value(&self.iri).unwrap().into()
     }
 
     /// Get all OWL declarations of this ontology.
@@ -51,7 +51,7 @@ impl Ontology {
     pub fn wasm_declarations(&self) -> DeclarationArray {
         let array = Array::new();
         for d in self.declarations() {
-            if let Ok(value) = JsValue::from_serde(d) {
+            if let Ok(value) = serde_wasm_bindgen::to_value(d) {
                 array.push(&value);
             }
         }
@@ -63,7 +63,7 @@ impl Ontology {
     pub fn wasm_axioms(&self) -> AxiomArray {
         let array = Array::new();
         for a in self.axioms() {
-            if let Ok(value) = JsValue::from_serde(a) {
+            if let Ok(value) = serde_wasm_bindgen::to_value(a) {
                 array.push(&value);
             }
         }
@@ -159,12 +159,12 @@ export interface AxiomMatcher<R> {
 export function matchAxiom<R>(axiom: Axiom, matcher: AxiomMatcher<R>): R
 
 interface DeclarationMatcher<R> {
-    Class?: ([IRI, Array<Annotation>]) => R,
-    NamedIndividual?: ([IRI, Array<Annotation>]) => R,
-    ObjectProperty?: ([IRI, Array<Annotation>]) => R,
-    DataProperty?: ([IRI, Array<Annotation>]) => R,
-    AnnotationProperty?: ([IRI, Array<Annotation>]) => R,
-    Datatype?: ([IRI, Array<Annotation>]) => R,
+    Class?: (cls: [IRI, Array<Annotation>]) => R,
+    NamedIndividual?: (individual: [IRI, Array<Annotation>]) => R,
+    ObjectProperty?: (objectProp: [IRI, Array<Annotation>]) => R,
+    DataProperty?: (dataProp: [IRI, Array<Annotation>]) => R,
+    AnnotationProperty?: (annotationProp: [IRI, Array<Annotation>]) => R,
+    Datatype?: (datatype: [IRI, Array<Annotation>]) => R,
 
 }
 
@@ -336,7 +336,7 @@ pub fn Iri(iri: &str) -> Option<IRI> {
 }
 
 fn iri_to_js_iri(iri: &crate::owl::IRI) -> Option<IRI> {
-    match JsValue::from_serde(iri) {
+    match serde_wasm_bindgen::to_value(iri) {
         Ok(jsv) => Some(jsv.unchecked_into()),
         Err(e) => {
             error_1(&format!("Failed to create JS value from IRI {}: {}", iri, e).into());
@@ -347,15 +347,30 @@ fn iri_to_js_iri(iri: &crate::owl::IRI) -> Option<IRI> {
 
 #[wasm_bindgen]
 pub fn set_query_parameter(iri: &IRI, name: &str, value: &str) -> Option<IRI> {
-    match iri.into_serde::<crate::owl::IRI>() {
-        Ok(mut iri) => {
-            if let Err(e) = iri.set_query_parameter(name, value) {
-                error_1(&e.into())
+    match JSON::stringify(iri) {
+        Ok(s) => match s.as_string() {
+            Some(s) => match serde_json::from_str::<crate::owl::IRI>(&s) {
+                Ok(mut iri) => {
+                    if let Err(e) = iri.set_query_parameter(name, value) {
+                        error_1(&e.into())
+                    }
+                    iri_to_js_iri(&iri)
+                }
+                Err(e) => {
+                    error_1(&format!("Failed to set query parameter: {}", e).into());
+                    None
+                }
+            },
+            None => {
+                error_1(
+                    &format!("Failed to set query parameter: Value could not be stringified.")
+                        .into(),
+                );
+                None
             }
-            iri_to_js_iri(&iri)
-        }
+        },
         Err(e) => {
-            error_1(&format!("Failed to parse JS IRI into Rust IRI: {:?}", e).into());
+            error_1(&format!("Failed to set query parameter: {:?}", e).into());
             None
         }
     }
@@ -437,7 +452,7 @@ impl well_known {
 }
 
 fn value_to_js_value(value: &crate::owl::Literal) -> Option<Value> {
-    match JsValue::from_serde(value) {
+    match serde_wasm_bindgen::to_value(value) {
         Ok(jsv) => Some(jsv.unchecked_into()),
         Err(e) => {
             error_1(&format!("Failed to create JS value from value {:?}: {}", value, e).into());

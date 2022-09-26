@@ -159,11 +159,13 @@ export interface AxiomMatcher<R> {
 export function matchAxiom<R>(axiom: Axiom, matcher: AxiomMatcher<R>): R
 
 interface DeclarationMatcher<R> {
-    Class?: (iri: IRI) => R,
-    NamedIndividual?: (iri: IRI) => R,
-    ObjectProperty?: (iri: IRI) => R,
-    DataProperty?: (iri: IRI) => R,
-    Datatype?: (iri: IRI) => R,
+    Class?: ([IRI, Array<Annotation>]) => R,
+    NamedIndividual?: ([IRI, Array<Annotation>]) => R,
+    ObjectProperty?: ([IRI, Array<Annotation>]) => R,
+    DataProperty?: ([IRI, Array<Annotation>]) => R,
+    AnnotationProperty?: ([IRI, Array<Annotation>]) => R,
+    Datatype?: ([IRI, Array<Annotation>]) => R,
+
 }
 
 export function matchDeclaration<R>(declaration: Declaration, matcher: DeclarationMatcher<R>): R

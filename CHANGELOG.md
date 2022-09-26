@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.7 - 2022-09-26
+#### Bug Fixes
+- Fix wrong types in matchDeclaration - (9b18971) - Florian Loers
+#### Miscellaneous Chores
+- Add keywords and URLs to Cargo.toml - (a7a0fb8) - Maximilian Goisser
+- Add badges to README - (4b533fe) - Maximilian Goisser
+
+- - -
+
 ## v0.8.6 - 2022-09-19
 #### Bug Fixes
 - Bump harriet to allow parsing of utf strings - (426fabb) - Florian Loers

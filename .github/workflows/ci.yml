@@ -26,6 +26,14 @@ jobs:
           cargo outdated
           cargo audit
 
+  bench:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: SAMPLES=10 cargo bench
+
   build:
     runs-on: ubuntu-latest
     needs: check

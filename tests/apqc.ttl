@@ -1,0 +1,1006 @@
+@base <http://field33.com/ontologies/@apqc_cross_industry/acquire_construct_and_manage_assets/> .
+@prefix : <http://field33.com/ontologies/@apqc_cross_industry/acquire_construct_and_manage_assets/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix registry: <http://field33.com/ontologies/REGISTRY/> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://field33.com/ontologies/@apqc_cross_industry/acquire_construct_and_manage_assets/> rdf:type owl:Ontology ;
+  registry:author "Field33" ;
+  registry:canonicalPrefix "acquire_construct_and_manage_assets" ;
+  registry:dependency "@fld33/relations_0_1_0 ^0.1.9", "@apqc/apqc ^0.1.1",
+    "@fld33_domain/business_objects ^0.1.4" ;
+  registry:license "2022 APQC. ALL RIGHTS RESERVED. This Process Classification Framework (PCF) is the copyrighted intellectual property of APQC. APQC encourages the wide distribution, discussion, and use of the PCF for classifying and defining organizational processes. Accordingly, APQC hereby grants you a perpetual, worldwide, royalty-free license to use, copy, publish, modify, and create derivative works of the PCF, provided that all copies of the PCF and any derivative works contain this notice."@en ;
+  registry:ontologyFormatVersion "v1" ;
+  registry:packageName "@apqc_cross_industry/acquire_construct_and_manage_assets" ;
+  registry:packageVersion "0.1.4" ;
+  registry:category "Process"@en ;
+  registry:keyword "APQC"@en ,
+                   "Cross Industry"@en ,
+                   "Process"@en ;
+  registry:repository "https://github.com/field33/ontology-workspace/tree/main/%40apqc_cross_industry/acquire_construct_and_manage_assets" ;
+  registry:shortDescription "APQC cross industry category: Acquire, Construct, and Manage Assets Ontology"@en ;
+  rdfs:comment "# Acquire, Construct, and Manage Assets<br>This package is a domain ontology describing the category \"Acquire, Construct, and Manage Assets Ontology\" as part of APQC for cross industry." ;
+  rdfs:label "Acquire, Construct, and Manage Assets"@en ;
+  owl:imports <http://field33.com/ontologies/@fld33/relations_0_1_0/>, <http://field33.com/ontologies/@apqc/apqc/>,
+    <http://field33.com/ontologies/@fld33_domain/business_objects/> .
+
+:10937 rdf:type owl:Class ;
+  rdfs:comment "Building and purchasing non-productive assets for the organization. Acquire and construct non-productive assets that are not yielding any income/profits to the business. "@en ;
+  rdfs:label "Plan and acquire assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessGroup> .
+
+:10937PartOf19207 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10937 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19207 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessGroupPartOfAPQCCategory> .
+
+:10940 rdf:type owl:Class ;
+  rdfs:comment "Retiring productive and non-productive assets. "@en ;
+  rdfs:label "Dispose of assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessGroup> .
+
+:10940PartOf19207 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10940 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19207 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessGroupPartOfAPQCCategory> .
+
+:10941 rdf:type owl:Class ;
+  rdfs:comment "Strategizing a long-term vision for managing properties. Prepare strategies and a long-term vision for managing purchased/retained properties."@en ;
+  rdfs:label "Develop property strategy and long term vision"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:10941PartOf10937 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10941 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10937 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:10943 rdf:type owl:Class ;
+  rdfs:comment "Recognizing the needs of facility users in order to construct a project proposal that meets those needs."@en ;
+  rdfs:label "Plan facility"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:10943PartOf10937 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10943 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10937 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:10944 rdf:type owl:Class ;
+  rdfs:comment "Managing the provision of the workspace and its assets. Arrange an office space with all assets (tables, chairs, computers, admin staff, etc.) according to requirements."@en ;
+  rdfs:label "Provide workspace and facilities"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:10944PartOf10937 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10944 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10937 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:10947 rdf:type owl:Class ;
+  rdfs:comment "Performing prophylactic maintenance in an effort to avoid corrective or unplanned repairs."@en ;
+  rdfs:label "Perform preventative asset maintenance"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10947FollowedBy19254 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10947 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19254 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10947PartOf19253 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10947 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19253 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10949 rdf:type owl:Class ;
+  rdfs:comment "Managing all operational activities of the facility. Manage how each function/business unit works. Support the manufacturing facility to attain organizational goals."@en ;
+  rdfs:label "Manage facilities operations"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:10949PartOf10937 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10949 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10937 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:10952 rdf:type owl:Class ;
+  rdfs:comment "Creating a strategy for managing asset exits. "@en ;
+  rdfs:label "Develop exit strategy"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:10952PartOf10940 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10952 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10940 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:10953 rdf:type owl:Class ;
+  rdfs:comment "Performing the sale of assets. Achieve and complete the sale process. Deliver the end product to the customers. "@en ;
+  rdfs:label "Perform sale or trade"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:10953PartOf10940 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10953 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10940 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:10954 rdf:type owl:Class ;
+  rdfs:comment "Abandoning assets. Manage the act of deliberately and permanently giving up, granting, leaving, or surrendering property or buildings and allowing others to use the intellectual property without protest."@en ;
+  rdfs:label "Perform abandonment"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:10954PartOf10940 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10954 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10940 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:10955 rdf:type owl:Class ;
+  rdfs:comment "Creating alignment between the requirement of properties and the overall business strategy. This process requires the organization to align the requirement of properties in accordance with its business strategies of the organization."@en ;
+  rdfs:label "Confirm alignment of property requirements with business strategy"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10955FollowedBy10956 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10955 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10956 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10955PartOf10941 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10955 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10941 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10956 rdf:type owl:Class ;
+  rdfs:comment "Evaluating the impact of the external environment. Evaluate the circumstances, objects, events, and aspects surrounding an organization that affects its actions and selections and that recognizes its opportunities and risks."@en ;
+  rdfs:label "Appraise the external environment"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10956FollowedBy10957 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10956 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10957 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10956PartOf10941 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10956 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10941 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10957 rdf:type owl:Class ;
+  rdfs:comment "Deciding whether to buy or build properties. Study the market forces about property prices and cost of construction in order to take decisions based on the market research."@en ;
+  rdfs:label "Determine build or buy decision"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10957PartOf10941 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10957 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10941 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10958 rdf:type owl:Class ;
+  rdfs:comment "Preparing and analyzing different designs for a facility in order to finalize which design will be the most suitable option."@en ;
+  rdfs:label "Design facility"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10958FollowedBy10959 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10958 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10959 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10958PartOf10943 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10958 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10943 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10959 rdf:type owl:Class ;
+  rdfs:comment "Evaluating the feasibility of budgets prepared for the construction of facilities."@en ;
+  rdfs:label "Analyze budget"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10959FollowedBy10960 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10959 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10960 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10959PartOf10943 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10959 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10943 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10960 rdf:type owl:Class ;
+  rdfs:comment "Assessing and choosing the appropriate property. Analyze the property requirements. Review the available property options. Finalize the most suitable option."@en ;
+  rdfs:label "Select property"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10960FollowedBy10961 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10960 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10961 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10960PartOf10943 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10960 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10943 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10961 rdf:type owl:Class ;
+  rdfs:comment "Discussing the terms and conditions of facilities to be occupied according to the business requirements and availability of budgets."@en ;
+  rdfs:label "Negotiate terms for facility"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10961FollowedBy10962 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10961 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10962 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10961PartOf10943 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10961 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10943 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10962 rdf:type owl:Class ;
+  rdfs:comment "Constructing the buildings. Manage renovations according to requirements and demands. "@en ;
+  rdfs:label "Manage construction or modification to building"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10962PartOf10943 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10962 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10943 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10963 rdf:type owl:Class ;
+  rdfs:comment "Attaining the office space with all assets (tables, chairs, computers, admin staff, etc.) according to requirements."@en ;
+  rdfs:label "Acquire workspace and facilities"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10963FollowedBy10964 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10963 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10964 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10963PartOf10944 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10963 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10944 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10964 rdf:type owl:Class ;
+  rdfs:comment "Modifying the formation of the workspace and its assets. Make necessary changes in an office space with all assets (tables, chairs, computers, admin staff, interior designing, etc.) according to requirements."@en ;
+  rdfs:label "Change fit/form/function of workspace and facilities"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10964PartOf10944 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10964 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10944 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10965 rdf:type owl:Class ;
+  rdfs:comment "Shifting staff or employees from one place to another place according to changes in business requirements."@en ;
+  rdfs:label "Relocate people"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10965FollowedBy10966 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10965 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10966 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10965PartOf10949 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10965 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10949 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10966 rdf:type owl:Class ;
+  rdfs:comment "Relocating the tools and raw materials. Shift raw or finished material and machines of company from one place to another place according to changes in business requirements."@en ;
+  rdfs:label "Relocate material and tools"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10966PartOf10949 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10966 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10949 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10967 rdf:type owl:Class ;
+  rdfs:comment "Evaluating assets in order to project future requirements for maintenance. Evaluate the present working condition of assets. Determine the future maintenance requirements of assets."@en ;
+  rdfs:label "Analyze assets and predict maintenance requirements"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10967FollowedBy19241 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10967 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19241 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10967PartOf19239 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10967 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19239 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:10968 rdf:type owl:Class ;
+  rdfs:comment "Devising a methodology and procedure for assimilating the works of planned maintenance into the schedule scheme for the processing of finished products that utilizes the same machinery. "@en ;
+  rdfs:label "Integrate preventive maintenance into operations schedule"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:10968FollowedBy19242 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10968 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19242 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:10968PartOf19239 rdf:type owl:ObjectProperty ;
+  rdfs:domain :10968 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19239 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:11276 rdf:type owl:Class ;
+  rdfs:comment "Managing the construction process to ensure that activates are on task, on budget, and are being performed with safety and quality in mind."@en ;
+  rdfs:label "Perform construction performance management"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:11276FollowedBy19221 rdf:type owl:ObjectProperty ;
+  rdfs:domain :11276 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19221 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:11276PartOf20139 rdf:type owl:ObjectProperty ;
+  rdfs:domain :11276 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :20139 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:16970 rdf:type owl:Class ;
+  rdfs:comment "Disposing of waste and hazardous materials as outlined by state, local, and federal regulations."@en ;
+  rdfs:label "Perform waste and hazardous goods management"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:16970PartOf10940 rdf:type owl:ObjectProperty ;
+  rdfs:domain :16970 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10940 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:19207 rdf:type owl:Class ;
+  rdfs:comment "Relating to the design, construction, acquisition, and management of both productive and non-productive assets."@en ;
+  rdfs:label "Acquire, Construct, and Manage Assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCCategory> .
+
+:19208 rdf:type owl:Class ;
+  rdfs:comment "Conceptualizing and realizing dividend and income generating assets such as machines, tools, factories, etc. Manage steps to acquire assets including managing capital, as well as planning, scheduling, and overseeing construction."@en ;
+  rdfs:label "Design and construct productive assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessGroup> .
+
+:19208PartOf19207 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19208 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19207 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessGroupPartOfAPQCCategory> .
+
+:19209 rdf:type owl:Class ;
+  rdfs:comment "Producing and maintaining a planning schedule and a financial plan to purchase or manufacture productive assets. Determine the investment plan, monitor capital, and secure the necessary financing in order to realize completion of the program."@en ;
+  rdfs:label "Manage capital program for productive assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:19209PartOf19208 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19209 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19208 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:19210 rdf:type owl:Class ;
+  rdfs:comment "Establishing what funds will be invested in the construction of productive assets for the advancement of established business objectives. "@en ;
+  rdfs:label "Define capital investment plan"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19210FollowedBy19211 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19210 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19211 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19210PartOf19209 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19210 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19209 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19211 rdf:type owl:Class ;
+  rdfs:comment "Monitoring plans on capital projects. Capital projects can be purchasing buildings, lands, etc. "@en ;
+  rdfs:label "Monitor capital program"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19211FollowedBy19212 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19211 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19212 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19211PartOf19209 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19211 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19209 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19212 rdf:type owl:Class ;
+  rdfs:comment "Acquiring the loans needed to construct necessary assets."@en ;
+  rdfs:label "Secure construction financing"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19212PartOf19209 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19212 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19209 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19220 rdf:type owl:Class ;
+  rdfs:comment "Developing a strategy to perform asset construction. Assure that timelines, regulations, and resources are on task and on budget."@en ;
+  rdfs:label "Develop construction strategy"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19220FollowedBy11276 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19220 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :11276 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19220PartOf20139 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19220 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :20139 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19221 rdf:type owl:Class ;
+  rdfs:comment "Gathering the required permits for construction from the proper jurisdiction. This may include inspections during and after construction to verify that the new asset meets all national, regional, and local codes."@en ;
+  rdfs:label "Obtain construction permissions"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19221FollowedBy19222 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19221 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19222 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19221PartOf20139 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19221 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :20139 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19222 rdf:type owl:Class ;
+  rdfs:comment "Designing assets to meet organizational needs as well as ensuring that the asset adheres to all national, regional, and local construction codes. "@en ;
+  rdfs:label "Design assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19222FollowedBy19223 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19222 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19223 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19222PartOf20139 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19222 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :20139 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19223 rdf:type owl:Class ;
+  rdfs:comment "Determining what resources will need to be acquired in order to carry out construction. Plan when, where, and how resources will be used. Determine the length of time resources will be utilized."@en ;
+  rdfs:label "Plan construction resources"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19223PartOf20139 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19223 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :20139 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19224 rdf:type owl:Class ;
+  rdfs:comment "Overseeing the performance and quality of work. Assure that records are maintained throughout the construction process. Adhere to all safety, security, and access regulations set forth by the organization and all government standards. "@en ;
+  rdfs:label "Manage asset construction"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:19224PartOf19208 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19224 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19208 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:19225 rdf:type owl:Class ;
+  rdfs:comment "Monitoring construction to insure that all regulatory laws are being adhered to, that all work is being performed in a timely manner, and that quality assurance is met at all steps of the construction process."@en ;
+  rdfs:label "Monitor work performance"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19225FollowedBy19226 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19225 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19226 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19225PartOf19224 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19225 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19224 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19226 rdf:type owl:Class ;
+  rdfs:comment "Implementing a checks and balances system to verify that the construction was performed correctly. Rework when errors are found. "@en ;
+  rdfs:label "Undertake construction quality control"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19226FollowedBy19227 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19226 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19227 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19226PartOf19224 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19226 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19224 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19227 rdf:type owl:Class ;
+  rdfs:comment "Implementing records to include all construction work that has been performed. Include all new or modified construction, and any construction or regulatory issues that might have occurred."@en ;
+  rdfs:label "Create work and asset records"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19227FollowedBy19228 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19227 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19228 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19227PartOf19224 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19227 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19224 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19228 rdf:type owl:Class ;
+  rdfs:comment "Ensuring that safety, security, and access is maintained. Provide a workplace that meets and exceeds all local, state, and federal guidelines. Provide security and access to the building site as set forth by safety and organizational guidelines."@en ;
+  rdfs:label "Manage safety, security, and access to sites"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19228PartOf19224 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19228 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19224 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19229 rdf:type owl:Class ;
+  rdfs:comment "Arranging a timetable for which to perform construction work. Schedule resources to contract assets for new or replacement assets. Reschedule or redesign assets if needed. "@en ;
+  rdfs:label "Schedule and perform construction work"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:19229PartOf19208 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19229 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19208 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:19230 rdf:type owl:Class ;
+  rdfs:comment "Defining a timetable for which to execute the construction of the asset."@en ;
+  rdfs:label "Schedule construction work"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19230FollowedBy19231 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19230 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19231 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19230PartOf19229 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19230 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19229 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19231 rdf:type owl:Class ;
+  rdfs:comment "Gathering resources needed to complete all construction work. Verify that all resources have the proper training and skills to perform the work."@en ;
+  rdfs:label "Obtain resources"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19231FollowedBy19232 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19231 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19232 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19231PartOf19229 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19231 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19229 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19232 rdf:type owl:Class ;
+  rdfs:comment "Building new assets necessary for the organization. Be aware of any construction codes and permits that need to be addressed."@en ;
+  rdfs:label "Construct new assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19232FollowedBy19233 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19232 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19233 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19232PartOf19229 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19232 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19229 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19233 rdf:type owl:Class ;
+  rdfs:comment "Modifying existing assets to align with the changing needs of the organization. Be aware of any construction codes and permits that need to be addressed."@en ;
+  rdfs:label "Augment existing assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19233FollowedBy19234 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19233 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19234 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19233PartOf19229 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19233 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19229 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19234 rdf:type owl:Class ;
+  rdfs:comment "Determining the need to replace existing assets. Be aware of any construction codes and permits that need to be addressed."@en ;
+  rdfs:label "Renew/Replace assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19234PartOf19229 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19234 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19229 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19238 rdf:type owl:Class ;
+  rdfs:comment "Preserving productive assets through the planning, managing, and performance of preventative, routine, and critical maintenance work. "@en ;
+  rdfs:label "Maintain productive assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessGroup> .
+
+:19238PartOf19207 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19238 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19207 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessGroupPartOfAPQCCategory> .
+
+:19239 rdf:type owl:Class ;
+  rdfs:comment "Ensuring that necessary resources are available and tasks are prioritized accordingly through planning. Provide strategies and policies that identify tasks that need to be completed, and the resources necessary to fulfill those tasks."@en ;
+  rdfs:label "Plan asset maintenance"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:19239PartOf19238 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19239 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19238 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:19240 rdf:type owl:Class ;
+  rdfs:comment "Creating goals and agendas to better realize the success of the maintenance policies that have been put into place."@en ;
+  rdfs:label "Develop maintenance strategies"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19240FollowedBy10967 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19240 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10967 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19240PartOf19239 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19240 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19239 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19241 rdf:type owl:Class ;
+  rdfs:comment "Communicating policies in regards to asset maintenance. Provide a clear set of procedures and policies that outline what will be involved in the maintenance process. "@en ;
+  rdfs:label "Specify maintenance policies"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19241FollowedBy10968 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19241 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :10968 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19241PartOf19239 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19241 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19239 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19242 rdf:type owl:Class ;
+  rdfs:comment "Identifying the steps needed for asset maintenance. List out the those tasks that are involved in completing this process. Prioritize the tasks that are created."@en ;
+  rdfs:label "Identify work management tasks & priorities"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19242FollowedBy19243 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19242 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19243 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19242PartOf19239 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19242 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19239 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19243 rdf:type owl:Class ;
+  rdfs:comment "Analyzing workload needs in relation to asset maintenance and plan resources around those needs."@en ;
+  rdfs:label "Conduct resource planning"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19243FollowedBy19244 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19243 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19244 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19243PartOf19239 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19243 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19239 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19244 rdf:type owl:Class ;
+  rdfs:comment "Creating procedures on how to maintain productive assets. "@en ;
+  rdfs:label "Create work plans"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19244PartOf19239 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19244 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19239 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19245 rdf:type owl:Class ;
+  rdfs:comment "Ensuring that asset maintenance is conducted in a timely manner and successfully. Schedule work with the required resources with an eye on quality control and safety. Verify that contracted maintenance meets performance targets."@en ;
+  rdfs:label "Manage asset maintenance"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:19245PartOf19238 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19245 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19238 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:19246 rdf:type owl:Class ;
+  rdfs:comment "Defining a timetable for which to execute the maintenance of the asset. "@en ;
+  rdfs:label "Schedule maintenance work"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19246FollowedBy19247 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19246 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19247 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19246PartOf19245 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19246 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19245 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19247 rdf:type owl:Class ;
+  rdfs:comment "Gathering resources needed to complete all maintenance work. Verify that all resources have the proper training and skills to perform the work."@en ;
+  rdfs:label "Obtain required resources"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19247FollowedBy19248 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19247 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19248 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19247PartOf19245 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19247 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19245 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19248 rdf:type owl:Class ;
+  rdfs:comment "Implementing a checks and balances system to verify that the maintenance was performed correctly. Rework when errors are found. "@en ;
+  rdfs:label "Undertake quality control"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19248FollowedBy19249 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19248 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19249 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19248PartOf19245 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19248 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19245 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19249 rdf:type owl:Class ;
+  rdfs:comment "Modifying existing maintenance records to include all new work that has been performed, what assets were serviced, and any issues that might have arisen. "@en ;
+  rdfs:label "Update work and asset records"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19249FollowedBy19250 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19249 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19250 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19249PartOf19245 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19249 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19245 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19250 rdf:type owl:Class ;
+  rdfs:comment "Assuring that all safety laws and regulations are being implemented and followed. Align practices with regulatory bureaus such as OSHA , EHS, and ISO. "@en ;
+  rdfs:label "Manage maintenance work safety"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19250FollowedBy19251 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19250 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19251 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19250PartOf19245 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19250 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19245 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19251 rdf:type owl:Class ;
+  rdfs:comment "Outlining what should be achieved through predictive indicators with regard to performing maintenance. This could include the length of time it takes to perform routine maintenance or how often unplanned maintenance feasibly occur."@en ;
+  rdfs:label "Define maintenance performance targets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19251FollowedBy19252 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19251 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19252 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19251PartOf19245 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19251 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19245 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19252 rdf:type owl:Class ;
+  rdfs:comment "Following set performance targets, monitor and gage the success of the organization in meeting those targets."@en ;
+  rdfs:label "Monitor maintenance performance against targets/contracts"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19252PartOf19245 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19252 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19245 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19253 rdf:type owl:Class ;
+  rdfs:comment "Engaging in all aspects of asset maintenance. Ensure that all assets are functioning properly and to all specified codes and regulations where applicable. Maintenance includes all preventative, routine, and corrective activates."@en ;
+  rdfs:label "Perform asset maintenance"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:19253PartOf19238 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19253 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19238 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:19254 rdf:type owl:Class ;
+  rdfs:comment "Carrying out required maintenance to continue upkeep of equipment or assets. "@en ;
+  rdfs:label "Perform routine asset maintenance"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19254FollowedBy19255 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19254 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19255 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19254PartOf19253 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19254 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19253 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19255 rdf:type owl:Class ;
+  rdfs:comment "Repairing or correcting faults that occur with an asset. This could be a break or other repairable damage. "@en ;
+  rdfs:label "Perform corrective asset maintenance and repairs"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19255FollowedBy19256 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19255 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19256 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19255PartOf19253 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19255 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19253 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19256 rdf:type owl:Class ;
+  rdfs:comment "Realizing potential or current problems with assets that would require unplanned maintenance. Unplanned maintenance is a repair or change that needs to be made that is not preventative or routine."@en ;
+  rdfs:label "Identify unplanned maintenance requirements"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19256FollowedBy19257 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19256 ;
+  rdfs:label "Followed By"@en ;
+  rdfs:range :19257 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityFollowedByAPQCActivity> .
+
+:19256PartOf19253 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19256 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19253 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19257 rdf:type owl:Class ;
+  rdfs:comment "Performing repairs that occur outside of normal routine or preventative maintenance. "@en ;
+  rdfs:label "Perform unplanned maintenance and repairs"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCActivity> .
+
+:19257PartOf19253 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19257 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19253 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCActivityPartOfAPQCProcess> .
+
+:19258 rdf:type owl:Class ;
+  rdfs:comment "Retiring assets that are no longer viable to the business. Decommission assets that are no longer in working order, are out of date, or whose maintenance exceeds the cost of replacement."@en ;
+  rdfs:label "Decommission productive assets"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:19258PartOf10940 rdf:type owl:ObjectProperty ;
+  rdfs:domain :19258 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :10940 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .
+
+:20139 rdf:type owl:Class ;
+  rdfs:comment "Outlining the steps and strategies needed to construct assets. Verify that all regulations are adhered to and that all permissions have been granted. Organize and plan for resources to complete construction."@en ;
+  rdfs:label "Design and plan asset construction"@en ;
+  rdfs:subClassOf <http://field33.com/ontologies/@apqc/apqc/APQCProcess> .
+
+:20139PartOf19208 rdf:type owl:ObjectProperty ;
+  rdfs:domain :20139 ;
+  rdfs:label "Part Of"@en ;
+  rdfs:range :19208 ;
+  rdfs:subPropertyOf <http://field33.com/ontologies/@apqc/apqc/APQCProcessPartOfAPQCProcessGroup> .

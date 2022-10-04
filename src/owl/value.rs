@@ -16,6 +16,19 @@ pub enum LiteralOrIRI {
     Literal(Literal),
 }
 
+impl std::fmt::Display for LiteralOrIRI {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LiteralOrIRI::IRI(iri) => {
+                write!(f, "{}", iri)
+            }
+            LiteralOrIRI::Literal(lit) => {
+                write!(f, "{}", lit)
+            }
+        }
+    }
+}
+
 impl From<Literal> for LiteralOrIRI {
     fn from(l: Literal) -> Self {
         Self::Literal(l)
@@ -39,6 +52,27 @@ pub enum Literal {
         type_iri: Option<DatatypeIRI>,
     },
     Bool(bool),
+}
+
+impl std::fmt::Display for Literal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Literal::Raw { data, type_iri } => write!(f, "{}: {:?}", type_iri.as_iri(), data),
+            Literal::String(s) => write!(f, "{}", s),
+            Literal::DateTime(dt) => write!(f, "{}", dt),
+            Literal::LangString { string, lang } => write!(f, "{}@{}", string, lang),
+            Literal::Number { number, type_iri } => write!(
+                f,
+                "{}{}",
+                number,
+                type_iri
+                    .as_ref()
+                    .map(|iri| format!("^^{}", iri.as_iri().as_str()))
+                    .unwrap_or_else(|| "".into())
+            ),
+            Literal::Bool(_) => todo!(),
+        }
+    }
 }
 
 const VALUE_STRING_TYPE: &str = "string";

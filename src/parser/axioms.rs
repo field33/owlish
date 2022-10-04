@@ -1,4 +1,4 @@
-use super::collector::BlankNodeHandle;
+use super::collector::CollectedBlankNode;
 use super::collector::MatcherHandler;
 use crate::error::Error;
 use crate::get_vars;
@@ -99,7 +99,7 @@ pub(crate) fn match_axioms(
                         Value::Blank(bn) => {
                             if let Some(bnh) = o.get_blank(bn) {
                                 match bnh {
-                                    BlankNodeHandle::ClassConstructor(constr) => {
+                                    CollectedBlankNode::ClassConstructor(constr) => {
                                         o.push_axiom(
                                             SubClassOf(
                                                 ClassConstructor::IRI(

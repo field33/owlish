@@ -13,7 +13,7 @@ use std::collections::HashMap;
 
 use crate::parser::matcher::RdfMatcher;
 
-use super::collector::BlankNodeHandle;
+use super::collector::CollectedBlankNode;
 use super::collector::MatcherHandler;
 
 pub(crate) fn match_blank_nodes(
@@ -42,7 +42,7 @@ pub(crate) fn match_blank_nodes(
                             }
                             o.insert_blank_node(
                                 bn.clone(),
-                                BlankNodeHandle::ClassConstructor(Box::new(
+                                CollectedBlankNode::ClassConstructor(Box::new(
                                     ClassConstructor::ObjectIntersectionOf(ObjectIntersectionOf(
                                         classes,
                                         vec![],

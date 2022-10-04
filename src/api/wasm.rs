@@ -467,7 +467,9 @@ fn value_to_js_value(value: &crate::owl::Literal) -> Option<Value> {
         Ok(s) => match JSON::parse(&s) {
             Ok(value) => Some(value.unchecked_into()),
             Err(e) => {
-                error_1(&format!("Failed to create JS value from value {:?}: {:?}", value, e).into());
+                error_1(
+                    &format!("Failed to create JS value from value {:?}: {:?}", value, e).into(),
+                );
                 None
             }
         },

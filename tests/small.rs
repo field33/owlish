@@ -8,7 +8,7 @@ fn small() {
     harriet::TurtleDocument::parse_full(turtle)
         .map_err(|e| format!("{}...", &format!("{:?}", e)[..200]))
         .expect("Could not parse with harriet");
-        
+
     let o = Ontology::parse(turtle, Default::default()).unwrap();
 
     assert_eq!(o.declarations().len(), 1000);

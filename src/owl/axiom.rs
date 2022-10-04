@@ -44,6 +44,43 @@ pub enum Axiom {
     HasKey(HasKey),
 }
 
+impl Axiom {
+    pub fn annotations_mut(&mut self) -> &mut Vec<Annotation> {
+        match self {
+            Axiom::AnnotationAssertion(a) => &mut a.3,
+            Axiom::SubObjectPropertyOf(a) => &mut a.2,
+            Axiom::EquivalentObjectProperties(a) => &mut a.2,
+            Axiom::EquivalentDataProperties(a) => &mut a.2,
+            Axiom::InverseObjectProperties(a) => &mut a.2,
+            Axiom::DisjointObjectProperties(a) => &mut a.2,
+            Axiom::ObjectPropertyDomain(a) => &mut a.2,
+            Axiom::ObjectPropertyRange(a) => &mut a.2,
+            Axiom::DataPropertyDomain(a) => &mut a.2,
+            Axiom::DataPropertyRange(a) => &mut a.2,
+            Axiom::SymmetricObjectProperty(a) => &mut a.1,
+            Axiom::AsymmetricObjectProperty(a) => &mut a.1,
+            Axiom::ReflexiveObjectProperty(a) => &mut a.1,
+            Axiom::IrreflexiveObjectProperty(a) => &mut a.1,
+            Axiom::FunctionalObjectProperty(a) => &mut a.1,
+            Axiom::InverseFunctionalObjectProperty(a) => &mut a.1,
+            Axiom::TransitiveObjectProperty(a) => &mut a.1,
+            Axiom::FunctionalDataProperty(a) => &mut a.1,
+            Axiom::SubClassOf(a) => &mut a.2,
+            Axiom::EquivalentClasses(a) => &mut a.2,
+            Axiom::DisjointClasses(a) => &mut a.1,
+            Axiom::DatatypeDefinition(a) => &mut a.2,
+            Axiom::ClassAssertion(a) => &mut a.2,
+            Axiom::SameIndividual(a) => &mut a.2,
+            Axiom::DifferentIndividuals(a) => &mut a.2,
+            Axiom::ObjectPropertyAssertion(a) => &mut a.3,
+            Axiom::NegativeObjectPropertyAssertion(a) => &mut a.3,
+            Axiom::DataPropertyAssertion(a) => &mut a.3,
+            Axiom::NegativeDataPropertyAssertion(a) => &mut a.3,
+            Axiom::HasKey(a) => &mut a.2,
+        }
+    }
+}
+
 impl From<SubObjectPropertyOf> for Axiom {
     fn from(s: SubObjectPropertyOf) -> Self {
         Self::SubObjectPropertyOf(s)

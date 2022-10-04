@@ -12,18 +12,18 @@ pub(crate) type MatcherHandler<'a> = Box<
 >;
 
 #[derive(Debug, Clone)]
-pub(crate) enum BlankNodeHandle {
+pub(crate) enum CollectedBlankNode {
     ClassConstructor(Box<ClassConstructor>),
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub(crate) enum Ann<'a> {
+pub(crate) enum CollectedAnnotationKey<'a> {
     Bn(RdfBlankNode),
     Iri(Cow<'a, str>),
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct Annotate<'a> {
+pub(crate) struct CollectedAnnotation<'a> {
     pub(crate) subject: Cow<'a, str>,
     pub(crate) predicate: Cow<'a, str>,
     pub(crate) object: Cow<'a, str>,
@@ -39,8 +39,11 @@ pub(crate) struct OntologyCollector<'a> {
     // child node -> root node
     sequence_tree: HashMap<RdfBlankNode, Option<RdfBlankNode>>,
 
-    annotations: HashMap<Ann<'a>, Annotate<'a>>,
-    blank_nodes: HashMap<RdfBlankNode, BlankNodeHandle>,
+    annotations: HashMap<CollectedAnnotationKey<'a>, CollectedAnnotation<'a>>,
+    blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode>,
+
+    axiom_index: HashMap<(String, String, String), usize>,
+    declaration_index: HashMap<String, usize>,
 }
 
 impl<'a> OntologyCollector<'a> {
@@ -55,30 +58,77 @@ impl<'a> OntologyCollector<'a> {
     }
 
     pub(crate) fn push_declaration(&mut self, declaration: Declaration) {
+        let iri = match &declaration {
+            Declaration::Class(iri, _) => iri.as_iri(),
+            Declaration::NamedIndividual(iri, _) => iri.as_iri(),
+            Declaration::ObjectProperty(iri, _) => iri.as_iri(),
+            Declaration::DataProperty(iri, _) => iri.as_iri(),
+            Declaration::AnnotationProperty(iri, _) => iri.as_iri(),
+            Declaration::Datatype(iri, _) => iri.as_iri(),
+        };
+        self.declaration_index
+            .insert(iri.to_string(), self.declarations.len());
         self.declarations.push(declaration)
     }
 
     pub(crate) fn push_axiom(&mut self, axiom: Axiom) {
+        match &axiom {
+            Axiom::SubClassOf(sco) => {
+                if let ClassConstructor::IRI(subject) = sco.subject() {
+                    if let ClassConstructor::IRI(parent) = sco.parent() {
+                        self.axiom_index.insert(
+                            (
+                                subject.as_iri().to_string(),
+                                well_known::rdfs_subClassOf_str.to_string(),
+                                parent.as_iri().to_string(),
+                            ),
+                            self.axioms.len(),
+                        );
+                    }
+                }
+            }
+            Axiom::AnnotationAssertion(ann) => {
+                let sub = ann.subject();
+                let iri = ann.iri();
+                let val = ann.value();
+                self.axiom_index.insert(
+                    (sub.to_string(), iri.to_string(), val.to_string()),
+                    self.axioms.len(),
+                );
+            }
+            _ => {
+                // TODO
+            }
+        }
         self.axioms.push(axiom);
     }
 
-    pub(crate) fn _axioms(&mut self) -> &Vec<Axiom> {
-        &self.axioms
+    pub(crate) fn get_from_index_mut(&mut self, s: &str, p: &str, o: &str) -> Option<&mut Axiom> {
+        self.axiom_index
+            .get(&(s.into(), p.into(), o.into()))
+            .and_then(|index| self.axioms.get_mut(*index))
     }
 
-    pub(crate) fn axioms_mut(&mut self) -> &mut Vec<Axiom> {
-        &mut self.axioms
-    }
+    // pub(crate) fn axioms_mut(&mut self) -> &mut Vec<Axiom> {
+    //     &mut self.axioms
+    // }
 
-    pub(crate) fn insert_blank_node(&mut self, bn: RdfBlankNode, bnh: BlankNodeHandle) {
+    pub(crate) fn insert_blank_node(&mut self, bn: RdfBlankNode, bnh: CollectedBlankNode) {
         self.blank_nodes.insert(bn, bnh);
     }
 
-    pub(crate) fn insert_annotation(&mut self, key: Ann<'a>, value: Annotate<'a>) {
+    pub(crate) fn insert_annotation(
+        &mut self,
+        key: CollectedAnnotationKey<'a>,
+        value: CollectedAnnotation<'a>,
+    ) {
         self.annotations.insert(key, value);
     }
 
-    pub(crate) fn annotation(&self, ann: Ann<'a>) -> Option<&Annotate<'a>> {
+    pub(crate) fn annotation(
+        &self,
+        ann: CollectedAnnotationKey<'a>,
+    ) -> Option<&CollectedAnnotation<'a>> {
         self.annotations.get(&ann)
     }
 
@@ -127,7 +177,7 @@ impl<'a> OntologyCollector<'a> {
         Ok(())
     }
 
-    pub(crate) fn get_blank(&self, bn: &RdfBlankNode) -> Option<&BlankNodeHandle> {
+    pub(crate) fn get_blank(&self, bn: &RdfBlankNode) -> Option<&CollectedBlankNode> {
         self.blank_nodes.get(bn)
     }
 
@@ -135,29 +185,44 @@ impl<'a> OntologyCollector<'a> {
         &self,
         iri: &IRI,
     ) -> Option<(&AnnotationPropertyIRI, &Vec<Annotation>)> {
-        self.declarations.iter().rev().find_map(|d| match d {
-            Declaration::AnnotationProperty(a, annotations) => {
-                if a.as_iri() == iri {
-                    Some((a, annotations))
-                } else {
-                    None
+        self.declaration_index
+            .get(iri.as_str())
+            .and_then(|index| self.declarations.get(*index))
+            .and_then(|d| match d {
+                Declaration::AnnotationProperty(a, annotations) => {
+                    if a.as_iri() == iri {
+                        Some((a, annotations))
+                    } else {
+                        None
+                    }
                 }
-            }
-            _ => None,
-        })
+                _ => None,
+            })
     }
 
     pub(crate) fn class_declaration(&self, cls: &IRI) -> Option<&Declaration> {
-        self.declarations.iter().rev().find(|d| match d {
-            Declaration::Class(iri, _) => iri.as_iri() == cls,
-            _ => false,
-        })
+        // self.declarations.iter().rev().find(|d| match d {
+        // })
+        self.declaration_index
+            .get(cls.as_str())
+            .and_then(|index| self.declarations.get(*index))
+            .and_then(|d| match d {
+                Declaration::Class(_, _) => Some(d),
+                _ => None,
+            })
     }
     pub(crate) fn data_property_declaration(&self, dp: &IRI) -> Option<&Declaration> {
-        self.declarations.iter().rev().find(|d| match d {
-            Declaration::DataProperty(iri, _) => iri.as_iri() == dp,
-            _ => false,
-        })
+        // self.declarations.iter().rev().find(|d| match d {
+        //     Declaration::DataProperty(iri, _) => iri.as_iri() == dp,
+        //     _ => false,
+        // })
+        self.declaration_index
+            .get(dp.as_str())
+            .and_then(|index| self.declarations.get(*index))
+            .and_then(|d| match d {
+                Declaration::DataProperty(_, _) => Some(d),
+                _ => None,
+            })
     }
 }
 

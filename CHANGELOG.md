@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.12 - 2022-10-05
+#### Bug Fixes
+- Adjust types - (9142426) - Florian Loers
+
+- - -
+
 ## v0.8.11 - 2022-10-05
 #### Bug Fixes
 - Improve parser error messages - (cdce6c3) - Florian Loers

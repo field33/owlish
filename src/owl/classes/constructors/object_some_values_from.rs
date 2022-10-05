@@ -2,11 +2,26 @@ use crate::owl::{Annotation, ClassConstructor, ClassIRI, ObjectPropertyConstruct
 
 /// Class construction based on properties.
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectSomeValuesFrom(
-    pub ObjectPropertyConstructor,
-    pub ClassIRI,
-    pub Vec<Annotation>,
-);
+pub struct ObjectSomeValuesFrom {
+    #[serde(rename = "objectProperty")]
+    pub object_property: ObjectPropertyConstructor,
+    pub cls: ClassIRI,
+    pub annotations: Vec<Annotation>,
+}
+
+impl ObjectSomeValuesFrom {
+    pub fn new(
+        object_property: ObjectPropertyConstructor,
+        cls: ClassIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            object_property,
+            cls,
+            annotations,
+        }
+    }
+}
 
 impl From<ObjectSomeValuesFrom> for ClassConstructor {
     fn from(c: ObjectSomeValuesFrom) -> Self {
@@ -35,6 +50,10 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-    export type ObjectSomeValuesFrom = [ObjectPropertyConstructor, IRI, Array<Annotation>];
+    export type ObjectSomeValuesFrom = {
+        objectProperty: ObjectPropertyConstructor,
+        cls: IRI,
+        annotations: Array<Annotation>,
+};
     "#;
 }

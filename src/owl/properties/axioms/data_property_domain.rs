@@ -1,27 +1,26 @@
-use crate::owl::{Annotation, ClassIRI, DataPropertyIRI, Regards, IRI};
+use crate::owl::{Annotation, ClassIRI, DataPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataPropertyDomain(
-    #[serde(rename = "dataPropertyIRI")] pub DataPropertyIRI,
-    #[serde(rename = "classIRI")] pub ClassIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
-
-impl DataPropertyDomain {
-    pub fn iri(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn class_iri(&self) -> &ClassIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
-    }
+pub struct DataPropertyDomain {
+    #[serde(rename = "dataPropertyIRI")]
+    pub data_property_iri: DataPropertyIRI,
+    #[serde(rename = "classIRI")]
+    pub class_iri: ClassIRI,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
 }
 
-impl Regards for DataPropertyDomain {
-    fn regards(&self, iri: &IRI) -> bool {
-        self.iri().as_iri() == iri || self.class_iri().as_iri() == iri
+impl DataPropertyDomain {
+    pub fn new(
+        data_property_iri: DataPropertyIRI,
+        class_iri: ClassIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            data_property_iri,
+            class_iri,
+            annotations,
+        }
     }
 }
 

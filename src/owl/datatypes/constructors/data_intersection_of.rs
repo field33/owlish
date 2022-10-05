@@ -2,21 +2,23 @@ use super::DatatypeDefinitionConstructor;
 use crate::owl::{Annotation, DataPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataIntersectionOf(
-    #[serde(rename = "iri")] pub DataPropertyIRI,
-    #[serde(rename = "datatype")] pub Box<DatatypeDefinitionConstructor>,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct DataIntersectionOf {
+    pub iri: DataPropertyIRI,
+    pub datatype: Box<DatatypeDefinitionConstructor>,
+    pub annotations: Vec<Annotation>,
+}
 
 impl DataIntersectionOf {
-    pub fn iri(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn datatype(&self) -> &DatatypeDefinitionConstructor {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        iri: DataPropertyIRI,
+        datatype: Box<DatatypeDefinitionConstructor>,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            datatype,
+            annotations,
+        }
     }
 }
 

@@ -1,17 +1,17 @@
 use crate::owl::{Annotation, ClassConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DisjointClasses(
-    #[serde(rename = "classes")] pub Vec<ClassConstructor>,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct DisjointClasses {
+    pub classes: Vec<ClassConstructor>,
+    pub annotations: Vec<Annotation>,
+}
 
 impl DisjointClasses {
-    pub fn classes(&self) -> &Vec<ClassConstructor> {
-        &self.0
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.1
+    pub fn new(classes: Vec<ClassConstructor>, annotations: Vec<Annotation>) -> Self {
+        Self {
+            classes,
+            annotations,
+        }
     }
 }
 

@@ -414,7 +414,7 @@ mod tests {
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            AnnotationAssertion(
+            AnnotationAssertion::new(
                 well_known::rdfs_comment(),
                 IRI::new("http://test#Person").unwrap(),
                 LiteralOrIRI::Literal(Literal::String("Represents the set of all people.".into())),
@@ -454,9 +454,9 @@ mod tests {
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            Axiom::SubClassOf(SubClassOf(
+            Axiom::SubClassOf(SubClassOf::new(
                 IRI::new("http://test#Grandfather").unwrap().into(),
-                ObjectIntersectionOf(
+                ObjectIntersectionOf::new(
                     vec![
                         IRI::new("http://test#Man").unwrap().into(),
                         IRI::new("http://test#Parent").unwrap().into(),
@@ -494,7 +494,7 @@ mod tests {
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            Axiom::SubClassOf(SubClassOf(
+            Axiom::SubClassOf(SubClassOf::new(
                 IRI::new("http://test#Man").unwrap().into(),
                 IRI::new("http://test#Person").unwrap().into(),
                 vec![]
@@ -533,10 +533,10 @@ mod tests {
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            Axiom::SubClassOf(SubClassOf(
+            Axiom::SubClassOf(SubClassOf::new(
                 IRI::new("http://test#Man").unwrap().into(),
                 IRI::new("http://test#Person").unwrap().into(),
-                vec![Annotation(
+                vec![Annotation::new(
                     well_known::rdfs_comment(),
                     LiteralOrIRI::Literal(Literal::String(
                         "States that every man is a person.".into()
@@ -577,13 +577,13 @@ mod tests {
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            Axiom::AnnotationAssertion(AnnotationAssertion(
+            Axiom::AnnotationAssertion(AnnotationAssertion::new(
                 IRI::new("http://www.w3.org/2000/01/rdf-schema#comment")
                     .unwrap()
                     .into(),
                 IRI::new("http://test#Man").unwrap(),
                 Literal::String("test".into()).into(),
-                vec![Annotation(
+                vec![Annotation::new(
                     well_known::rdfs_comment(),
                     LiteralOrIRI::Literal(Literal::String(
                         "States that every man is a person.".into()
@@ -627,11 +627,11 @@ mod tests {
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            AnnotationAssertion(
+            AnnotationAssertion::new(
                 well_known::rdfs_label(),
                 IRI::new("http://field33.com/dataset/foobar#7025935").unwrap(),
                 Literal::String("Lorem Ipsum".into()).into(),
-                vec![Annotation(
+                vec![Annotation::new(
                     IRI::new("http://query-server.field33.com/ontology/query-field")
                         .unwrap()
                         .into(),
@@ -668,7 +668,7 @@ mod tests {
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            ClassAssertion(
+            ClassAssertion::new(
                 IRI::new("http://test#Bob").unwrap().into(),
                 IRI::new("http://test#Man").unwrap().into(),
                 vec![]
@@ -704,7 +704,7 @@ mod tests {
         assert_eq!(o.axioms().len(), 2);
         assert_eq!(
             o.axioms()[1],
-            DataPropertyAssertion(
+            DataPropertyAssertion::new(
                 IRI::new("http://test#hasAge").unwrap().into(),
                 IRI::new("http://test#Bob").unwrap().into(),
                 Literal::String("51".into()),
@@ -770,11 +770,11 @@ mod tests {
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
-            AnnotationAssertion(
+            AnnotationAssertion::new(
                 well_known::rdfs_label(),
                 IRI::new("http://example.com/ONTO1/Individual1").unwrap(),
                 Literal::String("Person 1".into()).into(),
-                vec![Annotation(
+                vec![Annotation::new(
                     IRI::new("http://query-server.field33.com/ontology/query-field")
                         .unwrap()
                         .into(),

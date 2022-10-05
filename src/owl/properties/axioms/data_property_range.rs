@@ -1,21 +1,26 @@
 use crate::owl::{Annotation, DataPropertyIRI, DatatypeIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataPropertyRange(
-    #[serde(rename = "dataPropertyIRI")] pub DataPropertyIRI,
-    #[serde(rename = "datatypeIRI")] pub DatatypeIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct DataPropertyRange {
+    #[serde(rename = "dataPropertyIRI")]
+    pub data_property_iri: DataPropertyIRI,
+    #[serde(rename = "datatypeIRI")]
+    pub datatype_iri: DatatypeIRI,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl DataPropertyRange {
-    pub fn iri(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn datatype_iri(&self) -> &DatatypeIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        data_property_iri: DataPropertyIRI,
+        datatype_iri: DatatypeIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            data_property_iri,
+            datatype_iri,
+            annotations,
+        }
     }
 }
 

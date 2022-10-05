@@ -2,11 +2,25 @@ use super::DatatypeDefinitionConstructor;
 use crate::owl::{Annotation, DataPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataUnionOf(
-    #[serde(rename = "iri")] pub DataPropertyIRI,
-    #[serde(rename = "datatype")] pub Box<DatatypeDefinitionConstructor>,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct DataUnionOf {
+    pub iri: DataPropertyIRI,
+    pub datatype: Box<DatatypeDefinitionConstructor>,
+    pub annotations: Vec<Annotation>,
+}
+
+impl DataUnionOf {
+    pub fn new(
+        iri: DataPropertyIRI,
+        datatype: Box<DatatypeDefinitionConstructor>,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            datatype,
+            annotations,
+        }
+    }
+}
 
 impl From<DataUnionOf> for Box<DatatypeDefinitionConstructor> {
     fn from(c: DataUnionOf) -> Self {

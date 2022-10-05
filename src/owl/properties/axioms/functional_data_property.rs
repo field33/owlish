@@ -1,17 +1,19 @@
 use crate::owl::{Annotation, DataPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct FunctionalDataProperty(
-    #[serde(rename = "dataPropertyIRI")] pub DataPropertyIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct FunctionalDataProperty {
+    #[serde(rename = "dataPropertyIRI")]
+    pub data_property_iri: DataPropertyIRI,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl FunctionalDataProperty {
-    pub fn data_property_iri(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.1
+    pub fn new(data_property_iri: DataPropertyIRI, annotations: Vec<Annotation>) -> Self {
+        Self {
+            data_property_iri,
+            annotations,
+        }
     }
 }
 

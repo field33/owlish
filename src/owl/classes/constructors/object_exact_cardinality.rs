@@ -1,7 +1,22 @@
 use crate::owl::{ClassConstructor, ClassIRI, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectExactCardinality(pub u64, pub ObjectPropertyIRI, pub Option<ClassIRI>);
+pub struct ObjectExactCardinality {
+    pub value: u64,
+    #[serde(rename = "objectPropertyIRI")]
+    pub object_property_iri: ObjectPropertyIRI,
+    pub cls: Option<ClassIRI>,
+}
+
+impl ObjectExactCardinality {
+    pub fn new(value: u64, object_property_iri: ObjectPropertyIRI, cls: Option<ClassIRI>) -> Self {
+        Self {
+            value,
+            object_property_iri,
+            cls,
+        }
+    }
+}
 
 impl From<ObjectExactCardinality> for Box<ClassConstructor> {
     fn from(c: ObjectExactCardinality) -> Self {
@@ -30,8 +45,12 @@ mod wasm {
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
 /**
- * [cardinality, ObjectProperty IRI, optinal Class IRI]
+ * 
  */
-export type ObjectExactCardinality = [number, IRI, IRI | undefined];
+export type ObjectExactCardinality = {
+    value: number, 
+    objectPropertyIRI: IRI, 
+    cls: IRI | undefined,
+}
 "#;
 }

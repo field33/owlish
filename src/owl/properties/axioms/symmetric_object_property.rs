@@ -1,17 +1,19 @@
 use crate::owl::{Annotation, Axiom, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct SymmetricObjectProperty(
-    #[serde(rename = "objectPropertyIRI")] pub ObjectPropertyIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct SymmetricObjectProperty {
+    #[serde(rename = "objectPropertyIRI")]
+    pub object_property_iri: ObjectPropertyIRI,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl SymmetricObjectProperty {
-    pub fn object_property_iri(&self) -> &ObjectPropertyIRI {
-        &self.0
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.1
+    pub fn new(object_property_iri: ObjectPropertyIRI, annotations: Vec<Annotation>) -> Self {
+        Self {
+            object_property_iri,
+            annotations,
+        }
     }
 }
 

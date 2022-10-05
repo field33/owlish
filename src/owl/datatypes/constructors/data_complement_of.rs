@@ -3,17 +3,14 @@ use crate::owl::{Annotation, DataPropertyIRI};
 use super::DatatypeDefinitionConstructor;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataComplementOf(
-    #[serde(rename = "iri")] pub DataPropertyIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct DataComplementOf {
+    pub iri: DataPropertyIRI,
+    pub annotations: Vec<Annotation>,
+}
 
 impl DataComplementOf {
-    pub fn iri(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.1
+    pub fn new(iri: DataPropertyIRI, annotations: Vec<Annotation>) -> Self {
+        Self { iri, annotations }
     }
 }
 

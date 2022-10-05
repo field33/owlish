@@ -1,21 +1,24 @@
 use crate::owl::{Annotation, ClassConstructor, ClassIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct EquivalentClasses(
-    #[serde(rename = "classIRI")] pub ClassIRI,
-    #[serde(rename = "class")] pub Box<ClassConstructor>,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct EquivalentClasses {
+    #[serde(rename = "classIRI")]
+    pub class_iri: ClassIRI,
+    pub cls: Box<ClassConstructor>,
+    pub annotations: Vec<Annotation>,
+}
 
 impl EquivalentClasses {
-    pub fn class_iri(&self) -> &ClassIRI {
-        &self.0
-    }
-    pub fn class(&self) -> &ClassConstructor {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        class_iri: ClassIRI,
+        cls: Box<ClassConstructor>,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            class_iri,
+            cls,
+            annotations,
+        }
     }
 }
 
@@ -47,7 +50,7 @@ mod wasm {
     const WASM_API: &'static str = r#"
 export type EquivalentClasses = {
     classIRI: IRI,
-    class: ClassConstructor, 
+    cls: ClassConstructor, 
     annotations: Array<Annotation>,
 };
 "#;

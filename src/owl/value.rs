@@ -10,7 +10,7 @@ use crate::owl::IRI;
 
 use super::{well_known, DatatypeIRI, Lang};
 
-#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum LiteralOrIRI {
     IRI(IRI),
     Literal(Literal),
@@ -32,6 +32,118 @@ impl std::fmt::Display for LiteralOrIRI {
 impl From<Literal> for LiteralOrIRI {
     fn from(l: Literal) -> Self {
         Self::Literal(l)
+    }
+}
+
+const KEY_LITERAL: &str = "Literal";
+const KEY_IRI: &str = "IRI";
+
+impl Serialize for LiteralOrIRI {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut map = serializer.serialize_map(Some(4))?;
+        match self {
+            LiteralOrIRI::Literal(value) => {
+                map.serialize_key(KEY_TYPE)?;
+                map.serialize_value(KEY_LITERAL)?;
+
+                map.serialize_key(KEY_LITERAL)?;
+                map.serialize_value(value)?;
+            }
+            LiteralOrIRI::IRI(value) => {
+                map.serialize_key(KEY_TYPE)?;
+                map.serialize_value(KEY_IRI)?;
+
+                map.serialize_key(KEY_IRI)?;
+                map.serialize_value(value)?;
+            }
+        };
+        map.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for LiteralOrIRI {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct LiteralOrIRIVisitor;
+        impl<'de> Visitor<'de> for LiteralOrIRIVisitor {
+            type Value = LiteralOrIRI;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str(r#"an object {_type: <"Literal" | "IRI">, <IRI | Literal>: <the iri or literal string> }"#)
+            }
+
+            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+            where
+                A: serde::de::MapAccess<'de>,
+            {
+                let mut pairs = Vec::new();
+
+                let key1: Option<&str> = map.next_key()?;
+                let value1: Option<serde_json::Value> = map.next_value()?;
+                if let (Some(k), Some(v)) = (key1, value1) {
+                    pairs.push((k, v));
+                }
+                let key2: Option<&str> = map.next_key()?;
+                let value2: Option<serde_json::Value> = map.next_value()?;
+                if let (Some(k), Some(v)) = (key2, value2) {
+                    pairs.push((k, v));
+                }
+
+                if pairs.len() < 2 {
+                    return Err(serde::de::Error::custom(
+                        "Could not parse Value: Expected 2 fields bug got less.",
+                    ));
+                }
+
+                if let Some((_, _type)) = pairs.iter().find(|(k, _)| *k == KEY_TYPE) {
+                    let _type = _type.as_str().ok_or_else(|| {
+                        serde::de::Error::custom(
+                            "Could not parse Value: Key '_type' is not a string.",
+                        )
+                    })?;
+
+                    match _type {
+                        KEY_IRI => {
+                            if let Some(iri) = pairs
+                                .iter()
+                                .find(|(k, _)| *k == KEY_IRI)
+                                .and_then(|(_, v)| v.as_str())
+                            {
+                                match IRI::new(iri) {
+                                    Ok(iri) => return Ok(LiteralOrIRI::IRI(iri)),
+                                    Err(_) => {
+                                        return Err(serde::de::Error::custom("Could not parse IRI"))
+                                    }
+                                }
+                            }
+                        }
+                        KEY_LITERAL => {
+                            if let Some((_, value)) =
+                                pairs.into_iter().find(|(k, _)| *k == KEY_LITERAL)
+                            {
+                                let value: Literal =
+                                    serde_json::from_value(value).map_err(|_| {
+                                        serde::de::Error::custom(
+                                            "Could not parse value for LiteralOrValue",
+                                        )
+                                    })?;
+                                return Ok(LiteralOrIRI::Literal(value));
+                            }
+                        }
+                        _ => {
+                            return Err(serde::de::Error::custom("Could not parse LiteralOrIRI."));
+                        }
+                    }
+                }
+                Err(serde::de::Error::custom("Could not parse LiteralOrIRI."))
+            }
+        }
+        deserializer.deserialize_map(LiteralOrIRIVisitor)
     }
 }
 

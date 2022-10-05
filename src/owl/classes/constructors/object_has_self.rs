@@ -1,7 +1,20 @@
 use crate::owl::{Annotation, ClassConstructor, ObjectPropertyConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectHasSelf(pub ObjectPropertyConstructor, pub Vec<Annotation>);
+pub struct ObjectHasSelf {
+    #[serde(rename = "objectProperty")]
+    pub object_property: ObjectPropertyConstructor,
+    pub annotations: Vec<Annotation>,
+}
+
+impl ObjectHasSelf {
+    pub fn new(object_property: ObjectPropertyConstructor, annotations: Vec<Annotation>) -> Self {
+        Self {
+            object_property,
+            annotations,
+        }
+    }
+}
 
 impl From<ObjectHasSelf> for Box<ClassConstructor> {
     fn from(c: ObjectHasSelf) -> Self {
@@ -28,6 +41,9 @@ mod wasm {
     use wasm_bindgen::prelude::wasm_bindgen;
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type ObjectHasSelf = [ObjectPropertyConstructor, Array<Annotation>];
+export type ObjectHasSelf = {
+    objectProperty: ObjectPropertyConstructor, 
+    annotations: Array<Annotation>
+};
 "#;
 }

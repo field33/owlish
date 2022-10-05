@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 
-use crate::owl::{Axiom, ClassIRI, DatatypeIRI, LiteralOrIRI, Regards, IRI};
+use crate::owl::{Axiom, ClassIRI, DatatypeIRI, LiteralOrIRI, IRI};
 
 use super::Annotation;
 
@@ -25,70 +25,64 @@ impl Display for AnnotationPropertyIRI {
 }
 
 #[derive(Debug)]
-pub struct AnnotationPropertyDomain(pub AnnotationPropertyIRI, pub ClassIRI, pub Vec<Annotation>);
+pub struct AnnotationPropertyDomain {
+    pub iri: AnnotationPropertyIRI,
+    pub cls: ClassIRI,
+    pub annotations: Vec<Annotation>,
+}
 
 impl AnnotationPropertyDomain {
-    pub fn iri(&self) -> &AnnotationPropertyIRI {
-        &self.0
-    }
-    pub fn class(&self) -> &ClassIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(iri: AnnotationPropertyIRI, cls: ClassIRI, annotations: Vec<Annotation>) -> Self {
+        Self {
+            iri,
+            cls,
+            annotations,
+        }
     }
 }
 
 #[derive(Debug)]
-pub struct AnnotationPropertyRange(
-    pub AnnotationPropertyIRI,
-    pub DatatypeIRI,
-    pub Vec<Annotation>,
-);
+pub struct AnnotationPropertyRange {
+    pub iri: AnnotationPropertyIRI,
+    pub datatype_iri: DatatypeIRI,
+    pub annotations: Vec<Annotation>,
+}
 
 impl AnnotationPropertyRange {
-    pub fn iri(&self) -> &AnnotationPropertyIRI {
-        &self.0
-    }
-    pub fn datatype(&self) -> &DatatypeIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        iri: AnnotationPropertyIRI,
+        datatype_iri: DatatypeIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            datatype_iri,
+            annotations,
+        }
     }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
-pub struct AnnotationAssertion(
-    #[serde(rename = "iri")] pub AnnotationPropertyIRI,
-    #[serde(rename = "subject")] pub IRI,
-    #[serde(rename = "value")] pub LiteralOrIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
-
-impl AnnotationAssertion {
-    pub fn iri(&self) -> &AnnotationPropertyIRI {
-        &self.0
-    }
-    pub fn subject(&self) -> &IRI {
-        &self.1
-    }
-    pub fn value(&self) -> &LiteralOrIRI {
-        &self.2
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.3
-    }
+pub struct AnnotationAssertion {
+    pub iri: AnnotationPropertyIRI,
+    pub subject: IRI,
+    pub value: LiteralOrIRI,
+    pub annotations: Vec<Annotation>,
 }
 
-impl Regards for AnnotationAssertion {
-    fn regards(&self, iri: &IRI) -> bool {
-        self.iri().as_iri() == iri
-            || self.subject() == iri
-            || match self.value() {
-                LiteralOrIRI::IRI(i) => i == iri,
-                _ => false,
-            }
+impl AnnotationAssertion {
+    pub fn new(
+        iri: AnnotationPropertyIRI,
+        subject: IRI,
+        value: LiteralOrIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            subject,
+            value,
+            annotations,
+        }
     }
 }
 
@@ -119,7 +113,7 @@ export type AnnotationAssertion = {
     /**
      * The asserted value.
      */
-    value: Value, 
+    value: LiteralOrIRI, 
     annotations: Array<Annotation>
 };
 "#;
@@ -134,7 +128,7 @@ export type Annotation = {
     /**
      * The annotated value.
      */
-    value: Value,
+    value: LiteralOrIRI,
     annotations: Array<Annotation>,
 };
 "#;

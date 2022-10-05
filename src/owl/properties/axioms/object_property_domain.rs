@@ -1,21 +1,26 @@
 use crate::owl::{Annotation, Axiom, ClassIRI, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectPropertyDomain(
-    #[serde(rename = "objectPropertyIRI")] pub ObjectPropertyIRI,
-    #[serde(rename = "classIRI")] pub ClassIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct ObjectPropertyDomain {
+    #[serde(rename = "objectPropertyIRI")]
+    pub object_property_iri: ObjectPropertyIRI,
+    #[serde(rename = "classIRI")]
+    pub class_iri: ClassIRI,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl ObjectPropertyDomain {
-    pub fn iri(&self) -> &ObjectPropertyIRI {
-        &self.0
-    }
-    pub fn class_iri(&self) -> &ClassIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        object_property_iri: ObjectPropertyIRI,
+        class_iri: ClassIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            object_property_iri,
+            class_iri,
+            annotations,
+        }
     }
 }
 

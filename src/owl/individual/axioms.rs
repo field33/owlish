@@ -1,65 +1,65 @@
-use crate::owl::{Annotation, Axiom, ClassConstructor, IndividualIRI, Regards};
+use crate::owl::{Annotation, Axiom, ClassConstructor, IndividualIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct SameIndividual(
-    #[serde(rename = "individual1")] pub IndividualIRI,
-    #[serde(rename = "individual2")] pub IndividualIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct SameIndividual {
+    pub individual1: IndividualIRI,
+    pub individual2: IndividualIRI,
+    pub annotations: Vec<Annotation>,
+}
 
 impl SameIndividual {
-    pub fn individual1(&self) -> &IndividualIRI {
-        &self.0
-    }
-    pub fn individual2(&self) -> &IndividualIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        individual1: IndividualIRI,
+        individual2: IndividualIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            individual1,
+            individual2,
+            annotations,
+        }
     }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DifferentIndividuals(
-    #[serde(rename = "individual1")] pub IndividualIRI,
-    #[serde(rename = "individual2")] pub IndividualIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct DifferentIndividuals {
+    pub individual1: IndividualIRI,
+    pub individual2: IndividualIRI,
+    pub annotations: Vec<Annotation>,
+}
 
 impl DifferentIndividuals {
-    pub fn individual1(&self) -> &IndividualIRI {
-        &self.0
-    }
-    pub fn individual2(&self) -> &IndividualIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        individual1: IndividualIRI,
+        individual2: IndividualIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            individual1,
+            individual2,
+            annotations,
+        }
     }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ClassAssertion(
-    #[serde(rename = "cls")] pub ClassConstructor,
-    #[serde(rename = "individual")] pub IndividualIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
-
-impl ClassAssertion {
-    pub fn class_constructor(&self) -> &ClassConstructor {
-        &self.0
-    }
-    pub fn individual_iri(&self) -> &IndividualIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
-    }
+pub struct ClassAssertion {
+    pub cls: ClassConstructor,
+    pub individual: IndividualIRI,
+    pub annotations: Vec<Annotation>,
 }
 
-impl Regards for ClassAssertion {
-    fn regards(&self, iri: &crate::owl::IRI) -> bool {
-        self.individual_iri().as_iri() == iri || self.class_constructor().regards(iri)
+impl ClassAssertion {
+    pub fn new(
+        cls: ClassConstructor,
+        individual: IndividualIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            cls,
+            individual,
+            annotations,
+        }
     }
 }
 

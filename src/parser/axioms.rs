@@ -30,7 +30,7 @@ pub(crate) fn match_axioms(
                             if let Some(value) = mstate.last_literal("value") {
                                 if o.data_property_declaration(&predicate_iri).is_some() {
                                     o.push_axiom(
-                                        DataPropertyAssertion(
+                                        DataPropertyAssertion::new(
                                             predicate_iri.into(),
                                             subject_iri.into(),
                                             value,
@@ -69,7 +69,7 @@ pub(crate) fn match_axioms(
                     let cls = IRI::new(cls)?;
                     if o.class_declaration(&cls).is_some() {
                         o.push_axiom(
-                            ClassAssertion(individual_iri.into(), cls.into(), vec![]).into(),
+                            ClassAssertion::new(individual_iri.into(), cls.into(), vec![]).into(),
                         )
                     }
                 }
@@ -88,7 +88,7 @@ pub(crate) fn match_axioms(
                     Value::Iri(subject_iri_str) => match vars.object {
                         Value::Iri(object_iri_str) => {
                             o.push_axiom(
-                                SubClassOf(
+                                SubClassOf::new(
                                     ClassConstructor::IRI(IRI::new(subject_iri_str)?.into()).into(),
                                     ClassConstructor::IRI(IRI::new(object_iri_str)?.into()).into(),
                                     vec![],
@@ -101,7 +101,7 @@ pub(crate) fn match_axioms(
                                 match bnh {
                                     CollectedBlankNode::ClassConstructor(constr) => {
                                         o.push_axiom(
-                                            SubClassOf(
+                                            SubClassOf::new(
                                                 ClassConstructor::IRI(
                                                     IRI::new(subject_iri_str)?.into(),
                                                 )

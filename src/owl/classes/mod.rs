@@ -1,4 +1,4 @@
-use crate::owl::{DataSomeValuesFrom, Regards, IRI};
+use crate::owl::{DataSomeValuesFrom, IRI};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
@@ -78,29 +78,6 @@ impl ClassConstructor {
         match self {
             Self::IRI(iri) => Some(iri),
             _ => None,
-        }
-    }
-}
-
-impl Regards for ClassConstructor {
-    fn regards(&self, iri: &IRI) -> bool {
-        match self {
-            ClassConstructor::IRI(i) => i.as_iri() == iri,
-            ClassConstructor::SubClassOf(c) => c.regards(iri),
-            ClassConstructor::DataSomeValuesFrom(c) => c.regards(iri),
-            ClassConstructor::EquivalentClasses(_) => false, // TODO
-            ClassConstructor::DisjointClasses(_) => false,   // TODO
-            ClassConstructor::ObjectComplementOf(_) => false, // TODO
-            ClassConstructor::ObjectIntersectionOf(_) => false, // TODO
-            ClassConstructor::ObjectUnionOf(_) => false,     // TODO
-            ClassConstructor::ObjectSomeValuesFrom(_) => false, // TODO
-            ClassConstructor::ObjectMaxCardinality(_) => false, // TODO
-            ClassConstructor::ObjectMinCardinality(_) => false, // TODO
-            ClassConstructor::ObjectExactCardinality(_) => false, // TODO
-            ClassConstructor::ObjectAllValuesFrom(_) => false, // TODO
-            ClassConstructor::ObjectOneOf(_) => false,       // TODO
-            ClassConstructor::ObjectHasValue(_) => false,    // TODO
-            ClassConstructor::ObjectHasSelf(_) => false,     // TODO
         }
     }
 }

@@ -33,13 +33,14 @@ impl DataPropertyIRI {
         &self.0
     }
 }
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DataPropertyAssertion(
-    #[serde(rename = "iri")] pub DataPropertyIRI,
-    #[serde(rename = "subject")] pub IndividualIRI,
-    #[serde(rename = "value")] pub Literal,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
+pub struct DataPropertyAssertion {
+    pub iri: DataPropertyIRI,
+    pub subject: IndividualIRI,
+    pub value: Literal,
+    pub annotations: Vec<Annotation>,
+}
 
 impl From<DataPropertyAssertion> for Axiom {
     fn from(dpa: DataPropertyAssertion) -> Self {
@@ -48,40 +49,42 @@ impl From<DataPropertyAssertion> for Axiom {
 }
 
 impl DataPropertyAssertion {
-    pub fn iri(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn subject(&self) -> &IndividualIRI {
-        &self.1
-    }
-    pub fn value(&self) -> &Literal {
-        &self.2
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.3
+    pub fn new(
+        iri: DataPropertyIRI,
+        subject: IndividualIRI,
+        value: Literal,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            subject,
+            value,
+            annotations,
+        }
     }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct NegativeDataPropertyAssertion(
-    #[serde(rename = "iri")] pub DataPropertyIRI,
-    #[serde(rename = "subject")] pub IndividualIRI,
-    #[serde(rename = "value")] pub Literal,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct NegativeDataPropertyAssertion {
+    pub iri: DataPropertyIRI,
+    pub subject: IndividualIRI,
+    pub value: Literal,
+    pub annotations: Vec<Annotation>,
+}
 
 impl NegativeDataPropertyAssertion {
-    pub fn iri(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn subject(&self) -> &IndividualIRI {
-        &self.1
-    }
-    pub fn value(&self) -> &Literal {
-        &self.2
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.3
+    pub fn new(
+        iri: DataPropertyIRI,
+        subject: IndividualIRI,
+        value: Literal,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            subject,
+            value,
+            annotations,
+        }
     }
 }
 

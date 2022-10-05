@@ -1,21 +1,26 @@
 use crate::owl::{Annotation, DataPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct EquivalentDataProperties(
-    #[serde(rename = "dataPropertyIRI1")] pub DataPropertyIRI,
-    #[serde(rename = "dataPropertyIRI2")] pub DataPropertyIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct EquivalentDataProperties {
+    #[serde(rename = "dataPropertyIRI1")]
+    pub data_property_iri_1: DataPropertyIRI,
+    #[serde(rename = "dataPropertyIRI2")]
+    pub data_property_iri_2: DataPropertyIRI,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl EquivalentDataProperties {
-    pub fn data_property_iri_1(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn data_property_iri_2(&self) -> &DataPropertyIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        data_property_iri_1: DataPropertyIRI,
+        data_property_iri_2: DataPropertyIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            data_property_iri_1,
+            data_property_iri_2,
+            annotations,
+        }
     }
 }
 

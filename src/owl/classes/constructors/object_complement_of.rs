@@ -1,7 +1,16 @@
 use crate::owl::{Annotation, ClassConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectComplementOf(pub Box<ClassConstructor>, pub Vec<Annotation>);
+pub struct ObjectComplementOf {
+    pub cls: Box<ClassConstructor>,
+    pub annotations: Vec<Annotation>,
+}
+
+impl ObjectComplementOf {
+    pub fn new(cls: Box<ClassConstructor>, annotations: Vec<Annotation>) -> Self {
+        Self { cls, annotations }
+    }
+}
 
 impl From<ObjectComplementOf> for Box<ClassConstructor> {
     fn from(c: ObjectComplementOf) -> Self {
@@ -29,6 +38,9 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type ObjectComplementOf = [ClassConstructor, Array<Annotation>];
+export type ObjectComplementOf = {
+    cls: ClassConstructor, 
+    annotations: Array<Annotation>,
+};
 "#;
 }

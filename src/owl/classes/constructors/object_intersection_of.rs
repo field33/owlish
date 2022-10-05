@@ -1,7 +1,19 @@
 use crate::owl::{Annotation, ClassConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectIntersectionOf(pub Vec<ClassConstructor>, pub Vec<Annotation>);
+pub struct ObjectIntersectionOf {
+    pub classes: Vec<ClassConstructor>,
+    pub annotations: Vec<Annotation>,
+}
+
+impl ObjectIntersectionOf {
+    pub fn new(classes: Vec<ClassConstructor>, annotations: Vec<Annotation>) -> Self {
+        Self {
+            classes,
+            annotations,
+        }
+    }
+}
 
 impl From<ObjectIntersectionOf> for Box<ClassConstructor> {
     fn from(c: ObjectIntersectionOf) -> Self {
@@ -30,6 +42,9 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type ObjectIntersectionOf = [Array<ClassConstructor>, Array<Annotation>];
+export type ObjectIntersectionOf = {
+    classes: Array<ClassConstructor>, 
+    annotations: Array<Annotation>
+};
 "#;
 }

@@ -1,7 +1,19 @@
 use crate::owl::{Annotation, ClassConstructor, IndividualIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectOneOf(pub Vec<IndividualIRI>, pub Vec<Annotation>);
+pub struct ObjectOneOf {
+    pub individuals: Vec<IndividualIRI>,
+    pub annotations: Vec<Annotation>,
+}
+
+impl ObjectOneOf {
+    pub fn new(individuals: Vec<IndividualIRI>, annotations: Vec<Annotation>) -> Self {
+        Self {
+            individuals,
+            annotations,
+        }
+    }
+}
 
 impl From<ObjectOneOf> for Box<ClassConstructor> {
     fn from(c: ObjectOneOf) -> Self {
@@ -29,6 +41,9 @@ mod wasm {
     use wasm_bindgen::prelude::wasm_bindgen;
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type ObjectOneOf = [Array<IRI>, Array<Annotation>];
+export type ObjectOneOf = {
+    individuals: Array<IRI>, 
+    annotations: Array<Annotation>
+};
 "#;
 }

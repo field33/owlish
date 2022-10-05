@@ -24,51 +24,52 @@ impl ObjectPropertyIRI {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectPropertyAssertion(
-    #[serde(rename = "iri")] pub ObjectPropertyIRI,
-    #[serde(rename = "subject")] pub IndividualIRI,
-    #[serde(rename = "object")] pub IndividualIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct ObjectPropertyAssertion {
+    pub iri: ObjectPropertyIRI,
+    pub subject: IndividualIRI,
+    pub object: IndividualIRI,
+    pub annotations: Vec<Annotation>,
+}
 
 impl ObjectPropertyAssertion {
-    pub fn iri(&self) -> &ObjectPropertyIRI {
-        &self.0
-    }
-    pub fn subject(&self) -> &IndividualIRI {
-        &self.1
-    }
-    pub fn object(&self) -> &IndividualIRI {
-        &self.2
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.3
+    pub fn new(
+        iri: ObjectPropertyIRI,
+        subject: IndividualIRI,
+        object: IndividualIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            subject,
+            object,
+            annotations,
+        }
     }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct NegativeObjectPropertyAssertion(
-    #[serde(rename = "iri")] pub ObjectPropertyIRI,
-    #[serde(rename = "subject")] pub IndividualIRI,
-    #[serde(rename = "object")] pub IndividualIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
-
-impl NegativeObjectPropertyAssertion {
-    pub fn iri(&self) -> &ObjectPropertyIRI {
-        &self.0
-    }
-    pub fn subject(&self) -> &IndividualIRI {
-        &self.1
-    }
-    pub fn object(&self) -> &IndividualIRI {
-        &self.2
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.3
-    }
+pub struct NegativeObjectPropertyAssertion {
+    pub iri: ObjectPropertyIRI,
+    pub subject: IndividualIRI,
+    pub object: IndividualIRI,
+    pub annotations: Vec<Annotation>,
 }
 
+impl NegativeObjectPropertyAssertion {
+    pub fn new(
+        iri: ObjectPropertyIRI,
+        subject: IndividualIRI,
+        object: IndividualIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            subject,
+            object,
+            annotations,
+        }
+    }
+}
 impl From<ObjectPropertyAssertion> for Axiom {
     fn from(opa: ObjectPropertyAssertion) -> Self {
         Self::ObjectPropertyAssertion(opa)

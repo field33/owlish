@@ -1,21 +1,26 @@
 use crate::owl::{Annotation, ClassConstructor, LiteralOrIRI, ObjectPropertyConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectHasValue(
-    #[serde(rename = "objectProperty")] pub ObjectPropertyConstructor,
-    #[serde(rename = "valueOrIRI")] pub LiteralOrIRI,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct ObjectHasValue {
+    #[serde(rename = "objectProperty")]
+    pub object_property: ObjectPropertyConstructor,
+    #[serde(rename = "valueOrIRI")]
+    pub value_or_iri: LiteralOrIRI,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl ObjectHasValue {
-    pub fn object_property(&self) -> &ObjectPropertyConstructor {
-        &self.0
-    }
-    pub fn literal(&self) -> &LiteralOrIRI {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        object_property: ObjectPropertyConstructor,
+        value_or_iri: LiteralOrIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            object_property,
+            value_or_iri,
+            annotations,
+        }
     }
 }
 

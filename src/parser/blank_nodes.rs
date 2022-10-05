@@ -43,10 +43,9 @@ pub(crate) fn match_blank_nodes(
                             o.insert_blank_node(
                                 bn.clone(),
                                 CollectedBlankNode::ClassConstructor(Box::new(
-                                    ClassConstructor::ObjectIntersectionOf(ObjectIntersectionOf(
-                                        classes,
-                                        vec![],
-                                    )),
+                                    ClassConstructor::ObjectIntersectionOf(
+                                        ObjectIntersectionOf::new(classes, vec![]),
+                                    ),
                                 )),
                             );
                             return Ok(true);

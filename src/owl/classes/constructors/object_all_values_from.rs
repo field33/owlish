@@ -1,11 +1,26 @@
 use crate::owl::{Annotation, ClassConstructor, ClassIRI, ObjectPropertyConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectAllValuesFrom(
-    pub ObjectPropertyConstructor,
-    pub ClassIRI,
-    pub Vec<Annotation>,
-);
+pub struct ObjectAllValuesFrom {
+    #[serde(rename = "objectProperty")]
+    pub object_property: ObjectPropertyConstructor,
+    pub cls: ClassIRI,
+    pub annotations: Vec<Annotation>,
+}
+
+impl ObjectAllValuesFrom {
+    pub fn new(
+        object_property: ObjectPropertyConstructor,
+        cls: ClassIRI,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            object_property,
+            cls,
+            annotations,
+        }
+    }
+}
 
 impl From<ObjectAllValuesFrom> for Box<ClassConstructor> {
     fn from(c: ObjectAllValuesFrom) -> Self {
@@ -34,6 +49,10 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type ObjectAllValuesFrom = [ObjectPropertyConstructor, IRI, Array<Annotation>];
+export type ObjectAllValuesFrom = {
+    objectProperty: ObjectPropertyConstructor, 
+    cls: IRI,
+    annotations: Array<Annotation>,
+};
 "#;
 }

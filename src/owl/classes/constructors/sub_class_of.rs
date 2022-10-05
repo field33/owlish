@@ -1,24 +1,29 @@
-use crate::owl::{Annotation, Axiom, ClassConstructor, Regards, IRI};
+use crate::owl::{Annotation, Axiom, ClassConstructor};
 
 /// Defines that the subject is a sub class of the object.
 ///
 /// Structure `(subject, object, annotations)`.
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct SubClassOf(
-    #[serde(rename = "cls")] pub Box<ClassConstructor>,
-    #[serde(rename = "parentClass")] pub Box<ClassConstructor>,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct SubClassOf {
+    #[serde(rename = "cls")]
+    pub cls: Box<ClassConstructor>,
+    #[serde(rename = "parentClass")]
+    pub parent_class: Box<ClassConstructor>,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl SubClassOf {
-    pub fn subject(&self) -> &ClassConstructor {
-        &self.0
-    }
-    pub fn parent(&self) -> &ClassConstructor {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        cls: Box<ClassConstructor>,
+        parent_class: Box<ClassConstructor>,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            cls,
+            parent_class,
+            annotations,
+        }
     }
 }
 
@@ -30,12 +35,6 @@ impl From<SubClassOf> for Box<ClassConstructor> {
 impl From<SubClassOf> for ClassConstructor {
     fn from(sco: SubClassOf) -> Self {
         ClassConstructor::SubClassOf(sco)
-    }
-}
-
-impl Regards for SubClassOf {
-    fn regards(&self, iri: &IRI) -> bool {
-        self.subject().regards(iri) || self.parent().regards(iri)
     }
 }
 

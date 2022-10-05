@@ -1,7 +1,19 @@
 use crate::owl::{Annotation, ClassConstructor};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ObjectUnionOf(pub Vec<ClassConstructor>, pub Vec<Annotation>);
+pub struct ObjectUnionOf {
+    pub classes: Vec<ClassConstructor>,
+    pub annotations: Vec<Annotation>,
+}
+
+impl ObjectUnionOf {
+    pub fn new(classes: Vec<ClassConstructor>, annotations: Vec<Annotation>) -> Self {
+        Self {
+            classes,
+            annotations,
+        }
+    }
+}
 
 impl From<ObjectUnionOf> for ClassConstructor {
     fn from(c: ObjectUnionOf) -> Self {
@@ -29,6 +41,9 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
-export type ObjectUnionOf = [Array<ClassConstructor>, Array<Annotation>];
+export type ObjectUnionOf = {
+    classes: Array<ClassConstructor>,
+    annotations: Array<Annotation>,
+};
 "#;
 }

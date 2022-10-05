@@ -218,6 +218,7 @@ export type Value = {
     lang: null,
 }
 
+export type LiteralOrIRI = { _type: "Literal", Literal: Value } | { _type: "IRI", IRI: IRI }
 
 type ValueMatcher<R> =
     | {

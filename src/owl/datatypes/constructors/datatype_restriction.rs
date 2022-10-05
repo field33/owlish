@@ -1,5 +1,5 @@
 use super::DatatypeDefinitionConstructor;
-use crate::owl::{Annotation, DatatypeIRI, Literal, Regards};
+use crate::owl::{Annotation, DatatypeIRI, Literal};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Restriction {
@@ -10,21 +10,26 @@ pub enum Restriction {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DatatypeRestriction(
-    #[serde(rename = "datatypeIRI")] pub DatatypeIRI,
-    #[serde(rename = "restrictions")] pub Vec<Restriction>,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct DatatypeRestriction {
+    #[serde(rename = "datatypeIRI")]
+    pub datatype_iri: DatatypeIRI,
+    #[serde(rename = "restrictions")]
+    pub restrictions: Vec<Restriction>,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl DatatypeRestriction {
-    pub fn datatype_iri(&self) -> &DatatypeIRI {
-        &self.0
-    }
-    pub fn restrictions(&self) -> &Vec<Restriction> {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        datatype_iri: DatatypeIRI,
+        restrictions: Vec<Restriction>,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            datatype_iri,
+            restrictions,
+            annotations,
+        }
     }
 }
 
@@ -36,15 +41,6 @@ impl From<DatatypeRestriction> for Box<DatatypeDefinitionConstructor> {
 impl From<DatatypeRestriction> for DatatypeDefinitionConstructor {
     fn from(c: DatatypeRestriction) -> Self {
         DatatypeDefinitionConstructor::DatatypeRestriction(c)
-    }
-}
-
-impl Regards for DatatypeRestriction {
-    fn regards(&self, iri: &crate::owl::IRI) -> bool {
-        self.datatype_iri().as_iri() == iri
-            || self.restrictions().iter().any(|r| match r {
-                Restriction::Numeric(d, _) => d.as_iri() == iri,
-            })
     }
 }
 

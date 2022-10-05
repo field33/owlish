@@ -11,21 +11,26 @@ pub enum DatatypeDefinitionConstructor {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct DatatypeDefinition(
-    #[serde(rename = "dataPropertyIRI")] pub DataPropertyIRI,
-    #[serde(rename = "datatypeDefinition")] pub DatatypeDefinitionConstructor,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct DatatypeDefinition {
+    #[serde(rename = "dataPropertyIRI")]
+    pub data_property_iri: DataPropertyIRI,
+    #[serde(rename = "datatypeDefinition")]
+    pub datatype_definition: DatatypeDefinitionConstructor,
+    #[serde(rename = "annotations")]
+    pub annotations: Vec<Annotation>,
+}
 
 impl DatatypeDefinition {
-    pub fn data_property_iri(&self) -> &DataPropertyIRI {
-        &self.0
-    }
-    pub fn datatype_definition(&self) -> &DatatypeDefinitionConstructor {
-        &self.1
-    }
-    pub fn annotations(&self) -> &Vec<Annotation> {
-        &self.2
+    pub fn new(
+        data_property_iri: DataPropertyIRI,
+        datatype_definition: DatatypeDefinitionConstructor,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            data_property_iri,
+            datatype_definition,
+            annotations,
+        }
     }
 }
 

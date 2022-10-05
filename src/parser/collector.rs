@@ -74,8 +74,8 @@ impl<'a> OntologyCollector<'a> {
     pub(crate) fn push_axiom(&mut self, axiom: Axiom) {
         match &axiom {
             Axiom::SubClassOf(sco) => {
-                if let ClassConstructor::IRI(subject) = sco.subject() {
-                    if let ClassConstructor::IRI(parent) = sco.parent() {
+                if let ClassConstructor::IRI(subject) = sco.cls.as_ref() {
+                    if let ClassConstructor::IRI(parent) = sco.parent_class.as_ref() {
                         self.axiom_index.insert(
                             (
                                 subject.as_iri().to_string(),
@@ -88,9 +88,9 @@ impl<'a> OntologyCollector<'a> {
                 }
             }
             Axiom::AnnotationAssertion(ann) => {
-                let sub = ann.subject();
-                let iri = ann.iri();
-                let val = ann.value();
+                let sub = &ann.subject;
+                let iri = &ann.iri;
+                let val = &ann.value;
                 self.axiom_index.insert(
                     (sub.to_string(), iri.to_string(), val.to_string()),
                     self.axioms.len(),

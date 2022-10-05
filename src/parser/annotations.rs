@@ -2,10 +2,7 @@ use std::{collections::HashMap, convert::TryInto};
 
 use crate::{
     error::Error,
-    owl::{
-        well_known, Annotation, AnnotationAssertion, Axiom, ClassConstructor, Literal,
-        LiteralOrIRI, IRI,
-    },
+    owl::{well_known, Annotation, AnnotationAssertion, Literal, LiteralOrIRI, IRI},
     parser::matcher::{RdfMatcher, Value},
     rdf_match,
 };
@@ -235,7 +232,7 @@ fn handle_annotation_on_bn(
     if let Some(axiom) = o.get_from_index_mut(&subject, &predicate, &object) {
         axiom
             .annotations_mut()
-            .push(Annotation(predicate_iri.into(), value.into(), vec![]))
+            .push(Annotation::new(predicate_iri.into(), value.into(), vec![]))
     }
 
     Ok(false)
@@ -345,7 +342,7 @@ fn push_annotation_assertion(
         match object {
             Value::Iri(object_iri) => {
                 o.push_axiom(
-                    AnnotationAssertion(
+                    AnnotationAssertion::new(
                         predicate_iri.into(),
                         subject_iri,
                         LiteralOrIRI::IRI(IRI::new(object_iri)?),
@@ -382,7 +379,7 @@ fn push_annotation_assertion(
                     }
                 };
                 o.push_axiom(
-                    AnnotationAssertion(predicate_iri.into(), subject_iri, lit, vec![]).into(),
+                    AnnotationAssertion::new(predicate_iri.into(), subject_iri, lit, vec![]).into(),
                 );
                 return Ok(true);
             }
@@ -392,24 +389,24 @@ fn push_annotation_assertion(
     Ok(false)
 }
 
-fn _is_axiom<'a>(a: &'a mut Axiom, subject: &ClassConstructor) -> Option<&'a mut Vec<Annotation>> {
-    match a {
-        Axiom::SubClassOf(sco) => {
-            let sub = sco.subject();
-            if sub == subject {
-                Some(&mut sco.2)
-            } else {
-                None
-            }
-        }
-        Axiom::AnnotationAssertion(aa) => {
-            let sub = aa.subject();
-            if &ClassConstructor::IRI(sub.clone().into()) == subject {
-                Some(&mut aa.3)
-            } else {
-                None
-            }
-        }
-        _ => todo!(),
-    }
-}
+// fn _is_axiom<'a>(a: &'a mut Axiom, subject: &ClassConstructor) -> Option<&'a mut Vec<Annotation>> {
+//     match a {
+//         Axiom::SubClassOf(sco) => {
+//             let sub = sco.subject();
+//             if sub == subject {
+//                 Some(&mut sco.2)
+//             } else {
+//                 None
+//             }
+//         }
+//         Axiom::AnnotationAssertion(aa) => {
+//             let sub = aa.subject();
+//             if &ClassConstructor::IRI(sub.clone().into()) == subject {
+//                 Some(&mut aa.3)
+//             } else {
+//                 None
+//             }
+//         }
+//         _ => todo!(),
+//     }
+// }

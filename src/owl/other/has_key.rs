@@ -1,11 +1,26 @@
 use crate::owl::{Annotation, ClassIRI, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct HasKey(
-    #[serde(rename = "iri")] pub ClassIRI,
-    #[serde(rename = "objectProperties")] pub Vec<ObjectPropertyIRI>,
-    #[serde(rename = "annotations")] pub Vec<Annotation>,
-);
+pub struct HasKey {
+    pub iri: ClassIRI,
+    #[serde(rename = "objectProperties")]
+    pub object_properties: Vec<ObjectPropertyIRI>,
+    pub annotations: Vec<Annotation>,
+}
+
+impl HasKey {
+    pub fn new(
+        iri: ClassIRI,
+        object_properties: Vec<ObjectPropertyIRI>,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            object_properties,
+            annotations,
+        }
+    }
+}
 
 #[cfg(feature = "wasm")]
 mod wasm {
@@ -17,6 +32,6 @@ export type HasKey = {
     iri: IRI, 
     objectProperties: Array<IRI>,
     annotations: Array<Annotation>,
-}
+};
 "#;
 }

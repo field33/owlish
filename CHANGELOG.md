@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.8.10 - 2022-10-05
+#### Bug Fixes
+- Improve parser performance - (d9eabce) - Florian Loers
+#### Miscellaneous Chores
+- Add benchmark tests - (bfe14ed) - Florian Loers
+
+- - -
+
 ## v0.8.9 - 2022-09-26
 #### Bug Fixes
 - Fix wrong typescript IRI type - (3f4feb0) - Florian Loers

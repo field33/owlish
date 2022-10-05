@@ -14,7 +14,13 @@ impl Ontology {
         match js_sys::JSON::stringify(&options) {
             Ok(json) => match json.as_string() {
                 Some(json) => match serde_json::from_str(&json) {
-                    Ok(options) => Ontology::parse(&ttl, options).ok(),
+                    Ok(options) => match Ontology::parse(&ttl, options) {
+                        Ok(o) => Some(o),
+                        Err(e) => {
+                            error_1(&format!("Failed to parse ontology: {:?}", e).into());
+                            None
+                        }
+                    },
                     Err(e) => {
                         error_1(&format!("Invalid parser options: {}", e).into());
                         None

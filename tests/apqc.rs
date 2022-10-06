@@ -12,5 +12,5 @@ fn apqc() {
     let o = Ontology::parse(turtle, Default::default()).unwrap();
 
     assert_eq!(o.declarations().len(), 174);
-    assert_eq!(o.axioms().len(), 314);
+    assert_eq!(o.axioms().len(), 524);
 }

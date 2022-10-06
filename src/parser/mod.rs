@@ -405,19 +405,41 @@ mod tests {
         <http://test#> rdf:type owl:Ontology .
         :Person rdf:type owl:Class .
         :Person rdfs:comment "Represents the set of all people."^^xsd:string .
+        :Person rdfs:comment "foo" .
+        :Person rdfs:comment <http://test.org#Thing> .
 
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 1);
-        assert_eq!(o.axioms().len(), 1);
+        assert_eq!(o.axioms().len(), 3);
         assert_eq!(
             o.axioms()[0],
             AnnotationAssertion::new(
                 well_known::rdfs_comment(),
                 IRI::new("http://test#Person").unwrap(),
                 LiteralOrIRI::Literal(Literal::String("Represents the set of all people.".into())),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[1],
+            AnnotationAssertion::new(
+                well_known::rdfs_comment(),
+                IRI::new("http://test#Person").unwrap(),
+                LiteralOrIRI::Literal(Literal::String("foo".into())),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[2],
+            AnnotationAssertion::new(
+                well_known::rdfs_comment(),
+                IRI::new("http://test#Person").unwrap(),
+                LiteralOrIRI::IRI(IRI::new("http://test.org#Thing").unwrap()),
                 vec![]
             )
             .into()

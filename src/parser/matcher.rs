@@ -9,7 +9,7 @@ use std::{
 use harriet::triple_production::{RdfBlankNode, RdfLiteral, RdfObject, RdfSubject, RdfTriple};
 
 use crate::{
-    owl::{well_known, Literal, IRI},
+    owl::{well_known, Literal, LiteralOrIRI, IRI},
     parser_debug,
 };
 
@@ -69,6 +69,21 @@ impl<'a> TryInto<Literal> for Value<'a> {
     }
 }
 
+impl<'a> TryInto<LiteralOrIRI> for Value<'a> {
+    type Error = ();
+
+    fn try_into(self) -> Result<LiteralOrIRI, Self::Error> {
+        match self {
+            Value::Iri(iri) => match IRI::new(&iri) {
+                Ok(iri) => Ok(LiteralOrIRI::IRI(iri)),
+                Err(_) => Err(()),
+            },
+            Value::Literal { .. } => self.try_into().map(LiteralOrIRI::Literal),
+            _ => Err(()),
+        }
+    }
+}
+
 impl<'a> From<RdfLiteral<'a>> for Value<'a> {
     fn from(lit: RdfLiteral<'a>) -> Self {
         Value::Literal {
@@ -102,6 +117,7 @@ pub enum MatchOrVar {
     IriVar(&'static str),
     BlankVar(&'static str),
     LitVar(&'static str),
+    IriOrLitVar(&'static str),
     IriOrBlankVar(&'static str),
 }
 
@@ -242,6 +258,7 @@ impl std::fmt::Display for MatchOrVar {
             MatchOrVar::BlankVar(var) => write!(f, "_:{}", var),
             MatchOrVar::IriVar(var) => write!(f, "*:{}", var),
             MatchOrVar::LitVar(var) => write!(f, "lt:{}", var),
+            MatchOrVar::IriOrLitVar(var) => write!(f, "iol:{}", var),
             MatchOrVar::IriOrBlankVar(var) => write!(f, "iob:{}", var),
         }
     }
@@ -350,6 +367,10 @@ impl RdfMatcher {
                         let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
+                    MatchOrVar::IriOrLitVar(var) => {
+                        let value = Value::Iri(iri.iri.clone());
+                        mstate.check_var(*var, value)
+                    }
                     MatchOrVar::BlankVar(_) => (false, None),
                     MatchOrVar::LitVar(_) => (false, None),
                 },
@@ -357,6 +378,7 @@ impl RdfMatcher {
                     MatchOrVar::Iri(_) => (false, None),
                     MatchOrVar::Blank(p_bn) => (bn == p_bn, None),
                     MatchOrVar::LitVar(_) => (false, None),
+                    MatchOrVar::IriOrLitVar(_) => (false, None),
                     MatchOrVar::Var(var) => {
                         let value = Value::Blank(bn.clone());
                         mstate.check_var(*var, value)
@@ -390,6 +412,10 @@ impl RdfMatcher {
                         let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
+                    MatchOrVar::IriOrLitVar(var) => {
+                        let value = Value::Iri(iri.iri.clone());
+                        mstate.check_var(*var, value)
+                    }
                     MatchOrVar::BlankVar(_) => (false, None),
                     MatchOrVar::LitVar(_) => (false, None),
                 },
@@ -412,6 +438,10 @@ impl RdfMatcher {
                         let value = Value::Iri(iri.iri.clone());
                         mstate.check_var(*var, value)
                     }
+                    MatchOrVar::IriOrLitVar(var) => {
+                        let value = Value::Iri(iri.iri.clone());
+                        mstate.check_var(*var, value)
+                    }
                     MatchOrVar::BlankVar(_) => (false, None),
                     MatchOrVar::LitVar(_) => (false, None),
                 },
@@ -428,6 +458,7 @@ impl RdfMatcher {
                         mstate.check_var(*var, value)
                     }
                     MatchOrVar::IriVar(_) => (false, None),
+                    MatchOrVar::IriOrLitVar(_) => (false, None),
                     MatchOrVar::BlankVar(var) => {
                         let value = Value::Blank(bn.clone());
                         mstate.check_var(*var, value)
@@ -443,6 +474,10 @@ impl RdfMatcher {
                     MatchOrVar::IriVar(_) => (false, None),
                     MatchOrVar::BlankVar(_) => (false, None),
                     MatchOrVar::LitVar(var) => {
+                        let value = lit.clone().into();
+                        mstate.check_var(*var, value)
+                    }
+                    MatchOrVar::IriOrLitVar(var) => {
                         let value = lit.clone().into();
                         mstate.check_var(*var, value)
                     }
@@ -483,31 +518,33 @@ impl RdfMatcher {
 /// The syntax of the triple matchers is based on this document:
 /// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Parsing_of_Annotations
 ///
+/// parse the subject of the triple as an IRI:
 /// ```ignore
 /// [*:x] [B] [C] .
 /// ```
 ///
-/// will parse the subject of the triple as an IRI.
 ///
+/// parse x and y as IRI or blank nodes:
 /// ```ignore
 /// [iob:x] [B] [C] .
 /// [+:y] [B] [C] .
 /// ```
 ///
-/// will parse x and y as IRI or blank nodes.
 ///
+/// parse x as a blank node:
 /// ```ignore
 /// [_:x] [A] [B] .
 /// ```
 ///
-/// will parse x as a blank node.
-///
+/// parse x as a literal:
 /// ```ignore
 /// [lt:x] [A] [B] .
 /// ```
 ///
-/// will parse x as a litral.
-///
+/// parse x as a IRI or literal:
+/// ```ignore
+/// [iol:x] [A] [B] .
+/// ```
 ///
 /// You can define multiple matchers in one like this:
 ///
@@ -591,6 +628,14 @@ macro_rules! matcher_or_var {
     ) => {{
         let var = stringify!($($var)+);
         Ok($crate::parser::matcher::MatchOrVar::LitVar(var))
+    }};
+
+    (
+        $prefixes:ident,
+        iol:$($var:ident)+
+    ) => {{
+        let var = stringify!($($var)+);
+        Ok($crate::parser::matcher::MatchOrVar::IriOrLitVar(var))
     }};
 
     (

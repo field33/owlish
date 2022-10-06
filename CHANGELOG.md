@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.10.0 - 2022-10-06
+#### Features
+- Parse object property domain and range - (625e5f4) - Florian Loers
+
+- - -
+
 ## v0.9.0 - 2022-10-06
 #### Features
 - Parse annotation assertions with IRIs as values - (5a1bc60) - Florian Loers

@@ -216,7 +216,7 @@ mod tests {
         owl::{
             well_known, Annotation, AnnotationAssertion, Axiom, ClassAssertion,
             DataPropertyAssertion, Declaration, Literal, LiteralOrIRI, ObjectIntersectionOf,
-            SubClassOf, IRI,
+            ObjectPropertyDomain, ObjectPropertyRange, SubClassOf, IRI,
         },
         parser::ParserOptions,
     };
@@ -390,6 +390,45 @@ mod tests {
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 5);
+    }
+
+    #[test]
+    fn domain_and_range() {
+        let turtle = r##"
+        @prefix : <http://test#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        <http://test#> rdf:type owl:Ontology .
+
+        :hasWife rdfs:domain :Man ;
+                 rdfs:range  :Woman .
+
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
+        assert_eq!(o.declarations().len(), 0);
+        assert_eq!(o.axioms().len(), 2);
+
+        assert_eq!(
+            o.axioms()[0],
+            ObjectPropertyDomain::new(
+                IRI::new("http://test#hasWife").unwrap().into(),
+                IRI::new("http://test#Man").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[1],
+            ObjectPropertyRange::new(
+                IRI::new("http://test#hasWife").unwrap().into(),
+                IRI::new("http://test#Woman").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
     }
 
     #[test]
@@ -958,6 +997,6 @@ mod tests {
         let o = Ontology::parse(turtle, Default::default()).unwrap();
         println!("{:#?}", o);
         assert_eq!(o.declarations().len(), 6);
-        assert_eq!(o.axioms().len(), 23);
+        assert_eq!(o.axioms().len(), 27);
     }
 }

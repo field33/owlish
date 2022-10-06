@@ -5,6 +5,8 @@ use crate::get_vars;
 use crate::owl::ClassAssertion;
 use crate::owl::ClassConstructor;
 use crate::owl::DataPropertyAssertion;
+use crate::owl::ObjectPropertyDomain;
+use crate::owl::ObjectPropertyRange;
 use crate::owl::SubClassOf;
 use crate::owl::IRI;
 use crate::parser::matcher::RdfMatcher;
@@ -124,5 +126,76 @@ pub(crate) fn match_axioms(
             Ok(false)
         }),
     ));
+
+    matchers.push((
+        rdf_match!("ObjectPropertyDomain", prefixes,
+            [iob:subject] [rdfs:domain] [iob:object] .
+        )?,
+        Box::new(|mstate, o, _| {
+            if let Some(vars) = get_vars!(mstate, subject, object) {
+                match vars.subject {
+                    Value::Iri(subject_iri_str) => match vars.object {
+                        Value::Iri(object_iri_str) => {
+                            if let Ok(op_iri) = IRI::new(subject_iri_str) {
+                                if let Ok(class_iri) = IRI::new(object_iri_str) {
+                                    o.push_axiom(
+                                        ObjectPropertyDomain::new(
+                                            op_iri.into(),
+                                            class_iri.into(),
+                                            vec![],
+                                        )
+                                        .into(),
+                                    );
+                                }
+                            }
+                        }
+                        Value::Blank(_) => {
+                            todo!()
+                        }
+                        Value::Literal { .. } => todo!(),
+                    },
+                    Value::Blank(_) => todo!(),
+                    Value::Literal { .. } => todo!(),
+                }
+            }
+            Ok(false)
+        }),
+    ));
+
+    matchers.push((
+        rdf_match!("ObjectPropertyRange", prefixes,
+            [iob:subject] [rdfs:range] [iob:object] .
+        )?,
+        Box::new(|mstate, o, _| {
+            if let Some(vars) = get_vars!(mstate, subject, object) {
+                match vars.subject {
+                    Value::Iri(subject_iri_str) => match vars.object {
+                        Value::Iri(object_iri_str) => {
+                            if let Ok(op_iri) = IRI::new(subject_iri_str) {
+                                if let Ok(class_iri) = IRI::new(object_iri_str) {
+                                    o.push_axiom(
+                                        ObjectPropertyRange::new(
+                                            op_iri.into(),
+                                            class_iri.into(),
+                                            vec![],
+                                        )
+                                        .into(),
+                                    );
+                                }
+                            }
+                        }
+                        Value::Blank(_) => {
+                            todo!()
+                        }
+                        Value::Literal { .. } => todo!(),
+                    },
+                    Value::Blank(_) => todo!(),
+                    Value::Literal { .. } => todo!(),
+                }
+            }
+            Ok(false)
+        }),
+    ));
+
     Ok(())
 }

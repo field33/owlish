@@ -253,36 +253,20 @@ fn push_annotation_assertion(
                 );
                 return Ok(true);
             }
-            Value::Literal {
-                lexical_form,
-                datatype_iri,
-                language_tag: _,
-            } => {
-                let lit: LiteralOrIRI = match datatype_iri {
-                    Some(dt) if dt == well_known::xsd_integer_str => {
-                        let lex = lexical_form;
-                        LiteralOrIRI::Literal(Literal::Number {
-                            number: serde_json::from_str(lex).map_err(|_| {
-                                Error::new(format!(
-                                    "Tried to parse a numeric value that was no number: {:?}",
-                                    lex
-                                ))
-                            })?,
-                            type_iri: Some(IRI::new(dt)?.into()),
-                        })
-                    }
-                    _ => {
-                        if let Ok(iri) = IRI::new(lexical_form) {
-                            LiteralOrIRI::IRI(iri)
-                        } else {
-                            LiteralOrIRI::Literal(Literal::String(lexical_form.to_string()))
-                        }
-                    }
-                };
-                o.push_axiom(
-                    AnnotationAssertion::new(predicate_iri.into(), subject_iri, lit, vec![]).into(),
-                );
-                return Ok(true);
+            Value::Literal { .. } => {
+                if let Ok(lit) = object.clone().try_into() {
+                    o.push_axiom(
+                        AnnotationAssertion::new(
+                            predicate_iri.into(),
+                            subject_iri,
+                            LiteralOrIRI::Literal(lit),
+                            vec![],
+                        )
+                        .into(),
+                    );
+                    return Ok(true);
+                }
+                return Ok(false);
             }
             Value::Blank(_) => todo!(),
         }

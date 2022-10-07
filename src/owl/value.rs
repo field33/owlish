@@ -182,7 +182,7 @@ impl std::fmt::Display for Literal {
                     .map(|iri| format!("^^{}", iri.as_iri().as_str()))
                     .unwrap_or_else(|| "".into())
             ),
-            Literal::Bool(_) => todo!(),
+            Literal::Bool(b) => write!(f, "{}", b),
         }
     }
 }

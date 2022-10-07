@@ -211,6 +211,8 @@ impl ParserOptionsBuilder {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::Number;
+
     use crate::{
         api::Ontology,
         owl::{
@@ -446,13 +448,17 @@ mod tests {
         :Person rdfs:comment "Represents the set of all people."^^xsd:string .
         :Person rdfs:comment "foo" .
         :Person rdfs:comment <http://test.org#Thing> .
+        :Person rdfs:comment 42 .
+        :Person rdfs:comment "3.14"^^xsd:float .
+        :Person rdfs:comment "true"^^xsd:boolean .
+        :Person rdfs:comment false .
 
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 1);
-        assert_eq!(o.axioms().len(), 3);
+        assert_eq!(o.axioms().len(), 7);
         assert_eq!(
             o.axioms()[0],
             AnnotationAssertion::new(
@@ -479,6 +485,52 @@ mod tests {
                 well_known::rdfs_comment(),
                 IRI::new("http://test#Person").unwrap(),
                 LiteralOrIRI::IRI(IRI::new("http://test.org#Thing").unwrap()),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[3],
+            AnnotationAssertion::new(
+                well_known::rdfs_comment(),
+                IRI::new("http://test#Person").unwrap(),
+                LiteralOrIRI::Literal(Literal::Number {
+                    number: 42.into(),
+                    type_iri: Some(well_known::xsd_integer())
+                }),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[4],
+            AnnotationAssertion::new(
+                well_known::rdfs_comment(),
+                IRI::new("http://test#Person").unwrap(),
+                LiteralOrIRI::Literal(Literal::Number {
+                    number: Number::from_f64(3.14).unwrap(),
+                    type_iri: Some(well_known::xsd_float())
+                }),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[5],
+            AnnotationAssertion::new(
+                well_known::rdfs_comment(),
+                IRI::new("http://test#Person").unwrap(),
+                LiteralOrIRI::Literal(Literal::Bool(true)),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[6],
+            AnnotationAssertion::new(
+                well_known::rdfs_comment(),
+                IRI::new("http://test#Person").unwrap(),
+                LiteralOrIRI::Literal(Literal::Bool(false)),
                 vec![]
             )
             .into()
@@ -755,20 +807,73 @@ mod tests {
         :hasAge rdf:type owl:DatatypeProperty .
 
         :Bob rdf:type :Man .
-        :Bob :hasAge "51" .
+        :Bob :hasAge "51"^^xsd:nonNegativeInteger .
+        :Bob :hasAge 42 .
+        :Bob :hasAge "3.14"^^xsd:float .
+        :Bob :hasAge true .
+        :Bob :hasAge "false"^^xsd:boolean .
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
 
         assert_eq!(o.declarations().len(), 3);
-        assert_eq!(o.axioms().len(), 2);
+        assert_eq!(o.axioms().len(), 6);
         assert_eq!(
             o.axioms()[1],
             DataPropertyAssertion::new(
                 IRI::new("http://test#hasAge").unwrap().into(),
                 IRI::new("http://test#Bob").unwrap().into(),
-                Literal::String("51".into()),
+                Literal::Number {
+                    number: 51.into(),
+                    type_iri: Some(well_known::xsd_nonNegativeInteger())
+                },
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[2],
+            DataPropertyAssertion::new(
+                IRI::new("http://test#hasAge").unwrap().into(),
+                IRI::new("http://test#Bob").unwrap().into(),
+                Literal::Number {
+                    number: 42.into(),
+                    type_iri: Some(well_known::xsd_integer())
+                },
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[3],
+            DataPropertyAssertion::new(
+                IRI::new("http://test#hasAge").unwrap().into(),
+                IRI::new("http://test#Bob").unwrap().into(),
+                Literal::Number {
+                    number: Number::from_f64(3.14).unwrap(),
+                    type_iri: Some(well_known::xsd_float())
+                },
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[4],
+            DataPropertyAssertion::new(
+                IRI::new("http://test#hasAge").unwrap().into(),
+                IRI::new("http://test#Bob").unwrap().into(),
+                Literal::Bool(true),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[5],
+            DataPropertyAssertion::new(
+                IRI::new("http://test#hasAge").unwrap().into(),
+                IRI::new("http://test#Bob").unwrap().into(),
+                Literal::Bool(false),
                 vec![]
             )
             .into()

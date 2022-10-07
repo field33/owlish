@@ -44,6 +44,13 @@ impl<'a> TryInto<Literal> for Value<'a> {
                                 number: n,
                                 type_iri: well_known::xsd_integer().into(),
                             })
+                    } else if datatype_iri == well_known::xsd_nonNegativeInteger_str {
+                        serde_json::from_str(&lexical_form)
+                            .map_err(|_| ())
+                            .map(|n| Literal::Number {
+                                number: n,
+                                type_iri: well_known::xsd_nonNegativeInteger().into(),
+                            })
                     } else if datatype_iri == well_known::xsd_float_str {
                         serde_json::from_str(&lexical_form)
                             .map_err(|_| ())
@@ -51,6 +58,10 @@ impl<'a> TryInto<Literal> for Value<'a> {
                                 number: n,
                                 type_iri: well_known::xsd_float().into(),
                             })
+                    } else if datatype_iri == well_known::xsd_boolean_str {
+                        serde_json::from_str(&lexical_form)
+                            .map_err(|_| ())
+                            .map(Literal::Bool)
                     } else {
                         IRI::new(&datatype_iri)
                             .map_err(|_| ())

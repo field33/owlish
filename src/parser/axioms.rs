@@ -19,7 +19,7 @@ pub(crate) fn match_axioms(
     prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
     matchers.push((
-        rdf_match!("DataProperty", prefixes,
+        rdf_match!("DataPropertyAssertion", prefixes,
             [+:x] [*:predicate] [lt:value] .
         )?,
         Box::new(|mstate, o, _| {

@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.0 - 2022-10-07
+#### Features
+- Parse numeric and bolean literals - (96b710b) - Florian Loers
+
+- - -
+
 ## v0.10.0 - 2022-10-06
 #### Features
 - Parse object property domain and range - (625e5f4) - Florian Loers

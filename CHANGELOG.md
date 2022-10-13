@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.1 - 2022-10-13
+#### Bug Fixes
+- Implement Hash for IRI - (87da92a) - Florian Loers
+
+- - -
+
 ## v0.11.0 - 2022-10-07
 #### Features
 - Parse numeric and bolean literals - (96b710b) - Florian Loers

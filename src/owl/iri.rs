@@ -10,7 +10,7 @@ pub fn iri<T: From<IRI>>(iri: &str) -> T {
     IRI::new(iri).unwrap().into()
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IRI(iref::IriBuf);
 
 impl<'de> Deserialize<'de> for IRI {

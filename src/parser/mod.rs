@@ -187,6 +187,17 @@ impl ParserOptions {
         false
     }
 
+    pub fn is_data_prop(&self, iri: &str) -> bool {
+        for d in &self.known {
+            if let Declaration::DataProperty(p, _) = d {
+                if p.as_iri().as_str() == iri {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     pub fn builder() -> ParserOptionsBuilder {
         ParserOptionsBuilder {
             ..Default::default()

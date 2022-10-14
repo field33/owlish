@@ -1,0 +1,5 @@
+<http://field33.com/query_result/402d3591-6edb-4c91-bb69-7cc1d3a1194c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<http://field33.com/dataset/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<http://field33.com/dataset/test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://field33.com/ontologies/@fld33_domain/test/Test> .
+<http://field33.com/ontologies/@fld33_domain/test/Test> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://field33.com/dataset/test> <http://field33.com/ontologies/test/TestDataProperty> "29.25" .

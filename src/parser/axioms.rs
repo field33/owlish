@@ -22,7 +22,7 @@ pub(crate) fn match_axioms(
         rdf_match!("DataPropertyAssertion", prefixes,
             [+:x] [*:predicate] [lt:value] .
         )?,
-        Box::new(|mstate, o, _| {
+        Box::new(|mstate, o, options| {
             if let Some(predicate) = mstate.last_iri("predicate") {
                 let predicate_iri = IRI::new(predicate)?;
                 if let Some(subject) = mstate.last("x") {
@@ -30,7 +30,9 @@ pub(crate) fn match_axioms(
                         Value::Iri(subject_iri) => {
                             let subject_iri = IRI::new(subject_iri)?;
                             if let Some(value) = mstate.last_literal("value") {
-                                if o.data_property_declaration(&predicate_iri).is_some() {
+                                if o.data_property_declaration(&predicate_iri).is_some()
+                                    || options.is_data_prop(predicate_iri.as_str())
+                                {
                                     o.push_axiom(
                                         DataPropertyAssertion::new(
                                             predicate_iri.into(),

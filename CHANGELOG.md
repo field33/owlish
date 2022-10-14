@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.12.0 - 2022-10-14
+#### Features
+- Parse unknown Data Property Assertions - (7949d3e) - Kate Sieraia
+
+- - -
+
 ## v0.11.1 - 2022-10-13
 #### Bug Fixes
 - Implement Hash for IRI - (87da92a) - Florian Loers

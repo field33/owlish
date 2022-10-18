@@ -441,7 +441,7 @@ impl well_known {
         iri_to_js_iri(crate::owl::well_known::xsd_boolean().as_iri()).unwrap()
     }
     pub fn xsd_string() -> IRI {
-        iri_to_js_iri(crate::owl::well_known::xsd_float().as_iri()).unwrap()
+        iri_to_js_iri(crate::owl::well_known::xsd_string().as_iri()).unwrap()
     }
     pub fn xsd_float() -> IRI {
         iri_to_js_iri(crate::owl::well_known::xsd_float().as_iri()).unwrap()

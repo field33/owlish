@@ -13,6 +13,14 @@ pub fn xsd_string() -> DatatypeIRI {
 }
 
 #[allow(non_upper_case_globals)]
+pub const xsd_decimal_str: &str = "http://www.w3.org/2001/XMLSchema#decimal";
+
+#[allow(non_snake_case)]
+pub fn xsd_decimal() -> DatatypeIRI {
+    IRI::new(xsd_decimal_str).unwrap().into()
+}
+
+#[allow(non_upper_case_globals)]
 pub const xsd_dateTime_str: &str = "http://www.w3.org/2001/XMLSchema#dateTime";
 
 #[allow(non_snake_case)]

@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.12.1 - 2022-10-18
+#### Bug Fixes
+- Fix wrong well_known type export - (4781314) - Florian Loers
+
+- - -
+
 ## v0.12.0 - 2022-10-14
 #### Features
 - Parse unknown Data Property Assertions - (7949d3e) - Kate Sieraia

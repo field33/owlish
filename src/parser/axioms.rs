@@ -13,6 +13,7 @@ use crate::parser::matcher::RdfMatcher;
 use crate::parser::matcher::Value;
 use crate::rdf_match;
 use std::collections::HashMap;
+use std::ops::Deref;
 
 pub(crate) fn match_axioms(
     matchers: &mut Vec<(RdfMatcher, MatcherHandler)>,
@@ -133,28 +134,43 @@ pub(crate) fn match_axioms(
         Box::new(|mstate, o, _| {
             if let Some(vars) = get_vars!(mstate, subject, object) {
                 match vars.subject {
-                    Value::Iri(subject_iri_str) => match vars.object {
-                        Value::Iri(object_iri_str) => {
-                            if let Ok(op_iri) = IRI::new(subject_iri_str) {
-                                if let Ok(class_iri) = IRI::new(object_iri_str) {
-                                    o.push_axiom(
-                                        ObjectPropertyDomain::new(
-                                            op_iri.into(),
-                                            class_iri.into(),
-                                            vec![],
-                                        )
-                                        .into(),
-                                    );
+                    Value::Iri(subject_iri_str) => {
+                        if let Ok(op_iri) = IRI::new(subject_iri_str) {
+                            match vars.object {
+                                Value::Iri(object_iri_str) => {
+                                    if let Ok(class_iri) = IRI::new(object_iri_str) {
+                                        o.push_axiom(
+                                            ObjectPropertyDomain::new(
+                                                op_iri.into(),
+                                                class_iri.into(),
+                                                vec![],
+                                            )
+                                            .into(),
+                                        );
+                                    }
+                                }
+                                Value::Blank(bn) => {
+                                    if let Some(cbn) = o.get_blank(bn) {
+                                        match cbn {
+                                            CollectedBlankNode::ClassConstructor(cc) => {
+                                                o.push_axiom(
+                                                    ObjectPropertyDomain::new(
+                                                        op_iri.into(),
+                                                        cc.deref().clone(),
+                                                        vec![],
+                                                    )
+                                                    .into(),
+                                                );
+                                            }
+                                        }
+                                    }
+                                }
+                                Value::Literal { .. } => {
+                                    // TODO
                                 }
                             }
                         }
-                        Value::Blank(_) => {
-                            // TODO
-                        }
-                        Value::Literal { .. } => {
-                            // TODO
-                        }
-                    },
+                    }
                     Value::Blank(_) => todo!(),
                     Value::Literal { .. } => todo!(),
                 }
@@ -170,28 +186,43 @@ pub(crate) fn match_axioms(
         Box::new(|mstate, o, _| {
             if let Some(vars) = get_vars!(mstate, subject, object) {
                 match vars.subject {
-                    Value::Iri(subject_iri_str) => match vars.object {
-                        Value::Iri(object_iri_str) => {
-                            if let Ok(op_iri) = IRI::new(subject_iri_str) {
-                                if let Ok(class_iri) = IRI::new(object_iri_str) {
-                                    o.push_axiom(
-                                        ObjectPropertyRange::new(
-                                            op_iri.into(),
-                                            class_iri.into(),
-                                            vec![],
-                                        )
-                                        .into(),
-                                    );
+                    Value::Iri(subject_iri_str) => {
+                        if let Ok(op_iri) = IRI::new(subject_iri_str) {
+                            match vars.object {
+                                Value::Iri(object_iri_str) => {
+                                    if let Ok(class_iri) = IRI::new(object_iri_str) {
+                                        o.push_axiom(
+                                            ObjectPropertyRange::new(
+                                                op_iri.into(),
+                                                class_iri.into(),
+                                                vec![],
+                                            )
+                                            .into(),
+                                        );
+                                    }
+                                }
+                                Value::Blank(bn) => {
+                                    if let Some(cbn) = o.get_blank(bn) {
+                                        match cbn {
+                                            CollectedBlankNode::ClassConstructor(cc) => {
+                                                o.push_axiom(
+                                                    ObjectPropertyRange::new(
+                                                        op_iri.into(),
+                                                        cc.deref().clone(),
+                                                        vec![],
+                                                    )
+                                                    .into(),
+                                                );
+                                            }
+                                        }
+                                    }
+                                }
+                                Value::Literal { .. } => {
+                                    // TODO
                                 }
                             }
                         }
-                        Value::Blank(_) => {
-                            // TODO
-                        }
-                        Value::Literal { .. } => {
-                            // TODO
-                        }
-                    },
+                    }
                     Value::Blank(_) => todo!(),
                     Value::Literal { .. } => todo!(),
                 }

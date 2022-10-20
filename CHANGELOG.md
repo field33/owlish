@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.14.0 - 2022-10-20
+#### Features
+- Support parsing ObjectPropertyRange and ObjectPropertyDomain for simple cases - (ecd1e55) - Florian Loers
+
+- - -
+
 ## v0.13.0 - 2022-10-20
 #### Features
 - Support parsing ObjectProperties - (4f1c8c8) - Florian Loers

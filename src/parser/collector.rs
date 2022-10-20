@@ -4,11 +4,15 @@ use harriet::triple_production::RdfBlankNode;
 
 use crate::{api::Ontology, error::Error, owl::*, parser::matcher::Value};
 
-use super::{matcher::MatcherState, ParserOptions};
+use super::{matcher::MatcherState, IndexedParserOptions};
 
 /// Handle when a matcher matched. Returns whether the matched rules where actually
 pub(crate) type MatcherHandler<'a> = Box<
-    dyn Fn(&MatcherState<'a>, &mut OntologyCollector<'a>, &ParserOptions) -> Result<bool, Error>,
+    dyn Fn(
+        &MatcherState<'a>,
+        &mut OntologyCollector<'a>,
+        &IndexedParserOptions,
+    ) -> Result<bool, Error>,
 >;
 
 #[derive(Debug, Clone)]
@@ -201,8 +205,6 @@ impl<'a> OntologyCollector<'a> {
     }
 
     pub(crate) fn class_declaration(&self, cls: &IRI) -> Option<&Declaration> {
-        // self.declarations.iter().rev().find(|d| match d {
-        // })
         self.declaration_index
             .get(cls.as_str())
             .and_then(|index| self.declarations.get(*index))
@@ -212,15 +214,21 @@ impl<'a> OntologyCollector<'a> {
             })
     }
     pub(crate) fn data_property_declaration(&self, dp: &IRI) -> Option<&Declaration> {
-        // self.declarations.iter().rev().find(|d| match d {
-        //     Declaration::DataProperty(iri, _) => iri.as_iri() == dp,
-        //     _ => false,
-        // })
         self.declaration_index
             .get(dp.as_str())
             .and_then(|index| self.declarations.get(*index))
             .and_then(|d| match d {
                 Declaration::DataProperty(_, _) => Some(d),
+                _ => None,
+            })
+    }
+
+    pub(crate) fn object_property_declaration(&self, iri: &IRI) -> Option<&Declaration> {
+        self.declaration_index
+            .get(iri.as_str())
+            .and_then(|index| self.declarations.get(*index))
+            .and_then(|d| match d {
+                Declaration::ObjectProperty(_, _) => Some(d),
                 _ => None,
             })
     }

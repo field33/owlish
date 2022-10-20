@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     api::Ontology,
     error::Error,
-    owl::{well_known, Declaration},
+    owl::{well_known, Declaration, IRI},
     parser::matcher::{IRIOrBlank, MatchResult, RdfMatcher},
 };
 
@@ -21,6 +21,7 @@ mod annotations;
 mod axioms;
 mod blank_nodes;
 mod declarations;
+mod object_property_assertions;
 mod sequences;
 
 static mut RDF_MATCHER: Option<Option<String>> = None;
@@ -45,6 +46,7 @@ macro_rules! parser_debug {
 
 impl Ontology {
     pub fn parse(ttl: &str, options: ParserOptions) -> Result<Self, Error> {
+        let indexed_options: IndexedParserOptions = options.into();
         let ttl =
             harriet::TurtleDocument::parse_full(ttl).map_err(|e| Error::new(format!("{:?}", e)))?;
 
@@ -95,6 +97,7 @@ impl Ontology {
                 }
                 _ => {
                     axioms::match_axioms(&mut matchers, &prefixes)?;
+                    object_property_assertions::push(&mut matchers, &prefixes)?;
                     annotations::match_annotation_assertions(&mut matchers, &prefixes)?;
                 }
             }
@@ -149,7 +152,7 @@ impl Ontology {
                     if *finished {
                         finished_matcher_instances.push(*matcher_ins_id);
                         let (_m, handler) = &matchers[*mid];
-                        if !handler(mstate, &mut collector, &options)? {
+                        if !handler(mstate, &mut collector, &indexed_options)? {
                             // todo: did not meet semantic criteria
                         }
                     }
@@ -176,31 +179,64 @@ pub struct ParserOptions {
 }
 
 impl ParserOptions {
-    pub fn is_annotation(&self, iri: &str) -> bool {
-        for d in &self.known {
-            if let Declaration::AnnotationProperty(anno, _) = d {
-                if anno.as_iri().as_str() == iri {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-
-    pub fn is_data_prop(&self, iri: &str) -> bool {
-        for d in &self.known {
-            if let Declaration::DataProperty(p, _) = d {
-                if p.as_iri().as_str() == iri {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-
     pub fn builder() -> ParserOptionsBuilder {
         ParserOptionsBuilder {
             ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct IndexedParserOptions {
+    known: Vec<Declaration>,
+    index: HashMap<IRI, usize>,
+}
+impl IndexedParserOptions {
+    pub fn is_annotation(&self, iri: &IRI) -> bool {
+        if let Some(i) = self.index.get(iri) {
+            matches!(
+                self.known.get(*i),
+                Some(Declaration::AnnotationProperty(_, _))
+            )
+        } else {
+            false
+        }
+    }
+
+    pub fn is_data_prop(&self, iri: &IRI) -> bool {
+        if let Some(i) = self.index.get(iri) {
+            matches!(self.known.get(*i), Some(Declaration::DataProperty(_, _)))
+        } else {
+            false
+        }
+    }
+
+    fn is_object_prop(&self, iri: &IRI) -> bool {
+        if let Some(i) = self.index.get(iri) {
+            matches!(self.known.get(*i), Some(Declaration::ObjectProperty(_, _)))
+        } else {
+            false
+        }
+    }
+}
+
+impl From<ParserOptions> for IndexedParserOptions {
+    fn from(po: ParserOptions) -> Self {
+        let mut index = HashMap::new();
+        for (i, d) in po.known.iter().enumerate() {
+            let iri = match d {
+                Declaration::Class(iri, _) => iri.as_iri(),
+                Declaration::NamedIndividual(iri, _) => iri.as_iri(),
+                Declaration::ObjectProperty(iri, _) => iri.as_iri(),
+                Declaration::DataProperty(iri, _) => iri.as_iri(),
+                Declaration::AnnotationProperty(iri, _) => iri.as_iri(),
+                Declaration::Datatype(iri, _) => iri.as_iri(),
+            };
+            index.insert(iri.clone(), i);
+        }
+        Self {
+            known: po.known,
+            index,
         }
     }
 }
@@ -229,7 +265,7 @@ mod tests {
         owl::{
             well_known, Annotation, AnnotationAssertion, Axiom, ClassAssertion,
             DataPropertyAssertion, Declaration, Literal, LiteralOrIRI, ObjectIntersectionOf,
-            ObjectPropertyDomain, ObjectPropertyRange, SubClassOf, IRI,
+            ObjectPropertyAssertion, ObjectPropertyDomain, ObjectPropertyRange, SubClassOf, IRI,
         },
         parser::ParserOptions,
     };
@@ -542,6 +578,47 @@ mod tests {
                 well_known::rdfs_comment(),
                 IRI::new("http://test#Person").unwrap(),
                 LiteralOrIRI::Literal(Literal::Bool(false)),
+                vec![]
+            )
+            .into()
+        );
+    }
+
+    #[test]
+    fn object_property_assertions() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        @prefix : <http://test#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+        <http://test#> rdf:type owl:Ontology .
+        :Person rdf:type owl:Class .
+        :Schmerson rdf:type owl:Class .
+        :Person :foo :Schmerson .
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(
+            turtle,
+            ParserOptions::builder()
+                .known(Declaration::ObjectProperty(
+                    IRI::new("http://test#foo").unwrap().into(),
+                    vec![],
+                ))
+                .build(),
+        )
+        .unwrap();
+        assert_eq!(o.declarations().len(), 2);
+        assert_eq!(o.axioms().len(), 1);
+        assert_eq!(
+            o.axioms()[0],
+            ObjectPropertyAssertion::new(
+                IRI::new("http://test#foo").unwrap().into(),
+                IRI::new("http://test#Person").unwrap().into(),
+                IRI::new("http://test#Schmerson").unwrap().into(),
                 vec![]
             )
             .into()

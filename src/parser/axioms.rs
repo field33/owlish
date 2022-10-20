@@ -31,7 +31,7 @@ pub(crate) fn match_axioms(
                             let subject_iri = IRI::new(subject_iri)?;
                             if let Some(value) = mstate.last_literal("value") {
                                 if o.data_property_declaration(&predicate_iri).is_some()
-                                    || options.is_data_prop(predicate_iri.as_str())
+                                    || options.is_data_prop(&predicate_iri)
                                 {
                                     o.push_axiom(
                                         DataPropertyAssertion::new(
@@ -55,9 +55,6 @@ pub(crate) fn match_axioms(
                     }
                 }
             }
-
-            //     }
-            // }
 
             Ok(false)
         }),

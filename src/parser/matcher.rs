@@ -95,6 +95,21 @@ impl<'a> TryInto<LiteralOrIRI> for Value<'a> {
     }
 }
 
+impl<'a> TryInto<IRI> for Value<'a> {
+    type Error = ();
+
+    fn try_into(self) -> Result<IRI, Self::Error> {
+        match self {
+            Value::Iri(iri) => match IRI::new(&iri) {
+                Ok(iri) => Ok(iri),
+                Err(_) => Err(()),
+            },
+            Value::Literal { .. } => Err(()),
+            _ => Err(()),
+        }
+    }
+}
+
 impl<'a> From<RdfLiteral<'a>> for Value<'a> {
     fn from(lit: RdfLiteral<'a>) -> Self {
         Value::Literal {
@@ -146,6 +161,15 @@ impl<'a> From<IRIOrBlank<'a>> for Value<'a> {
         }
     }
 }
+
+// impl<'a> From<IRIOrBlank<'a>> for &Value<'a> {
+//     fn from(iob: IRIOrBlank<'a>) -> Self {
+//         match iob {
+//             IRIOrBlank::Iri(iri) => &Value::Iri(iri),
+//             IRIOrBlank::Blank(b) => &Value::Blank(b),
+//         }
+//     }
+// }
 
 #[derive(Debug, Clone)]
 pub struct MatcherState<'a> {

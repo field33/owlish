@@ -120,7 +120,7 @@ pub(crate) fn match_simple_annotation_assertions<'a>(
         Box::new(|mstate, o, options| {
             if let Some(predicate_iri) = get_iri_var("predicate", mstate)? {
                 if o.annotation_property(&predicate_iri).is_some()
-                    || options.is_annotation(predicate_iri.as_str())
+                    || options.is_annotation(&predicate_iri)
                     || WELL_KNOWN_ANNOTATIONS.contains(&predicate_iri.as_str())
                 {
                     if let Some(subject) = mstate.get("subject") {
@@ -164,7 +164,7 @@ pub(crate) fn match_annotation_assertions<'a>(
                 };
                 if let Some(predicate_iri) = get_iri_var("predicate", mstate)? {
                     if o.annotation_property(&predicate_iri).is_some()
-                        || options.is_annotation(predicate_iri.as_str())
+                        || options.is_annotation(&predicate_iri)
                         || WELL_KNOWN_ANNOTATIONS.contains(&predicate_iri.as_str())
                     {
                         if let Some(subject) = mstate.get("subject") {

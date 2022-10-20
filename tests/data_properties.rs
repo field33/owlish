@@ -7,7 +7,7 @@ use owlish::{
 #[test]
 fn data_properties() {
     env_logger::try_init().ok();
-    let turtle = include_str!("./dataProperties.ttl");
+    let turtle = include_str!("./data_properties.ttl");
 
     harriet::TurtleDocument::parse_full(turtle)
         .map_err(|e| format!("{}...", &format!("{:?}", e)[..200]))

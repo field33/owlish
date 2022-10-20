@@ -149,9 +149,11 @@ pub(crate) fn match_axioms(
                             }
                         }
                         Value::Blank(_) => {
-                            todo!()
+                            // TODO
                         }
-                        Value::Literal { .. } => todo!(),
+                        Value::Literal { .. } => {
+                            // TODO
+                        }
                     },
                     Value::Blank(_) => todo!(),
                     Value::Literal { .. } => todo!(),
@@ -184,9 +186,11 @@ pub(crate) fn match_axioms(
                             }
                         }
                         Value::Blank(_) => {
-                            todo!()
+                            // TODO
                         }
-                        Value::Literal { .. } => todo!(),
+                        Value::Literal { .. } => {
+                            // TODO
+                        }
                     },
                     Value::Blank(_) => todo!(),
                     Value::Literal { .. } => todo!(),

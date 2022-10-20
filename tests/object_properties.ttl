@@ -1,0 +1,1365 @@
+@prefix : <http://field33.com/ontologies/EXTERNAL_as_innovation/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix registry: <http://field33.com/ontologies/REGISTRY/> .
+@base <http://field33.com/ontologies/EXTERNAL_as_innovation/> .
+
+<http://field33.com/ontologies/EXTERNAL_as_innovation/> rdf:type owl:Ontology ;
+                                                         registry:author "Field 33" ;
+                                                         registry:canonicalPrefix "EXTERNAL_as_innovation" ;
+                                                         registry:category "Customer Ontology"@en ,
+                                                                           "Innovation"@en ,
+                                                                           "Meta Model"@en ;
+                                                         registry:keyword "Axel Springer"@en ,
+                                                                          "Field 33 Package"@en ,
+                                                                          "Innovation"@en ;
+                                                         registry:ontologyFormatVersion "v1" ;
+                                                         registry:packageName "@axel_springer/innovation" ;
+                                                         registry:packageVersion "0.1.1" ;
+                                                         registry:repository "https://github.com/field33/ontology-workspace/tree/main/%40axel_springer/innovation" ;
+                                                         registry:shortDescription "Axel Springer Enterprise Innovation ontology"@en ;
+                                                         rdfs:comment "#Axel Springer Enterprise Innovation Ontology<br>This package is a customer specific ontology for Axel Springer and describes concepts for Enterprise innovation."@en ;
+                                                         rdfs:label "Axel Springer Enterprise Innovation"@en .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TimeRangeEnd
+:TimeRangeEnd rdf:type owl:AnnotationProperty ;
+              rdfs:label "Time range end" ;
+              rdfs:range xsd:dateTime .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TimeRangeStart
+:TimeRangeStart rdf:type owl:AnnotationProperty ;
+                rdfs:label "Time range start" ;
+                rdfs:range xsd:dateTime .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/adoptedBy
+:adoptedBy rdf:type owl:AnnotationProperty ;
+           rdfs:label "Adopted By"@en ;
+           rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/approvedForDevelopment
+:approvedForDevelopment rdf:type owl:AnnotationProperty ;
+                        rdfs:label "Approved For Development"@en ;
+                        rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/businessCaseValidated
+:businessCaseValidated rdf:type owl:AnnotationProperty ;
+                       rdfs:label "Business Case Validation"@en ;
+                       rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/dailyOperations
+:dailyOperations rdf:type owl:AnnotationProperty ;
+                 rdfs:label "Daily Operations"@en ;
+                 rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/fakeClass
+:fakeClass rdf:type owl:AnnotationProperty ;
+           rdfs:label "Fake Class"@en ;
+           rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/initiativeStatusOtherText
+:initiativeStatusOtherText rdf:type owl:AnnotationProperty ;
+                           rdfs:label "Initiative Status Other Text"@en ;
+                           rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/isHierarchical
+:isHierarchical rdf:type owl:AnnotationProperty ;
+                rdfs:range xsd:boolean .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/otherInitiativeStatus
+:otherInitiativeStatus rdf:type owl:AnnotationProperty ;
+                       rdfs:label "Other Initiative Status"@en ;
+                       rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/pitched
+:pitched rdf:type owl:AnnotationProperty ;
+         rdfs:label "Pitched"@en ;
+         rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/pitchedTo
+:pitchedTo rdf:type owl:AnnotationProperty ;
+           rdfs:label "Pitched to"@en ;
+           rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/prototyped
+:prototyped rdf:type owl:AnnotationProperty ;
+            rdfs:label "Prototyped"@en ;
+            rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/stillActive
+:stillActive rdf:type owl:AnnotationProperty ;
+             rdfs:label "Still Active"@en ;
+             rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/unitAdoption
+:unitAdoption rdf:type owl:AnnotationProperty ;
+              rdfs:label "Unit Adoption"@en ;
+              rdfs:range xsd:string .
+
+
+###  http://field33.com/ontologies/REGISTRY/author
+registry:author rdf:type owl:AnnotationProperty .
+
+
+###  http://field33.com/ontologies/REGISTRY/canonicalPrefix
+registry:canonicalPrefix rdf:type owl:AnnotationProperty .
+
+
+###  http://field33.com/ontologies/REGISTRY/category
+registry:category rdf:type owl:AnnotationProperty .
+
+
+###  http://field33.com/ontologies/REGISTRY/keyword
+registry:keyword rdf:type owl:AnnotationProperty .
+
+
+###  http://field33.com/ontologies/REGISTRY/ontologyFormatVersion
+registry:ontologyFormatVersion rdf:type owl:AnnotationProperty .
+
+
+###  http://field33.com/ontologies/REGISTRY/packageName
+registry:packageName rdf:type owl:AnnotationProperty .
+
+
+###  http://field33.com/ontologies/REGISTRY/packageVersion
+registry:packageVersion rdf:type owl:AnnotationProperty .
+
+
+###  http://field33.com/ontologies/REGISTRY/repository
+registry:repository rdf:type owl:AnnotationProperty .
+
+
+###  http://field33.com/ontologies/REGISTRY/shortDescription
+registry:shortDescription rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/AccountabilityFulfillingOf
+:AccountabilityFulfillingOf rdf:type owl:ObjectProperty ;
+                            rdfs:subPropertyOf :FulfillingOf ;
+                            rdfs:domain :Accountability ;
+                            rdfs:range :Purpose ;
+                            rdfs:label "Accountability fulfilling of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/AccountabilitySupport
+:AccountabilitySupport rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf :ResoningOf ;
+                       rdfs:domain :Accountability ;
+                       rdfs:range :Purpose ;
+                       rdfs:label "Accountability support"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ActivityContributeTo
+:ActivityContributeTo rdf:type owl:ObjectProperty ;
+                      rdfs:subPropertyOf :ContributeTo ;
+                      rdfs:domain :Activity ;
+                      rdfs:range [ rdf:type owl:Class ;
+                                   owl:unionOf ( :Accountability
+                                                 :Goal
+                                                 :Project
+                                               )
+                                 ] ;
+                      rdfs:label "Activity contribute to"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ActivityCreationOf
+:ActivityCreationOf rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf :CreationOf ;
+                    rdfs:domain [ rdf:type owl:Class ;
+                                  owl:unionOf ( :Person
+                                                :Role
+                                              )
+                                ] ;
+                    rdfs:range :Activity ;
+                    rdfs:label "Activity creation of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ActorHas
+:ActorHas rdf:type owl:ObjectProperty ;
+          rdfs:subPropertyOf :Has ;
+          rdfs:domain :Person ;
+          rdfs:range :Competency ;
+          rdfs:label "Actor has"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/AdoptionOf
+:AdoptionOf rdf:type owl:ObjectProperty ;
+            rdfs:domain :Context ;
+            rdfs:range :Policy ;
+            rdfs:label "Adoption of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/AggregationOf
+:AggregationOf rdf:type owl:ObjectProperty ;
+               rdfs:domain :CoreIdea ;
+               rdfs:range :InnovationObject ;
+               rdfs:label "Aggregation of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/AllocatedTo
+:AllocatedTo rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf :PartOf ;
+             rdfs:domain :Company ;
+             rdfs:range :Segment ;
+             rdfs:label "Allocated to"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/AllowOf
+:AllowOf rdf:type owl:ObjectProperty ;
+         rdfs:domain :Capability ;
+         rdfs:range :ITAbility ;
+         rdfs:label "Allow of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/AreaOf
+:AreaOf rdf:type owl:ObjectProperty ;
+        rdfs:subPropertyOf :PartOf ;
+        rdfs:domain :Area ;
+        rdfs:range :Segment ;
+        rdfs:label "Area of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/BelongTo
+:BelongTo rdf:type owl:ObjectProperty ;
+          rdfs:domain :Actor ;
+          rdfs:range :Class ;
+          rdfs:label "Belong to"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CallsFor
+:CallsFor rdf:type owl:ObjectProperty ;
+          rdfs:domain [ rdf:type owl:Class ;
+                        owl:unionOf ( :Gate
+                                      :Phase
+                                    )
+                      ] ;
+          rdfs:range [ rdf:type owl:Class ;
+                       owl:unionOf ( :Activity
+                                     :AssessmentProcedure
+                                   )
+                     ] ;
+          rdfs:label "Calls for"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CircleConsistOf
+:CircleConsistOf rdf:type owl:ObjectProperty ;
+                 rdfs:subPropertyOf :ConsistOf ;
+                 rdfs:domain :Circle ;
+                 rdfs:range [ rdf:type owl:Class ;
+                              owl:unionOf ( :Accountability
+                                            :Metric
+                                            :Purpose
+                                            :Role
+                                          )
+                            ] ;
+                 rdfs:label "Circle consist of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CircleReportingOf
+:CircleReportingOf rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf :ReportingOf ;
+                   rdfs:domain :Circle ;
+                   rdfs:range [ rdf:type owl:Class ;
+                                owl:unionOf ( :Activity
+                                              :Metric
+                                              :Project
+                                            )
+                              ] ;
+                   rdfs:label "Circle Reporting Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CityPartOf
+:CityPartOf rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf :PartOf ;
+            rdfs:domain :City ;
+            rdfs:range :Country ;
+            rdfs:label "City part of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ClarificationOf
+:ClarificationOf rdf:type owl:ObjectProperty ;
+                 rdfs:label "Clarification Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CompanyHas
+:CompanyHas rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf :Has ;
+            rdfs:domain :Company ;
+            rdfs:range :BusinessModel ;
+            rdfs:label "Company has"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CompanyHasInvestmentType
+:CompanyHasInvestmentType rdf:type owl:ObjectProperty ;
+                          rdfs:subPropertyOf :Has ;
+                          rdfs:domain :Company ;
+                          rdfs:range :InvestmentType ;
+                          rdfs:label "Company has investment type"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CompanyHeldBy
+:CompanyHeldBy rdf:type owl:ObjectProperty ;
+               rdfs:subPropertyOf :PartOf ;
+               rdfs:domain :Company ;
+               rdfs:range :Holding ;
+               rdfs:label "Company held by"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CompanyIsOf
+:CompanyIsOf rdf:type owl:ObjectProperty ;
+             rdfs:domain :Company ;
+             rdfs:range :InvestmentType ;
+             rdfs:label "Company is of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CompanyLocatedInCity
+:CompanyLocatedInCity rdf:type owl:ObjectProperty ;
+                      rdfs:subPropertyOf :LocatedIn ;
+                      rdfs:domain :Company ;
+                      rdfs:range :City ;
+                      rdfs:label "Company located in city"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CompanyLocatedInCountry
+:CompanyLocatedInCountry rdf:type owl:ObjectProperty ;
+                         rdfs:subPropertyOf :LocatedIn ;
+                         rdfs:domain :Company ;
+                         rdfs:range :Country ;
+                         rdfs:label "Company located in country"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CompanyPartOfPortfolio
+:CompanyPartOfPortfolio rdf:type owl:ObjectProperty ;
+                        rdfs:subPropertyOf :PartOf ;
+                        rdfs:domain :Company ;
+                        rdfs:range :Portfolio ;
+                        rdfs:label "Company part of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ComposedOf
+:ComposedOf rdf:type owl:ObjectProperty ;
+            rdfs:domain :Process ;
+            rdfs:range :Phase ;
+            rdfs:label "Composed of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ConsistOf
+:ConsistOf rdf:type owl:ObjectProperty ;
+           rdfs:label "Consist of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ConstrainedBy
+:ConstrainedBy rdf:type owl:ObjectProperty ;
+               rdfs:domain [ rdf:type owl:Class ;
+                             owl:unionOf ( :CoreIdea
+                                           :Task
+                                         )
+                           ] ;
+               rdfs:range :Constraint ;
+               rdfs:label "Constrained by"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Contains
+:Contains rdf:type owl:ObjectProperty ;
+          rdfs:domain :Metric ;
+          rdfs:range :Scale ;
+          rdfs:label "Contains"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ContextHas
+:ContextHas rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf :Has ;
+            rdfs:domain :Context ;
+            rdfs:range :MaturityLevel ;
+            rdfs:label "Context has"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ContributeTo
+:ContributeTo rdf:type owl:ObjectProperty ;
+              rdfs:label "Contribute to"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CoreIdeaHas
+:CoreIdeaHas rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf :Has ;
+             rdfs:domain :CoreIdea ;
+             rdfs:range :RelevanceLevel ;
+             rdfs:label "Core idea has"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CreationOf
+:CreationOf rdf:type owl:ObjectProperty ;
+            rdfs:label "Creation of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/DecidesOn
+:DecidesOn rdf:type owl:ObjectProperty ;
+           rdfs:domain :Gate ;
+           rdfs:range :Deliverable ;
+           rdfs:label "Decides on"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/DefiningOf
+:DefiningOf rdf:type owl:ObjectProperty ;
+            rdfs:label "Defining of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Deliver
+:Deliver rdf:type owl:ObjectProperty ;
+         rdfs:domain :Task ;
+         rdfs:range :Deliverable ;
+         rdfs:label "Deliver"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/DependsOn
+:DependsOn rdf:type owl:ObjectProperty ;
+           rdfs:domain [ rdf:type owl:Class ;
+                         owl:unionOf ( :CoreIdea
+                                       :Strategy
+                                     )
+                       ] ;
+           rdfs:range [ rdf:type owl:Class ;
+                        owl:unionOf ( :BusinessModel
+                                      :CoreIdea
+                                    )
+                      ] ;
+           rdfs:label "Depends on"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/DividedIn
+:DividedIn rdf:type owl:ObjectProperty ;
+           rdfs:domain :Phase ;
+           rdfs:range :Stage ;
+           rdfs:label "Divided in"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/FillingOf
+:FillingOf rdf:type owl:ObjectProperty ;
+           rdfs:domain :Person ;
+           rdfs:range [ rdf:type owl:Class ;
+                        owl:unionOf ( :Circle
+                                      :Role
+                                    )
+                      ] ;
+           rdfs:label "Filling Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/FollowedBy
+:FollowedBy rdf:type owl:ObjectProperty ;
+            rdfs:domain :Stage ;
+            rdfs:range :Gate ;
+            rdfs:label "Followed by"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/FormedBy
+:FormedBy rdf:type owl:ObjectProperty ;
+          rdfs:domain :Activity ;
+          rdfs:range :Task ;
+          rdfs:label "Formed by"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/FulfillingOf
+:FulfillingOf rdf:type owl:ObjectProperty ;
+              rdfs:domain :Role ;
+              rdfs:range :Purpose ;
+              rdfs:label "Fulfilling of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/GateIdentificationOf
+:GateIdentificationOf rdf:type owl:ObjectProperty ;
+                      rdfs:subPropertyOf :IdentificationOf ;
+                      rdfs:domain :Gate ;
+                      rdfs:range :Status ;
+                      rdfs:label "Gate identification of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/GovernanceModificationOf
+:GovernanceModificationOf rdf:type owl:ObjectProperty ;
+                          rdfs:subPropertyOf :ModificationOf ;
+                          rdfs:domain :Governance ;
+                          rdfs:range [ rdf:type owl:Class ;
+                                       owl:unionOf ( :Accountability
+                                                     :Circle
+                                                     :Domain
+                                                     :Metric
+                                                     :Policy
+                                                     :Purpose
+                                                     :Role
+                                                   )
+                                     ] ;
+                          rdfs:label "Governance modification of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/GroupingOf
+:GroupingOf rdf:type owl:ObjectProperty ;
+            rdfs:domain :Stage ;
+            rdfs:range :Iteration ;
+            rdfs:label "Grouping of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Has
+:Has rdf:type owl:ObjectProperty ;
+     rdfs:label "Has"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/HasAssigned
+:HasAssigned rdf:type owl:ObjectProperty ;
+             rdfs:domain :Task ;
+             rdfs:range [ rdf:type owl:Class ;
+                          owl:unionOf ( :Resource
+                                        :Task
+                                      )
+                        ] ;
+             rdfs:label "Has assigned"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/IdentificationOf
+:IdentificationOf rdf:type owl:ObjectProperty ;
+                  rdfs:label "Identification Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/InnovationObjectCreationOf
+:InnovationObjectCreationOf rdf:type owl:ObjectProperty ;
+                            rdfs:subPropertyOf :CreationOf ;
+                            rdfs:domain :Actor ;
+                            rdfs:range :InnovationObject ;
+                            rdfs:label "Innovation Object creation of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/InvestedIn
+:InvestedIn rdf:type owl:ObjectProperty ;
+            rdfs:domain :Company ;
+            rdfs:range :Company ;
+            rdfs:label "Invested in"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Involves
+:Involves rdf:type owl:ObjectProperty ;
+          rdfs:domain [ rdf:type owl:Class ;
+                        owl:unionOf ( :CoreIdea
+                                      :Task
+                                    )
+                      ] ;
+          rdfs:range [ rdf:type owl:Class ;
+                       owl:unionOf ( :Activity
+                                     :Role
+                                   )
+                     ] ;
+          rdfs:label "Involves"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/JustificationOf
+:JustificationOf rdf:type owl:ObjectProperty ;
+                 rdfs:label "Justification Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/KeyresultFulfillingOf
+:KeyresultFulfillingOf rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf :FulfillingOf ;
+                       rdfs:domain :KeyResult ;
+                       rdfs:range :Objective ;
+                       rdfs:label "Key Result fulfilling of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/LocatedIn
+:LocatedIn rdf:type owl:ObjectProperty ;
+           rdfs:label "Located in"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/MeasuredUsing
+:MeasuredUsing rdf:type owl:ObjectProperty ;
+               rdfs:domain :InnovationObject ;
+               rdfs:range :AssessmentProcedure ;
+               rdfs:label "Measured using"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/MemberOf
+:MemberOf rdf:type owl:ObjectProperty ;
+          rdfs:domain :Actor ;
+          rdfs:range :Community ;
+          rdfs:label "Member of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/MetricClarificationOf
+:MetricClarificationOf rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf :ClarificationOf ;
+                       rdfs:domain :Metric ;
+                       rdfs:range :KeyResult ;
+                       rdfs:label "Metric clarification of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ModificationOf
+:ModificationOf rdf:type owl:ObjectProperty ;
+                rdfs:label "Modification Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Needs
+:Needs rdf:type owl:ObjectProperty ;
+       rdfs:domain :Task ;
+       rdfs:range :ITAbility ;
+       rdfs:label "Needs"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ObjectiveFulfillingOf
+:ObjectiveFulfillingOf rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf :FulfillingOf ;
+                       rdfs:domain :Objective ;
+                       rdfs:range :Objective ;
+                       rdfs:label "Objective fulfilling of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Offers
+:Offers rdf:type owl:ObjectProperty ;
+        rdfs:domain :Context ;
+        rdfs:range :Capability ;
+        rdfs:label "Offers"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/OwnsInterestIn
+:OwnsInterestIn rdf:type owl:ObjectProperty ;
+                rdfs:domain :Company ;
+                rdfs:range :Company ;
+                rdfs:label "Owns interest in"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/PartOf
+:PartOf rdf:type owl:ObjectProperty ;
+        rdfs:label "Part of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Performs
+:Performs rdf:type owl:ObjectProperty ;
+          rdfs:domain :Actor ;
+          rdfs:range :Task ;
+          rdfs:label "Performs"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Plays
+:Plays rdf:type owl:ObjectProperty ;
+       rdfs:domain :Actor ;
+       rdfs:range :Role ;
+       rdfs:label "Plays"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/PolicyDefiningOf
+:PolicyDefiningOf rdf:type owl:ObjectProperty ;
+                  rdfs:subPropertyOf :DefiningOf ;
+                  rdfs:domain :Policy ;
+                  rdfs:range [ rdf:type owl:Class ;
+                               owl:unionOf ( :Responsibility
+                                             :Strategy
+                                           )
+                             ] ;
+                  rdfs:label "Policy defining of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/PolicyIdentificationOf
+:PolicyIdentificationOf rdf:type owl:ObjectProperty ;
+                        rdfs:subPropertyOf :IdentificationOf ;
+                        rdfs:domain :Policy ;
+                        rdfs:range [ rdf:type owl:Class ;
+                                     owl:unionOf ( :Practice
+                                                   :Status
+                                                 )
+                                   ] ;
+                        rdfs:label "Policy identification of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Presents
+:Presents rdf:type owl:ObjectProperty ;
+          rdfs:domain [ rdf:type owl:Class ;
+                        owl:unionOf ( :Condition
+                                      :Context
+                                    )
+                      ] ;
+          rdfs:range [ rdf:type owl:Class ;
+                       owl:unionOf ( :Condition
+                                     :Constraint
+                                     :Opportunity
+                                   )
+                     ] ;
+          rdfs:label "Presents"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Produces
+:Produces rdf:type owl:ObjectProperty ;
+          rdfs:domain :AssessmentProcedure ;
+          rdfs:range :MeasureValue ;
+          rdfs:label "Produces"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Provides
+:Provides rdf:type owl:ObjectProperty ;
+          rdfs:domain [ rdf:type owl:Class ;
+                        owl:unionOf ( :Actor
+                                      :Context
+                                    )
+                      ] ;
+          rdfs:range [ rdf:type owl:Class ;
+                       owl:unionOf ( :Feedback
+                                     :Resource
+                                   )
+                     ] ;
+          rdfs:label "Provides"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/PurposeContributeTo
+:PurposeContributeTo rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf :ContributeTo ;
+                     rdfs:domain :Purpose ;
+                     rdfs:range :Purpose ;
+                     rdfs:label "Purpose contribute to"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/PurposeJustificationOf
+:PurposeJustificationOf rdf:type owl:ObjectProperty ;
+                        rdfs:subPropertyOf :JustificationOf ;
+                        rdfs:domain :Purpose ;
+                        rdfs:range [ rdf:type owl:Class ;
+                                     owl:unionOf ( :Circle
+                                                   :Role
+                                                 )
+                                   ] ;
+                        rdfs:label "Purpose justification of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Quantify
+:Quantify rdf:type owl:ObjectProperty ;
+          rdfs:domain :AssessmentProcedure ;
+          rdfs:range :Feedback ;
+          rdfs:label "Quantify"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/RelatesTo
+:RelatesTo rdf:type owl:ObjectProperty ;
+           rdfs:domain :Actor ;
+           rdfs:range :Actor ;
+           rdfs:label "Relates to"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ReportingOf
+:ReportingOf rdf:type owl:ObjectProperty ;
+             rdfs:label "Reporting Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Requires
+:Requires rdf:type owl:ObjectProperty ;
+          rdfs:domain :Task ;
+          rdfs:range :Competency ;
+          rdfs:label "Requires"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ResolvingOf
+:ResolvingOf rdf:type owl:ObjectProperty ;
+             rdfs:domain :Process ;
+             rdfs:range :Tension ;
+             rdfs:label "Resolving Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ResoningOf
+:ResoningOf rdf:type owl:ObjectProperty ;
+            rdfs:label "Reasoning Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/RoleConsistOf
+:RoleConsistOf rdf:type owl:ObjectProperty ;
+               rdfs:subPropertyOf :ConsistOf ;
+               rdfs:domain :Role ;
+               rdfs:range [ rdf:type owl:Class ;
+                            owl:unionOf ( :Accountability
+                                          :Metric
+                                          :Purpose
+                                        )
+                          ] ;
+               rdfs:label "Role consist of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/RoleHas
+:RoleHas rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf :Has ;
+         rdfs:domain :Role ;
+         rdfs:range [ rdf:type owl:Class ;
+                      owl:unionOf ( :Competency
+                                    :Goal
+                                    :Resource
+                                    :Responsibility
+                                    :Skill
+                                  )
+                    ] ;
+         rdfs:label "Role has"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/RoleReportingOf
+:RoleReportingOf rdf:type owl:ObjectProperty ;
+                 rdfs:subPropertyOf :ReportingOf ;
+                 rdfs:domain :Role ;
+                 rdfs:range [ rdf:type owl:Class ;
+                              owl:unionOf ( :Activity
+                                            :Metric
+                                            :Project
+                                          )
+                            ] ;
+                 rdfs:label "Role Reporting Of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Runs
+:Runs rdf:type owl:ObjectProperty ;
+      rdfs:domain :CoreIdea ;
+      rdfs:range :Process ;
+      rdfs:label "Runs"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Satisfies
+:Satisfies rdf:type owl:ObjectProperty ;
+           rdfs:domain :CoreIdea ;
+           rdfs:range :Goal ;
+           rdfs:label "Satisfies"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/SubsegmentOf
+:SubsegmentOf rdf:type owl:ObjectProperty ;
+              rdfs:subPropertyOf :PartOf ;
+              rdfs:domain :SubSegment ;
+              rdfs:range :Segment ;
+              rdfs:label "Subsegment of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/SubsidiaryHeldBy
+:SubsidiaryHeldBy rdf:type owl:ObjectProperty ;
+                  rdfs:subPropertyOf :PartOf ;
+                  rdfs:domain :Subsidiary ;
+                  rdfs:range :Company ;
+                  rdfs:label "Subsidiary held by"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TaskHas
+:TaskHas rdf:type owl:ObjectProperty ;
+         rdfs:subPropertyOf :Has ;
+         rdfs:domain :Task ;
+         rdfs:range :Duration ;
+         rdfs:label "Task has"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TensionJustificationOf
+:TensionJustificationOf rdf:type owl:ObjectProperty ;
+                        rdfs:subPropertyOf :JustificationOf ;
+                        rdfs:domain :Tension ;
+                        rdfs:range [ rdf:type owl:Class ;
+                                     owl:unionOf ( :Activity
+                                                   :Process
+                                                   :Project
+                                                 )
+                                   ] ;
+                        rdfs:label "Tension justification of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TicketContributeTo
+:TicketContributeTo rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf :ContributeTo ;
+                    rdfs:domain :Ticket ;
+                    rdfs:range :Goal ;
+                    rdfs:label "Ticket contribute to"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TicketCreationOf
+:TicketCreationOf rdf:type owl:ObjectProperty ;
+                  rdfs:subPropertyOf :CreationOf ;
+                  rdfs:domain :Person ;
+                  rdfs:range :Ticket ;
+                  rdfs:label "Ticket creation of"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TriggeredBy
+:TriggeredBy rdf:type owl:ObjectProperty ;
+             rdfs:domain :CoreIdea ;
+             rdfs:range :Trigger ;
+             rdfs:label "Triggered by"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Uses
+:Uses rdf:type owl:ObjectProperty ;
+      rdfs:domain :Actor ;
+      rdfs:range :ITAbility ;
+      rdfs:label "Uses"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Using
+:Using rdf:type owl:ObjectProperty ;
+       rdfs:domain :InnovationObject ;
+       rdfs:range :Annotation ;
+       rdfs:label "Using"@en .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Cost
+:Cost rdf:type owl:DatatypeProperty ;
+      rdfs:label "Cost" .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Date
+:Date rdf:type owl:DatatypeProperty ;
+      rdfs:label "Date" .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/DateTimeStart
+:DateTimeStart rdf:type owl:DatatypeProperty ;
+               rdfs:label "Date time start" .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/EmployeeKey
+:EmployeeKey rdf:type owl:DatatypeProperty ;
+             rdfs:label "Employee key" .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Forename
+:Forename rdf:type owl:DatatypeProperty ;
+          rdfs:label "Forename" .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Surname
+:Surname rdf:type owl:DatatypeProperty ;
+         rdfs:label "Surname" .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TicketNumber
+:TicketNumber rdf:type owl:DatatypeProperty ;
+              rdfs:label "Ticket number" .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/TimeTracked
+:TimeTracked rdf:type owl:DatatypeProperty ;
+             rdfs:label "Time tracked" .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Ability
+:Ability rdf:type owl:Class ;
+         rdfs:label "Ability"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Accountability
+:Accountability rdf:type owl:Class ;
+                rdfs:subClassOf :Authority ;
+                rdfs:label "Accountability"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Activity
+:Activity rdf:type owl:Class ;
+          rdfs:label "Activity"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Actor
+:Actor rdf:type owl:Class ;
+       rdfs:subClassOf :Person ;
+       rdfs:label "Actor"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Administration
+:Administration rdf:type owl:Class ;
+                rdfs:subClassOf :Organisation ;
+                rdfs:label "Administration"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Annotation
+:Annotation rdf:type owl:Class ;
+            rdfs:label "Annotation"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Area
+:Area rdf:type owl:Class ;
+      rdfs:label "Area"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/AssessmentProcedure
+:AssessmentProcedure rdf:type owl:Class ;
+                     rdfs:label "Assessment procedure"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Authority
+:Authority rdf:type owl:Class ;
+           rdfs:label "Authority"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/BusinessModel
+:BusinessModel rdf:type owl:Class ;
+               rdfs:label "Business Model"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Capability
+:Capability rdf:type owl:Class ;
+            rdfs:subClassOf :Ability ;
+            rdfs:label "Capability"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Circle
+:Circle rdf:type owl:Class ;
+        rdfs:subClassOf :Organisation ;
+        rdfs:label "Circle"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/City
+:City rdf:type owl:Class ;
+      rdfs:subClassOf :Region ;
+      rdfs:label "City"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Class
+:Class rdf:type owl:Class ;
+       rdfs:label "Class"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Community
+:Community rdf:type owl:Class ;
+           rdfs:subClassOf :Organisation ;
+           rdfs:label "Community"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Company
+:Company rdf:type owl:Class ;
+         rdfs:subClassOf :Organisation ;
+         rdfs:label "Company"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Competency
+:Competency rdf:type owl:Class ;
+            rdfs:label "Competency"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Condition
+:Condition rdf:type owl:Class ;
+           rdfs:label "Condition"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Constraint
+:Constraint rdf:type owl:Class ;
+            rdfs:label "Constraint"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Context
+:Context rdf:type owl:Class ;
+         rdfs:label "Context"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/CoreIdea
+:CoreIdea rdf:type owl:Class ;
+          rdfs:label "Core idea"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Country
+:Country rdf:type owl:Class ;
+         rdfs:subClassOf :Region ;
+         rdfs:label "Country"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Deliverable
+:Deliverable rdf:type owl:Class ;
+             rdfs:label "Deliverable"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Domain
+:Domain rdf:type owl:Class ;
+        rdfs:subClassOf :Organisation ;
+        rdfs:label "Domain"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Duration
+:Duration rdf:type owl:Class ;
+          rdfs:label "Duration"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Feedback
+:Feedback rdf:type owl:Class ;
+          rdfs:label "Feedback"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Gate
+:Gate rdf:type owl:Class ;
+      rdfs:label "Gate"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Goal
+:Goal rdf:type owl:Class ;
+      rdfs:label "Goal"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Governance
+:Governance rdf:type owl:Class ;
+            rdfs:subClassOf :Process ;
+            rdfs:label "Governance"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Group
+:Group rdf:type owl:Class ;
+       owl:equivalentClass :Team ;
+       rdfs:subClassOf :Organisation ;
+       rdfs:label "Group"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/GrowthDriver
+:GrowthDriver rdf:type owl:Class ;
+              rdfs:label "Growth Driver"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Holding
+:Holding rdf:type owl:Class ;
+         rdfs:subClassOf :Organisation ;
+         rdfs:label "Holding"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/ITAbility
+:ITAbility rdf:type owl:Class ;
+           rdfs:subClassOf :Ability ;
+           rdfs:label "IT ability"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/InnovationObject
+:InnovationObject rdf:type owl:Class ;
+                  rdfs:label "Innovation object"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/InvestmentType
+:InvestmentType rdf:type owl:Class ;
+                rdfs:label "Investment type"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Iteration
+:Iteration rdf:type owl:Class ;
+           rdfs:label "Iteration"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/KeyResult
+:KeyResult rdf:type owl:Class ;
+           rdfs:label "Key Result"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Management
+:Management rdf:type owl:Class ;
+            rdfs:subClassOf :Administration ;
+            rdfs:label "Management"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/MaturityLevel
+:MaturityLevel rdf:type owl:Class ;
+               rdfs:label "Maturity level"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/MeasureValue
+:MeasureValue rdf:type owl:Class ;
+              rdfs:label "Measure value"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Method
+:Method rdf:type owl:Class ;
+        rdfs:label "Method"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Metric
+:Metric rdf:type owl:Class ;
+        rdfs:subClassOf :Method ;
+        rdfs:label "Metric"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Objective
+:Objective rdf:type owl:Class ;
+           rdfs:label "Objective"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Opportunity
+:Opportunity rdf:type owl:Class ;
+             rdfs:label "Opportunity"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Organisation
+:Organisation rdf:type owl:Class ;
+              rdfs:label "Organisation"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Person
+:Person rdf:type owl:Class ;
+        rdfs:label "Person"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Phase
+:Phase rdf:type owl:Class ;
+       rdfs:label "Phase"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Policy
+:Policy rdf:type owl:Class ;
+        rdfs:label "Policy"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Portfolio
+:Portfolio rdf:type owl:Class ;
+           rdfs:label "Portfolio"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Practice
+:Practice rdf:type owl:Class ;
+          rdfs:label "Practice"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Process
+:Process rdf:type owl:Class ;
+         rdfs:label "Process"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Project
+:Project rdf:type owl:Class ;
+         rdfs:label "Project"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Purpose
+:Purpose rdf:type owl:Class ;
+         rdfs:label "Purpose"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Region
+:Region rdf:type owl:Class ;
+        rdfs:label "Region"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/RelevanceLevel
+:RelevanceLevel rdf:type owl:Class ;
+                rdfs:label "Relevance level"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Report
+:Report rdf:type owl:Class ;
+        rdfs:label "Report"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Resource
+:Resource rdf:type owl:Class ;
+          rdfs:label "Resource"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Responsibility
+:Responsibility rdf:type owl:Class ;
+                rdfs:subClassOf :Authority ;
+                rdfs:label "Responsibiltiy"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Role
+:Role rdf:type owl:Class ;
+      rdfs:label "Role"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Scale
+:Scale rdf:type owl:Class ;
+       rdfs:subClassOf :Method ;
+       rdfs:label "Scale"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Segment
+:Segment rdf:type owl:Class ;
+         rdfs:subClassOf :Organisation ;
+         rdfs:label "Segment"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Shareholder
+:Shareholder rdf:type owl:Class ;
+             rdfs:label "Shareholder"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Skill
+:Skill rdf:type owl:Class ;
+       rdfs:label "Skill"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Stage
+:Stage rdf:type owl:Class ;
+       rdfs:label "Stage"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Status
+:Status rdf:type owl:Class ;
+        rdfs:label "Status"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Strategy
+:Strategy rdf:type owl:Class ;
+          rdfs:label "Strategy"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/SubSegment
+:SubSegment rdf:type owl:Class ;
+            rdfs:subClassOf :Segment ;
+            rdfs:label "Sub-segment"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Subsidiary
+:Subsidiary rdf:type owl:Class ;
+            rdfs:subClassOf :Organisation ;
+            rdfs:label "Subsidiary"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Tactical
+:Tactical rdf:type owl:Class ;
+          rdfs:subClassOf :Process ;
+          rdfs:label "Tactical"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Target
+:Target rdf:type owl:Class ;
+        rdfs:label "Target"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Task
+:Task rdf:type owl:Class ;
+      rdfs:label "Task"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Team
+:Team rdf:type owl:Class ;
+      rdfs:subClassOf :Organisation ;
+      rdfs:label "Team"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Tension
+:Tension rdf:type owl:Class ;
+         rdfs:label "Tension"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Ticket
+:Ticket rdf:type owl:Class ;
+        rdfs:subClassOf :Report ;
+        rdfs:label "Ticket"@en .
+
+
+###  http://field33.com/ontologies/EXTERNAL_as_innovation/Trigger
+:Trigger rdf:type owl:Class ;
+         rdfs:label "Trigger"@en .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

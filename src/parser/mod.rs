@@ -265,7 +265,8 @@ mod tests {
         owl::{
             well_known, Annotation, AnnotationAssertion, Axiom, ClassAssertion,
             DataPropertyAssertion, Declaration, Literal, LiteralOrIRI, ObjectIntersectionOf,
-            ObjectPropertyAssertion, ObjectPropertyDomain, ObjectPropertyRange, SubClassOf, IRI,
+            ObjectPropertyAssertion, ObjectPropertyDomain, ObjectPropertyRange, ObjectUnionOf,
+            SubClassOf, IRI,
         },
         parser::ParserOptions,
     };
@@ -619,6 +620,103 @@ mod tests {
                 IRI::new("http://test#foo").unwrap().into(),
                 IRI::new("http://test#Person").unwrap().into(),
                 IRI::new("http://test#Schmerson").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+    }
+
+    #[test]
+    fn object_property_range_domain() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        @prefix : <http://test#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+        <http://test#> rdf:type owl:Ontology .
+        :A rdf:type owl:Class .
+        :B rdf:type owl:Class .
+        :C rdf:type owl:Class .
+        :D rdf:type owl:Class .
+        
+
+        :O1 rdf:type owl:ObjectProperty .
+        :O2 rdf:type owl:ObjectProperty .
+        :O3 rdf:type owl:ObjectProperty .
+
+        :O1 rdfs:domain :A .
+        :O1 rdfs:range :B .
+
+        :O3 rdfs:domain [ rdf:type owl:Class ;
+                         owl:unionOf ( :A :B )
+                       ] ;
+            rdfs:range [ rdf:type owl:Class ;
+                         owl:unionOf ( :C :D )
+                       ] .
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(
+            turtle,
+            ParserOptions::builder()
+                .known(Declaration::ObjectProperty(
+                    IRI::new("http://test#foo").unwrap().into(),
+                    vec![],
+                ))
+                .build(),
+        )
+        .unwrap();
+        assert_eq!(o.declarations().len(), 7);
+        assert_eq!(o.axioms().len(), 4);
+        assert_eq!(
+            o.axioms()[0],
+            ObjectPropertyDomain::new(
+                IRI::new("http://test#O1").unwrap().into(),
+                IRI::new("http://test#A").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[1],
+            ObjectPropertyRange::new(
+                IRI::new("http://test#O1").unwrap().into(),
+                IRI::new("http://test#B").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[2],
+            ObjectPropertyDomain::new(
+                IRI::new("http://test#O3").unwrap().into(),
+                ObjectUnionOf::new(
+                    vec![
+                        IRI::new("http://test#A").unwrap().into(),
+                        IRI::new("http://test#B").unwrap().into(),
+                    ],
+                    vec![]
+                )
+                .into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[3],
+            ObjectPropertyRange::new(
+                IRI::new("http://test#O3").unwrap().into(),
+                ObjectUnionOf::new(
+                    vec![
+                        IRI::new("http://test#C").unwrap().into(),
+                        IRI::new("http://test#D").unwrap().into(),
+                    ],
+                    vec![]
+                )
+                .into(),
                 vec![]
             )
             .into()

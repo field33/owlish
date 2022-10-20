@@ -9,6 +9,11 @@ use web_sys::console::error_1;
 
 #[wasm_bindgen]
 impl Ontology {
+    /// Returns the json serialized version of this ontology or undefined if it could not be serialized.
+    pub fn to_string(&self) -> Option<String> {
+        serde_json::to_string(self).ok()
+    }
+
     /// Create an ontology based on a turtle formatted string.
     pub fn parseTurtle(ttl: String, options: ParserOptions) -> Option<Ontology> {
         match js_sys::JSON::stringify(&options) {

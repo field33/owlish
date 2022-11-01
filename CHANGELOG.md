@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.0 - 2022-11-01
+#### Features
+- Support parsing UnionOf constructs in ObjectPropertyDomain and ObjectPropertyRange constructs - (9fded31) - Florian Loers
+
+- - -
+
 ## v0.14.0 - 2022-10-20
 #### Features
 - Support parsing ObjectPropertyRange and ObjectPropertyDomain for simple cases - (ecd1e55) - Florian Loers

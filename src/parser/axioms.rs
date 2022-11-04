@@ -71,7 +71,7 @@ pub(crate) fn match_axioms(
                     let cls = IRI::new(cls)?;
                     if o.class_declaration(&cls).is_some() {
                         o.push_axiom(
-                            ClassAssertion::new(individual_iri.into(), cls.into(), vec![]).into(),
+                            ClassAssertion::new(cls.into(), individual_iri.into(), vec![]).into(),
                         )
                     }
                 }

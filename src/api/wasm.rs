@@ -14,6 +14,20 @@ impl Ontology {
         serde_json::to_string(self).ok()
     }
 
+    pub fn append(&mut self, other: Self) {
+        for d in other.owl.declarations {
+            self.owl.declarations.push(d);
+        }
+        for a in other.owl.axioms {
+            self.owl.axioms.push(a);
+        }
+        for (key, import) in other.imports {
+            if !self.imports.contains_key(&key) {
+                self.imports.insert(key, import);
+            }
+        }
+    }
+
     /// Create an ontology based on a turtle formatted string.
     pub fn parseTurtle(ttl: String, options: ParserOptions) -> Option<Ontology> {
         match js_sys::JSON::stringify(&options) {

@@ -968,8 +968,8 @@ mod tests {
         assert_eq!(
             o.axioms()[0],
             ClassAssertion::new(
-                IRI::new("http://test#Bob").unwrap().into(),
                 IRI::new("http://test#Man").unwrap().into(),
+                IRI::new("http://test#Bob").unwrap().into(),
                 vec![]
             )
             .into()

@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.1 - 2022-11-04
+#### Bug Fixes
+- ClassAssertion has correct class and individual IRIs - (fa44128) - Kate Sieraia
+#### Miscellaneous Chores
+- Fix tests - (90fa10a) - Kate Sieraia
+
+- - -
+
 ## v0.15.0 - 2022-11-01
 #### Features
 - Support parsing UnionOf constructs in ObjectPropertyDomain and ObjectPropertyRange constructs - (9fded31) - Florian Loers

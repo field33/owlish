@@ -100,6 +100,19 @@ impl<'a> OntologyCollector<'a> {
                     self.axioms.len(),
                 );
             }
+            Axiom::DataPropertyAssertion(ann) => {
+                let sub = &ann.subject;
+                let iri = &ann.iri;
+                let val = &ann.value;
+                self.axiom_index.insert(
+                    (
+                        sub.as_iri().to_string(),
+                        iri.as_iri().to_string(),
+                        val.to_string(),
+                    ),
+                    self.axioms.len(),
+                );
+            }
             _ => {
                 // TODO
             }

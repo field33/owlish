@@ -206,7 +206,7 @@ pub(crate) fn match_annotation_assertions<'a>(
     Ok(())
 }
 
-fn handle_annotation_on_bn(
+pub(crate) fn handle_annotation_on_bn(
     o: &mut OntologyCollector,
     subject_bn: harriet::triple_production::RdfBlankNode,
     predicate_iri: IRI,

@@ -828,6 +828,7 @@ mod tests {
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
 
+        println!("{:#?}", o);
         assert_eq!(o.declarations().len(), 2);
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
@@ -859,11 +860,12 @@ mod tests {
         <http://test#> rdf:type owl:Ontology .
 
         :Man rdf:type owl:Class .
+        :bla rdf:type owl:AnnotationProperty .
 
-        :Man rdfs:comment "test" .
+        :Man :bla "test" .
         []   rdf:type               owl:Axiom ;
              owl:annotatedSource    :Man ;
-             owl:annotatedProperty  rdfs:comment ;
+             owl:annotatedProperty  :bla ;
              owl:annotatedTarget    "test" ;
              rdfs:comment           "States that every man is a person."^^xsd:string .
 
@@ -872,14 +874,13 @@ mod tests {
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
 
-        assert_eq!(o.declarations().len(), 1);
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 2);
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
             Axiom::AnnotationAssertion(AnnotationAssertion::new(
-                IRI::new("http://www.w3.org/2000/01/rdf-schema#comment")
-                    .unwrap()
-                    .into(),
+                IRI::new("http://test#bla").unwrap().into(),
                 IRI::new("http://test#Man").unwrap(),
                 Literal::String("test".into()).into(),
                 vec![Annotation::new(
@@ -939,6 +940,52 @@ mod tests {
                 )]
             )
             .into()
+        );
+    }
+
+    #[test]
+    fn annotations_on_data_property_assertions() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        @prefix : <http://test#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+        <http://test#> rdf:type owl:Ontology .
+
+        :Man rdf:type owl:Class .
+        :bla rdf:type owl:DatatypeProperty .
+
+        :Man :bla "test" .
+        []   rdf:type               owl:Axiom ;
+             owl:annotatedSource    :Man ;
+             owl:annotatedProperty  :bla ;
+             owl:annotatedTarget    "test" ;
+             rdfs:comment           "States that every man is a person."^^xsd:string .
+
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 2);
+        assert_eq!(o.axioms().len(), 1);
+        assert_eq!(
+            o.axioms()[0],
+            Axiom::DataPropertyAssertion(DataPropertyAssertion::new(
+                IRI::new("http://test#bla").unwrap().into(),
+                IRI::new("http://test#Man").unwrap().into(),
+                Literal::String("test".into()).into(),
+                vec![Annotation::new(
+                    well_known::rdfs_comment(),
+                    LiteralOrIRI::Literal(Literal::String(
+                        "States that every man is a person.".into()
+                    )),
+                    vec![]
+                )]
+            ))
         );
     }
 

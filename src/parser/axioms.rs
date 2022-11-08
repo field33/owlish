@@ -1,3 +1,4 @@
+use super::annotations::handle_annotation_on_bn;
 use super::collector::CollectedBlankNode;
 use super::collector::MatcherHandler;
 use crate::error::Error;
@@ -27,13 +28,13 @@ pub(crate) fn match_axioms(
             if let Some(predicate) = mstate.last_iri("predicate") {
                 let predicate_iri = IRI::new(predicate)?;
                 if let Some(subject) = mstate.last("x") {
-                    match subject {
-                        Value::Iri(subject_iri) => {
-                            let subject_iri = IRI::new(subject_iri)?;
-                            if let Some(value) = mstate.last_literal("value") {
-                                if o.data_property_declaration(&predicate_iri).is_some()
-                                    || options.is_data_prop(&predicate_iri)
-                                {
+                    if o.data_property_declaration(&predicate_iri).is_some()
+                        || options.is_data_prop(&predicate_iri)
+                    {
+                        match subject {
+                            Value::Iri(subject_iri) => {
+                                let subject_iri = IRI::new(subject_iri)?;
+                                if let Some(value) = mstate.last_literal("value") {
                                     o.push_axiom(
                                         DataPropertyAssertion::new(
                                             predicate_iri.into(),
@@ -45,13 +46,19 @@ pub(crate) fn match_axioms(
                                     )
                                 }
                             }
-                        }
-                        Value::Blank(_) => {
-
-                            // todo
-                        }
-                        Value::Literal { .. } => {
-                            unreachable!("subject must not be a literal")
+                            Value::Blank(subject_bn) => {
+                                if let Some(value) = mstate.last_literal("value") {
+                                    return handle_annotation_on_bn(
+                                        o,
+                                        subject_bn.clone(),
+                                        predicate_iri,
+                                        value,
+                                    );
+                                }
+                            }
+                            Value::Literal { .. } => {
+                                unreachable!("subject must not be a literal")
+                            }
                         }
                     }
                 }

@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.1 - 2022-11-08
+#### Bug Fixes
+- Parsing annotations on data properties did not work correctly - (012d428) - Florian Loers
+
+- - -
+
 ## v0.17.0 - 2022-11-08
 #### Features
 - Parse annotations on data properties - (f8ed0ad) - Florian Loers

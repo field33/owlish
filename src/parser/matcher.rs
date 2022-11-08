@@ -51,6 +51,13 @@ impl<'a> TryInto<Literal> for Value<'a> {
                                 number: n,
                                 type_iri: well_known::xsd_nonNegativeInteger().into(),
                             })
+                    } else if datatype_iri == well_known::xsd_decimal_str {
+                        serde_json::from_str(&lexical_form)
+                            .map_err(|_| ())
+                            .map(|n| Literal::Number {
+                                number: n,
+                                type_iri: well_known::xsd_decimal().into(),
+                            })
                     } else if datatype_iri == well_known::xsd_float_str {
                         serde_json::from_str(&lexical_form)
                             .map_err(|_| ())

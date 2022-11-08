@@ -20,6 +20,7 @@ use collector::*;
 mod annotations;
 mod axioms;
 mod blank_nodes;
+mod data_props;
 mod declarations;
 mod object_property_assertions;
 mod sequences;
@@ -91,6 +92,7 @@ impl Ontology {
                     sequences::match_sequences(&mut matchers, &prefixes)?;
                     blank_nodes::match_blank_nodes(&mut matchers, &prefixes)?;
                     annotations::match_simple_annotation_assertions(&mut matchers, &prefixes)?;
+                    data_props::match_simple_dataprop_assertions(&mut matchers, &prefixes)?;
                 }
                 1 => {
                     annotations::match_annotations(&mut matchers, &prefixes)?;
@@ -99,6 +101,7 @@ impl Ontology {
                     axioms::match_axioms(&mut matchers, &prefixes)?;
                     object_property_assertions::push(&mut matchers, &prefixes)?;
                     annotations::match_annotation_assertions(&mut matchers, &prefixes)?;
+                    data_props::match_dataprop_assertions(&mut matchers, &prefixes)?;
                 }
             }
 
@@ -268,7 +271,7 @@ mod tests {
             ObjectPropertyAssertion, ObjectPropertyDomain, ObjectPropertyRange, ObjectUnionOf,
             SubClassOf, IRI,
         },
-        parser::ParserOptions,
+        parser::{ParserOptions, ParserOptionsBuilder},
     };
 
     #[test]
@@ -947,42 +950,50 @@ mod tests {
     fn annotations_on_data_property_assertions() {
         env_logger::try_init().ok();
         let turtle = r##"
-        @prefix : <http://test#> .
-        @prefix owl: <http://www.w3.org/2002/07/owl#> .
-        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-        <http://test#> rdf:type owl:Ontology .
-
-        :Man rdf:type owl:Class .
-        :bla rdf:type owl:DatatypeProperty .
-
-        :Man :bla "test" .
-        []   rdf:type               owl:Axiom ;
-             owl:annotatedSource    :Man ;
-             owl:annotatedProperty  :bla ;
-             owl:annotatedTarget    "test" ;
-             rdfs:comment           "States that every man is a person."^^xsd:string .
+            <http://field33.com/query_result/00000000-0000-0000-0000-000000000000> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://query-server.field33.com/ontology/query-field> "index-1" .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://www.w3.org/2002/07/owl#annotatedTarget> "0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://www.w3.org/2002/07/owl#annotatedProperty> <http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://www.w3.org/2002/07/owl#annotatedSource> <http://field33.com/ontologies/@fld33_domain/dora_metrics/Team2> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/Team2> <http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate> "0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
 
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
-        let o = Ontology::parse(turtle, Default::default()).unwrap();
+        let o = Ontology::parse(
+            turtle,
+            ParserOptionsBuilder::default()
+                .known(Declaration::AnnotationProperty(
+                    IRI::new("http://query-server.field33.com/ontology/query-field")
+                        .unwrap()
+                        .into(),
+                    vec![],
+                ))
+                .known(Declaration::DataProperty(
+                    IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate")
+                        .unwrap()
+                        .into(),
+                    vec![],
+                ))
+                .build(),
+        )
+        .unwrap();
         println!("{:#?}", o);
-        assert_eq!(o.declarations().len(), 2);
+        assert_eq!(o.declarations().len(), 0);
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
             o.axioms()[0],
             Axiom::DataPropertyAssertion(DataPropertyAssertion::new(
-                IRI::new("http://test#bla").unwrap().into(),
-                IRI::new("http://test#Man").unwrap().into(),
-                Literal::String("test".into()).into(),
+                IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate").unwrap().into(),
+                IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/Team2").unwrap().into(),
+                Literal::Number {
+                    number: 0.into(),
+                    type_iri: Some(well_known::xsd_decimal().into())
+                }.into(),
                 vec![Annotation::new(
-                    well_known::rdfs_comment(),
-                    LiteralOrIRI::Literal(Literal::String(
-                        "States that every man is a person.".into()
-                    )),
+                    IRI::new("http://query-server.field33.com/ontology/query-field").unwrap().into(),
+                    LiteralOrIRI::Literal("index-1".into()),
                     vec![]
                 )]
             ))
@@ -1053,7 +1064,7 @@ mod tests {
         assert_eq!(o.declarations().len(), 3);
         assert_eq!(o.axioms().len(), 6);
         assert_eq!(
-            o.axioms()[1],
+            o.axioms()[0],
             DataPropertyAssertion::new(
                 IRI::new("http://test#hasAge").unwrap().into(),
                 IRI::new("http://test#Bob").unwrap().into(),
@@ -1066,7 +1077,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[2],
+            o.axioms()[1],
             DataPropertyAssertion::new(
                 IRI::new("http://test#hasAge").unwrap().into(),
                 IRI::new("http://test#Bob").unwrap().into(),
@@ -1079,7 +1090,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[3],
+            o.axioms()[2],
             DataPropertyAssertion::new(
                 IRI::new("http://test#hasAge").unwrap().into(),
                 IRI::new("http://test#Bob").unwrap().into(),
@@ -1092,7 +1103,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[4],
+            o.axioms()[3],
             DataPropertyAssertion::new(
                 IRI::new("http://test#hasAge").unwrap().into(),
                 IRI::new("http://test#Bob").unwrap().into(),
@@ -1102,7 +1113,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[5],
+            o.axioms()[4],
             DataPropertyAssertion::new(
                 IRI::new("http://test#hasAge").unwrap().into(),
                 IRI::new("http://test#Bob").unwrap().into(),

@@ -25,10 +25,11 @@ fn data_properties() {
             .build(),
     )
     .unwrap();
+    println!("{:#?}", o);
     assert_eq!(o.declarations().len(), 2);
     assert_eq!(o.axioms().len(), 2);
     assert_eq!(
-        o.axioms()[1],
+        o.axioms()[0],
         Axiom::DataPropertyAssertion(DataPropertyAssertion::new(
             IRI::new("http://field33.com/ontologies/test/TestDataProperty")
                 .unwrap()

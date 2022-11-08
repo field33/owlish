@@ -1,11 +1,9 @@
-use super::annotations::handle_annotation_on_bn;
 use super::collector::CollectedBlankNode;
 use super::collector::MatcherHandler;
 use crate::error::Error;
 use crate::get_vars;
 use crate::owl::ClassAssertion;
 use crate::owl::ClassConstructor;
-use crate::owl::DataPropertyAssertion;
 use crate::owl::ObjectPropertyDomain;
 use crate::owl::ObjectPropertyRange;
 use crate::owl::SubClassOf;
@@ -20,53 +18,6 @@ pub(crate) fn match_axioms(
     matchers: &mut Vec<(RdfMatcher, MatcherHandler)>,
     prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
-    matchers.push((
-        rdf_match!("DataPropertyAssertion", prefixes,
-            [+:x] [*:predicate] [lt:value] .
-        )?,
-        Box::new(|mstate, o, options| {
-            if let Some(predicate) = mstate.last_iri("predicate") {
-                let predicate_iri = IRI::new(predicate)?;
-                if let Some(subject) = mstate.last("x") {
-                    if o.data_property_declaration(&predicate_iri).is_some()
-                        || options.is_data_prop(&predicate_iri)
-                    {
-                        match subject {
-                            Value::Iri(subject_iri) => {
-                                let subject_iri = IRI::new(subject_iri)?;
-                                if let Some(value) = mstate.last_literal("value") {
-                                    o.push_axiom(
-                                        DataPropertyAssertion::new(
-                                            predicate_iri.into(),
-                                            subject_iri.into(),
-                                            value,
-                                            vec![],
-                                        )
-                                        .into(),
-                                    )
-                                }
-                            }
-                            Value::Blank(subject_bn) => {
-                                if let Some(value) = mstate.last_literal("value") {
-                                    return handle_annotation_on_bn(
-                                        o,
-                                        subject_bn.clone(),
-                                        predicate_iri,
-                                        value,
-                                    );
-                                }
-                            }
-                            Value::Literal { .. } => {
-                                unreachable!("subject must not be a literal")
-                            }
-                        }
-                    }
-                }
-            }
-
-            Ok(false)
-        }),
-    ));
     matchers.push((
         rdf_match!("ClassAssertions", prefixes,
             [*:x] [rdf:type] [*:cls] .

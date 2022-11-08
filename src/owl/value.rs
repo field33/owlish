@@ -173,15 +173,10 @@ impl std::fmt::Display for Literal {
             Literal::String(s) => write!(f, "{}", s),
             Literal::DateTime(dt) => write!(f, "{}", dt),
             Literal::LangString { string, lang } => write!(f, "{}@{}", string, lang),
-            Literal::Number { number, type_iri } => write!(
-                f,
-                "{}{}",
+            Literal::Number {
                 number,
-                type_iri
-                    .as_ref()
-                    .map(|iri| format!("^^{}", iri.as_iri().as_str()))
-                    .unwrap_or_else(|| "".into())
-            ),
+                type_iri: _,
+            } => write!(f, "{}", number,),
             Literal::Bool(b) => write!(f, "{}", b),
         }
     }

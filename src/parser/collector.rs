@@ -43,6 +43,7 @@ pub(crate) struct OntologyCollector<'a> {
     // child node -> root node
     sequence_tree: HashMap<RdfBlankNode, Option<RdfBlankNode>>,
 
+    // annotations on things
     annotations: HashMap<CollectedAnnotationKey<'a>, CollectedAnnotation<'a>>,
     blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode>,
 

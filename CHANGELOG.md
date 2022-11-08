@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.0 - 2022-11-08
+#### Features
+- Parse annotations on data properties - (f8ed0ad) - Florian Loers
+
+- - -
+
 ## v0.16.0 - 2022-11-04
 #### Features
 - Allow to combine ontologies via Ontology.append - (8ca2ca6) - Florian Loers

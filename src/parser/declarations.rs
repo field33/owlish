@@ -24,7 +24,10 @@ pub(crate) fn match_declarations(
         rdf_match!("Class", prefixes, [*:subject] [rdf:type] [owl:Class] .)?,
         Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
-                o.push_declaration(Declaration::Class(iri.into(), vec![]));
+                o.push_declaration(Declaration::Class {
+                    iri: iri.into(),
+                    annotations: vec![],
+                });
             }
             Ok(true)
         }),
@@ -33,7 +36,10 @@ pub(crate) fn match_declarations(
         rdf_match!("Datatype",prefixes, [*:subject] [rdf:type] [rdfs:Datatype] .)?,
         Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
-                o.push_declaration(Declaration::Datatype(iri.into(), vec![]));
+                o.push_declaration(Declaration::Datatype {
+                    iri: iri.into(),
+                    annotations: vec![],
+                });
             }
             Ok(true)
         }),
@@ -42,7 +48,10 @@ pub(crate) fn match_declarations(
         rdf_match!("ObjectProperty", prefixes, [*:subject] [rdf:type] [owl:ObjectProperty] .)?,
         Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
-                o.push_declaration(Declaration::ObjectProperty(iri.into(), vec![]));
+                o.push_declaration(Declaration::ObjectProperty {
+                    iri: iri.into(),
+                    annotations: vec![],
+                });
             }
             Ok(true)
         }),
@@ -51,7 +60,10 @@ pub(crate) fn match_declarations(
         rdf_match!("DataProperty", prefixes, [*:subject] [rdf:type] [owl:DatatypeProperty] .)?,
         Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
-                o.push_declaration(Declaration::DataProperty(iri.into(), vec![]));
+                o.push_declaration(Declaration::DataProperty {
+                    iri: iri.into(),
+                    annotations: vec![],
+                });
             }
             Ok(true)
         }),
@@ -60,7 +72,7 @@ pub(crate) fn match_declarations(
         rdf_match!("AnnotationProperty", prefixes, [*:subject] [rdf:type] [owl:AnnotationProperty] .)?,
         Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
-                o.push_declaration(Declaration::AnnotationProperty(iri.into(), vec![]));
+                o.push_declaration(Declaration::AnnotationProperty{iri: iri.into(),annotations: vec![],});
             }
             Ok(true)
         }),
@@ -69,7 +81,10 @@ pub(crate) fn match_declarations(
         rdf_match!("NamedIndividual", prefixes, [*:subject] [rdf:type] [owl:NamedIndividual] .)?,
         Box::new(|mstate, o, _| {
             if let Some(iri) = get_iri_var("subject", mstate)? {
-                o.push_declaration(Declaration::NamedIndividual(iri.into(), vec![]));
+                o.push_declaration(Declaration::NamedIndividual {
+                    iri: iri.into(),
+                    annotations: vec![],
+                });
             }
             Ok(true)
         }),

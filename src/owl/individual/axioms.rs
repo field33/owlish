@@ -2,8 +2,11 @@ use crate::owl::{Annotation, Axiom, ClassConstructor, IndividualIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct SameIndividual {
+    #[serde(rename = "individualIRI1")]
     pub individual1: IndividualIRI,
+    #[serde(rename = "individualIRI2")]
     pub individual2: IndividualIRI,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -23,8 +26,11 @@ impl SameIndividual {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DifferentIndividuals {
+    #[serde(rename = "individualIRI1")]
     pub individual1: IndividualIRI,
+    #[serde(rename = "individualIRI2")]
     pub individual2: IndividualIRI,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -44,8 +50,11 @@ impl DifferentIndividuals {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ClassAssertion {
+    #[serde(rename = "cls")]
     pub cls: ClassConstructor,
+    #[serde(rename = "individualIRI")]
     pub individual: IndividualIRI,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -76,8 +85,8 @@ mod wasm {
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API1: &'static str = r#"
 export type SameIndividual = {
-    individual1: IRI,
-    individual2: IRI,
+    individualIRI1: IRI,
+    individualIRI2: IRI,
     annotations: Array<Annotation>,
 };
 "#;
@@ -85,8 +94,8 @@ export type SameIndividual = {
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API2: &'static str = r#"
 export type DifferentIndividuals = {
-    individual1: IRI,
-    individual2: IRI,
+    individualIRI1: IRI,
+    individualIRI2: IRI,
     annotations: Array<Annotation>,
 };
 "#;
@@ -95,7 +104,7 @@ export type DifferentIndividuals = {
     const WASM_API3: &'static str = r#"
 export type ClassAssertion = {
     cls: ClassConstructor,
-    individual: IRI,
+    individualIRI: IRI,
     annotations: Array<Annotation>,
 };
 "#;

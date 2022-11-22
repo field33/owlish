@@ -4,13 +4,18 @@ use super::DatatypeDefinitionConstructor;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataComplementOf {
-    pub iri: DataPropertyIRI,
+    #[serde(rename = "dataPropertyIRI")]
+    pub data_property_iri: DataPropertyIRI,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
 impl DataComplementOf {
-    pub fn new(iri: DataPropertyIRI, annotations: Vec<Annotation>) -> Self {
-        Self { iri, annotations }
+    pub fn new(data_property_iri: DataPropertyIRI, annotations: Vec<Annotation>) -> Self {
+        Self {
+            data_property_iri,
+            annotations,
+        }
     }
 }
 
@@ -33,7 +38,7 @@ mod wasm {
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
 export type DataComplementOf = {
-    iri: IRI,
+    dataPropertyIRI: IRI,
     annotations: Array<Annotation>,
 };
 "#;

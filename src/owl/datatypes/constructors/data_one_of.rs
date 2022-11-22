@@ -4,7 +4,9 @@ use super::DatatypeDefinitionConstructor;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataOneOf {
+    #[serde(rename = "literals")]
     pub literals: Vec<Literal>,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 

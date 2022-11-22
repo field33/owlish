@@ -16,16 +16,16 @@ fn data_properties() {
     let o = Ontology::parse(
         turtle,
         ParserOptions::builder()
-            .known(owlish::owl::Declaration::DataProperty(
-                IRI::new("http://field33.com/ontologies/test/TestDataProperty")
+            .known(owlish::owl::Declaration::DataProperty {
+                iri: IRI::new("http://field33.com/ontologies/test/TestDataProperty")
                     .unwrap()
                     .into(),
-                vec![],
-            ))
+                annotations: vec![],
+            })
             .build(),
     )
     .unwrap();
-    println!("{:#?}", o);
+    // println!("{:#?}", o);
     assert_eq!(o.declarations().len(), 2);
     assert_eq!(o.axioms().len(), 2);
     assert_eq!(

@@ -14,8 +14,8 @@ pub enum DatatypeDefinitionConstructor {
 pub struct DatatypeDefinition {
     #[serde(rename = "dataPropertyIRI")]
     pub data_property_iri: DataPropertyIRI,
-    #[serde(rename = "datatypeDefinition")]
-    pub datatype_definition: DatatypeDefinitionConstructor,
+    #[serde(rename = "datatype")]
+    pub datatype: DatatypeDefinitionConstructor,
     #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
@@ -28,7 +28,7 @@ impl DatatypeDefinition {
     ) -> Self {
         Self {
             data_property_iri,
-            datatype_definition,
+            datatype: datatype_definition,
             annotations,
         }
     }
@@ -56,7 +56,7 @@ export interface DatatypeDefinitionConstructor {
  */
 export type DatatypeDefinition = {
     dataPropertyIRI: IRI, 
-    datatypeDefinition: DatatypeDefinitionConstructor, 
+    datatype: DatatypeDefinitionConstructor, 
     annotations: Array<Annotation>,
 };
 "#;

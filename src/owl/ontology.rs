@@ -3,23 +3,59 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub enum Declaration {
-    Class(ClassIRI, Vec<Annotation>),
-    NamedIndividual(IndividualIRI, Vec<Annotation>),
-    ObjectProperty(ObjectPropertyIRI, Vec<Annotation>),
-    DataProperty(DataPropertyIRI, Vec<Annotation>),
-    AnnotationProperty(AnnotationPropertyIRI, Vec<Annotation>),
-    Datatype(DatatypeIRI, Vec<Annotation>),
+    Class {
+        iri: ClassIRI,
+        annotations: Vec<Annotation>,
+    },
+    NamedIndividual {
+        iri: IndividualIRI,
+        annotations: Vec<Annotation>,
+    },
+    ObjectProperty {
+        iri: ObjectPropertyIRI,
+        annotations: Vec<Annotation>,
+    },
+    DataProperty {
+        iri: DataPropertyIRI,
+        annotations: Vec<Annotation>,
+    },
+    AnnotationProperty {
+        iri: AnnotationPropertyIRI,
+        annotations: Vec<Annotation>,
+    },
+    Datatype {
+        iri: DatatypeIRI,
+        annotations: Vec<Annotation>,
+    },
 }
 
 impl Declaration {
     pub fn annotations(&self) -> &Vec<Annotation> {
         match &self {
-            Declaration::Class(_, a) => a,
-            Declaration::NamedIndividual(_, a) => a,
-            Declaration::ObjectProperty(_, a) => a,
-            Declaration::DataProperty(_, a) => a,
-            Declaration::AnnotationProperty(_, a) => a,
-            Declaration::Datatype(_, a) => a,
+            Declaration::Class {
+                iri: _,
+                annotations,
+            } => annotations,
+            Declaration::NamedIndividual {
+                iri: _,
+                annotations,
+            } => annotations,
+            Declaration::ObjectProperty {
+                iri: _,
+                annotations,
+            } => annotations,
+            Declaration::DataProperty {
+                iri: _,
+                annotations,
+            } => annotations,
+            Declaration::AnnotationProperty {
+                iri: _,
+                annotations,
+            } => annotations,
+            Declaration::Datatype {
+                iri: _,
+                annotations,
+            } => annotations,
         }
     }
 }
@@ -57,7 +93,10 @@ mod tests {
 
     #[test]
     pub fn test_ser_de_declaration() {
-        let d = Declaration::Class(IRI::new("http://example.com").unwrap().into(), vec![]);
+        let d = Declaration::Class {
+            iri: IRI::new("http://example.com").unwrap().into(),
+            annotations: vec![],
+        };
         let json = serde_json::to_string(&d).unwrap();
         assert_eq!(
             json,

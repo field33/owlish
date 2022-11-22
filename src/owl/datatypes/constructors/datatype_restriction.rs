@@ -3,10 +3,12 @@ use crate::owl::{Annotation, DatatypeIRI, Literal};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Restriction {
-    Numeric(
-        #[serde(rename = "iri")] DatatypeIRI,
-        #[serde(rename = "value")] Literal,
-    ),
+    Numeric {
+        #[serde(rename = "datatypeIRI")]
+        datatype_iri: DatatypeIRI,
+        #[serde(rename = "value")]
+        value: Literal,
+    },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -50,7 +52,7 @@ mod wasm {
 
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API1: &'static str = r#"
-export type Restriction = { Numeric: {iri: IRI, value: number} };
+export type Restriction = { Numeric: {datatypeIRI: IRI, value: number} };
 "#;
 
     #[wasm_bindgen(typescript_custom_section)]

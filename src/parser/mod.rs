@@ -199,7 +199,7 @@ impl IndexedParserOptions {
         if let Some(i) = self.index.get(iri) {
             matches!(
                 self.known.get(*i),
-                Some(Declaration::AnnotationProperty(_, _))
+                Some(Declaration::AnnotationProperty { .. })
             )
         } else {
             false
@@ -208,7 +208,7 @@ impl IndexedParserOptions {
 
     pub fn is_data_prop(&self, iri: &IRI) -> bool {
         if let Some(i) = self.index.get(iri) {
-            matches!(self.known.get(*i), Some(Declaration::DataProperty(_, _)))
+            matches!(self.known.get(*i), Some(Declaration::DataProperty { .. }))
         } else {
             false
         }
@@ -216,7 +216,7 @@ impl IndexedParserOptions {
 
     fn is_object_prop(&self, iri: &IRI) -> bool {
         if let Some(i) = self.index.get(iri) {
-            matches!(self.known.get(*i), Some(Declaration::ObjectProperty(_, _)))
+            matches!(self.known.get(*i), Some(Declaration::ObjectProperty { .. }))
         } else {
             false
         }
@@ -228,12 +228,30 @@ impl From<ParserOptions> for IndexedParserOptions {
         let mut index = HashMap::new();
         for (i, d) in po.known.iter().enumerate() {
             let iri = match d {
-                Declaration::Class(iri, _) => iri.as_iri(),
-                Declaration::NamedIndividual(iri, _) => iri.as_iri(),
-                Declaration::ObjectProperty(iri, _) => iri.as_iri(),
-                Declaration::DataProperty(iri, _) => iri.as_iri(),
-                Declaration::AnnotationProperty(iri, _) => iri.as_iri(),
-                Declaration::Datatype(iri, _) => iri.as_iri(),
+                Declaration::Class {
+                    iri,
+                    annotations: _,
+                } => iri.as_iri(),
+                Declaration::NamedIndividual {
+                    iri,
+                    annotations: _,
+                } => iri.as_iri(),
+                Declaration::ObjectProperty {
+                    iri,
+                    annotations: _,
+                } => iri.as_iri(),
+                Declaration::DataProperty {
+                    iri,
+                    annotations: _,
+                } => iri.as_iri(),
+                Declaration::AnnotationProperty {
+                    iri,
+                    annotations: _,
+                } => iri.as_iri(),
+                Declaration::Datatype {
+                    iri,
+                    annotations: _,
+                } => iri.as_iri(),
             };
             index.insert(iri.clone(), i);
         }
@@ -267,9 +285,9 @@ mod tests {
         api::Ontology,
         owl::{
             well_known, Annotation, AnnotationAssertion, Axiom, ClassAssertion,
-            DataPropertyAssertion, Declaration, Literal, LiteralOrIRI, ObjectIntersectionOf,
-            ObjectPropertyAssertion, ObjectPropertyDomain, ObjectPropertyRange, ObjectUnionOf,
-            SubClassOf, IRI,
+            DataPropertyAssertion, DataPropertyDomain, DataPropertyRange, Declaration, Literal,
+            LiteralOrIRI, ObjectIntersectionOf, ObjectPropertyAssertion, ObjectPropertyDomain,
+            ObjectPropertyRange, ObjectUnionOf, SubClassOf, IRI,
         },
         parser::{ParserOptions, ParserOptionsBuilder},
     };
@@ -314,23 +332,38 @@ mod tests {
         assert_eq!(o.declarations().len(), 5);
         assert_eq!(
             *o.declarations().get(0).unwrap(),
-            Declaration::Class(IRI::new("http://test#Class1").unwrap().into(), vec![])
+            Declaration::Class {
+                iri: IRI::new("http://test#Class1").unwrap().into(),
+                annotations: vec![]
+            }
         );
         assert_eq!(
             *o.declarations().get(1).unwrap(),
-            Declaration::Class(IRI::new("http://test#Class2").unwrap().into(), vec![])
+            Declaration::Class {
+                iri: IRI::new("http://test#Class2").unwrap().into(),
+                annotations: vec![]
+            }
         );
         assert_eq!(
             *o.declarations().get(2).unwrap(),
-            Declaration::Class(IRI::new("http://test#Class3").unwrap().into(), vec![])
+            Declaration::Class {
+                iri: IRI::new("http://test#Class3").unwrap().into(),
+                annotations: vec![]
+            }
         );
         assert_eq!(
             *o.declarations().get(3).unwrap(),
-            Declaration::Class(IRI::new("http://test#Class4").unwrap().into(), vec![])
+            Declaration::Class {
+                iri: IRI::new("http://test#Class4").unwrap().into(),
+                annotations: vec![]
+            }
         );
         assert_eq!(
             *o.declarations().get(4).unwrap(),
-            Declaration::Class(IRI::new("http://test#Class5").unwrap().into(), vec![])
+            Declaration::Class {
+                iri: IRI::new("http://test#Class5").unwrap().into(),
+                annotations: vec![]
+            }
         );
     }
 
@@ -406,7 +439,7 @@ mod tests {
         assert_eq!(
             o.declarations().iter().fold(0, |acc, x| {
                 acc + match x {
-                    Declaration::ObjectProperty(_, _) => 1,
+                    Declaration::ObjectProperty { .. } => 1,
                     _ => 0,
                 }
             }),
@@ -415,7 +448,7 @@ mod tests {
         assert_eq!(
             o.declarations().iter().fold(0, |acc, x| {
                 acc + match x {
-                    Declaration::Datatype(_, _) => 1,
+                    Declaration::Datatype { .. } => 1,
                     _ => 0,
                 }
             }),
@@ -608,10 +641,10 @@ mod tests {
         let o = Ontology::parse(
             turtle,
             ParserOptions::builder()
-                .known(Declaration::ObjectProperty(
-                    IRI::new("http://test#foo").unwrap().into(),
-                    vec![],
-                ))
+                .known(Declaration::ObjectProperty {
+                    iri: IRI::new("http://test#foo").unwrap().into(),
+                    annotations: vec![],
+                })
                 .build(),
         )
         .unwrap();
@@ -665,10 +698,10 @@ mod tests {
         let o = Ontology::parse(
             turtle,
             ParserOptions::builder()
-                .known(Declaration::ObjectProperty(
-                    IRI::new("http://test#foo").unwrap().into(),
-                    vec![],
-                ))
+                .known(Declaration::ObjectProperty {
+                    iri: IRI::new("http://test#foo").unwrap().into(),
+                    annotations: vec![],
+                })
                 .build(),
         )
         .unwrap();
@@ -914,12 +947,12 @@ mod tests {
         "##;
 
         let options = ParserOptions::builder()
-            .known(Declaration::AnnotationProperty(
-                IRI::new("http://query-server.field33.com/ontology/query-field")
+            .known(Declaration::AnnotationProperty {
+                iri: IRI::new("http://query-server.field33.com/ontology/query-field")
                     .unwrap()
                     .into(),
-                vec![],
-            ))
+                annotations: vec![],
+            })
             .build();
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
@@ -964,18 +997,18 @@ mod tests {
         let o = Ontology::parse(
             turtle,
             ParserOptionsBuilder::default()
-                .known(Declaration::AnnotationProperty(
-                    IRI::new("http://query-server.field33.com/ontology/query-field")
+                .known(Declaration::AnnotationProperty{
+                    iri: IRI::new("http://query-server.field33.com/ontology/query-field")
                         .unwrap()
                         .into(),
-                    vec![],
-                ))
-                .known(Declaration::DataProperty(
-                    IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate")
+                    annotations: vec![],
+                })
+                .known(Declaration::DataProperty{
+                    iri: IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate")
                         .unwrap()
                         .into(),
-                    vec![],
-                ))
+                    annotations: vec![],
+                })
                 .build(),
         )
         .unwrap();
@@ -1151,12 +1184,12 @@ mod tests {
         harriet::TurtleDocument::parse_full(turtle).unwrap();
 
         let options = ParserOptions::builder()
-            .known(Declaration::AnnotationProperty(
-                IRI::new("http://query-server.field33.com/ontology/query-field")
+            .known(Declaration::AnnotationProperty {
+                iri: IRI::new("http://query-server.field33.com/ontology/query-field")
                     .unwrap()
                     .into(),
-                vec![],
-            ))
+                annotations: vec![],
+            })
             .build();
 
         let o = Ontology::parse(turtle, options).unwrap();
@@ -1169,12 +1202,12 @@ mod tests {
         assert_eq!(o.declarations().len(), 1);
         assert_eq!(
             o.declarations()[0],
-            Declaration::NamedIndividual(
-                IRI::new("http://example.com/ONTO1/Individual1")
+            Declaration::NamedIndividual {
+                iri: IRI::new("http://example.com/ONTO1/Individual1")
                     .unwrap()
                     .into(),
-                vec![]
-            )
+                annotations: vec![]
+            }
         );
 
         assert_eq!(o.axioms().len(), 1);

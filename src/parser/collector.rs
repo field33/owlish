@@ -64,12 +64,30 @@ impl<'a> OntologyCollector<'a> {
 
     pub(crate) fn push_declaration(&mut self, declaration: Declaration) {
         let iri = match &declaration {
-            Declaration::Class(iri, _) => iri.as_iri(),
-            Declaration::NamedIndividual(iri, _) => iri.as_iri(),
-            Declaration::ObjectProperty(iri, _) => iri.as_iri(),
-            Declaration::DataProperty(iri, _) => iri.as_iri(),
-            Declaration::AnnotationProperty(iri, _) => iri.as_iri(),
-            Declaration::Datatype(iri, _) => iri.as_iri(),
+            Declaration::Class {
+                iri,
+                annotations: _,
+            } => iri.as_iri(),
+            Declaration::NamedIndividual {
+                iri,
+                annotations: _,
+            } => iri.as_iri(),
+            Declaration::ObjectProperty {
+                iri,
+                annotations: _,
+            } => iri.as_iri(),
+            Declaration::DataProperty {
+                iri,
+                annotations: _,
+            } => iri.as_iri(),
+            Declaration::AnnotationProperty {
+                iri,
+                annotations: _,
+            } => iri.as_iri(),
+            Declaration::Datatype {
+                iri,
+                annotations: _,
+            } => iri.as_iri(),
         };
         self.declaration_index
             .insert(iri.to_string(), self.declarations.len());
@@ -207,7 +225,10 @@ impl<'a> OntologyCollector<'a> {
             .get(iri.as_str())
             .and_then(|index| self.declarations.get(*index))
             .and_then(|d| match d {
-                Declaration::AnnotationProperty(a, annotations) => {
+                Declaration::AnnotationProperty {
+                    iri: a,
+                    annotations,
+                } => {
                     if a.as_iri() == iri {
                         Some((a, annotations))
                     } else {
@@ -223,7 +244,7 @@ impl<'a> OntologyCollector<'a> {
             .get(cls.as_str())
             .and_then(|index| self.declarations.get(*index))
             .and_then(|d| match d {
-                Declaration::Class(_, _) => Some(d),
+                Declaration::Class { .. } => Some(d),
                 _ => None,
             })
     }
@@ -232,7 +253,7 @@ impl<'a> OntologyCollector<'a> {
             .get(dp.as_str())
             .and_then(|index| self.declarations.get(*index))
             .and_then(|d| match d {
-                Declaration::DataProperty(_, _) => Some(d),
+                Declaration::DataProperty { .. } => Some(d),
                 _ => None,
             })
     }
@@ -242,7 +263,7 @@ impl<'a> OntologyCollector<'a> {
             .get(iri.as_str())
             .and_then(|index| self.declarations.get(*index))
             .and_then(|d| match d {
-                Declaration::ObjectProperty(_, _) => Some(d),
+                Declaration::ObjectProperty { .. } => Some(d),
                 _ => None,
             })
     }

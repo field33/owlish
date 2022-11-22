@@ -3,8 +3,11 @@ use crate::owl::{Annotation, DataPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataIntersectionOf {
-    pub iri: DataPropertyIRI,
+    #[serde(rename = "dataPropertyIRI")]
+    pub data_property_iri: DataPropertyIRI,
+    #[serde(rename = "datatype")]
     pub datatype: Box<DatatypeDefinitionConstructor>,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -15,7 +18,7 @@ impl DataIntersectionOf {
         annotations: Vec<Annotation>,
     ) -> Self {
         Self {
-            iri,
+            data_property_iri: iri,
             datatype,
             annotations,
         }
@@ -41,7 +44,7 @@ mod wasm {
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
 export type DataIntersectionOf = {
-    iri: IRI, 
+    dataPropertyIRI: IRI, 
     datatype: DatatypeDefinitionConstructor,
     annotations: Array<Annotation>,
 };

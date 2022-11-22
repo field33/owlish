@@ -2,9 +2,11 @@ use crate::owl::{Annotation, ClassIRI, ObjectPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct HasKey {
+    #[serde(rename = "iri")]
     pub iri: ClassIRI,
     #[serde(rename = "objectProperties")]
     pub object_properties: Vec<ObjectPropertyIRI>,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 

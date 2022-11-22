@@ -60,8 +60,8 @@ impl DataPropertyAssertion {
         annotations: Vec<Annotation>,
     ) -> Self {
         Self {
-            iri: iri.into(),
-            subject: subject.into(),
+            iri,
+            subject,
             value,
             annotations,
         }

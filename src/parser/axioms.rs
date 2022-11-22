@@ -2,8 +2,12 @@ use super::collector::CollectedBlankNode;
 use super::collector::MatcherHandler;
 use crate::error::Error;
 use crate::get_vars;
+use crate::owl::AnnotationPropertyDomain;
+use crate::owl::AnnotationPropertyRange;
 use crate::owl::ClassAssertion;
 use crate::owl::ClassConstructor;
+use crate::owl::DataPropertyDomain;
+use crate::owl::DataPropertyRange;
 use crate::owl::ObjectPropertyDomain;
 use crate::owl::ObjectPropertyRange;
 use crate::owl::SubClassOf;
@@ -86,10 +90,10 @@ pub(crate) fn match_axioms(
     ));
 
     matchers.push((
-        rdf_match!("ObjectPropertyDomain", prefixes,
+        rdf_match!("PropertyDomain", prefixes,
             [iob:subject] [rdfs:domain] [iob:object] .
         )?,
-        Box::new(|mstate, o, _| {
+        Box::new(|mstate, o, options| {
             if let Some(vars) = get_vars!(mstate, subject, object) {
                 match vars.subject {
                     Value::Iri(subject_iri_str) => {
@@ -97,28 +101,71 @@ pub(crate) fn match_axioms(
                             match vars.object {
                                 Value::Iri(object_iri_str) => {
                                     if let Ok(class_iri) = IRI::new(object_iri_str) {
-                                        o.push_axiom(
-                                            ObjectPropertyDomain::new(
-                                                op_iri.into(),
-                                                class_iri.into(),
-                                                vec![],
-                                            )
-                                            .into(),
-                                        );
+                                        if o.data_property_declaration(&op_iri).is_some()
+                                            || options.is_data_prop(&op_iri)
+                                        {
+                                            o.push_axiom(
+                                                DataPropertyDomain::new(
+                                                    op_iri.into(),
+                                                    class_iri.into(),
+                                                    vec![],
+                                                )
+                                                .into(),
+                                            );
+                                        } else if o.object_property_declaration(&op_iri).is_some()
+                                            || options.is_object_prop(&op_iri)
+                                        {
+                                            o.push_axiom(
+                                                ObjectPropertyDomain::new(
+                                                    op_iri.into(),
+                                                    class_iri.into(),
+                                                    vec![],
+                                                )
+                                                .into(),
+                                            );
+                                        } else if o.annotation_property(&op_iri).is_some()
+                                            || options.is_annotation(&op_iri)
+                                        {
+                                            o.push_axiom(
+                                                AnnotationPropertyDomain::new(
+                                                    op_iri.into(),
+                                                    class_iri.into(),
+                                                    vec![],
+                                                )
+                                                .into(),
+                                            );
+                                        }
                                     }
                                 }
                                 Value::Blank(bn) => {
                                     if let Some(cbn) = o.get_blank(bn) {
                                         match cbn {
                                             CollectedBlankNode::ClassConstructor(cc) => {
-                                                o.push_axiom(
-                                                    ObjectPropertyDomain::new(
-                                                        op_iri.into(),
-                                                        cc.deref().clone(),
-                                                        vec![],
-                                                    )
-                                                    .into(),
-                                                );
+                                                if o.data_property_declaration(&op_iri).is_some()
+                                                    || options.is_data_prop(&op_iri)
+                                                {
+                                                    o.push_axiom(
+                                                        DataPropertyDomain::new(
+                                                            op_iri.into(),
+                                                            cc.deref().clone(),
+                                                            vec![],
+                                                        )
+                                                        .into(),
+                                                    );
+                                                } else if o
+                                                    .object_property_declaration(&op_iri)
+                                                    .is_some()
+                                                    || options.is_object_prop(&op_iri)
+                                                {
+                                                    o.push_axiom(
+                                                        ObjectPropertyDomain::new(
+                                                            op_iri.into(),
+                                                            cc.deref().clone(),
+                                                            vec![],
+                                                        )
+                                                        .into(),
+                                                    );
+                                                }
                                             }
                                         }
                                     }
@@ -138,10 +185,10 @@ pub(crate) fn match_axioms(
     ));
 
     matchers.push((
-        rdf_match!("ObjectPropertyRange", prefixes,
+        rdf_match!("PropertyRange", prefixes,
             [iob:subject] [rdfs:range] [iob:object] .
         )?,
-        Box::new(|mstate, o, _| {
+        Box::new(|mstate, o, options| {
             if let Some(vars) = get_vars!(mstate, subject, object) {
                 match vars.subject {
                     Value::Iri(subject_iri_str) => {
@@ -149,28 +196,58 @@ pub(crate) fn match_axioms(
                             match vars.object {
                                 Value::Iri(object_iri_str) => {
                                     if let Ok(class_iri) = IRI::new(object_iri_str) {
-                                        o.push_axiom(
-                                            ObjectPropertyRange::new(
-                                                op_iri.into(),
-                                                class_iri.into(),
-                                                vec![],
-                                            )
-                                            .into(),
-                                        );
+                                        if o.data_property_declaration(&op_iri).is_some()
+                                            || options.is_data_prop(&op_iri)
+                                        {
+                                            o.push_axiom(
+                                                DataPropertyRange::new(
+                                                    op_iri.into(),
+                                                    class_iri.into(),
+                                                    vec![],
+                                                )
+                                                .into(),
+                                            );
+                                        } else if o.object_property_declaration(&op_iri).is_some()
+                                            || options.is_object_prop(&op_iri)
+                                        {
+                                            o.push_axiom(
+                                                ObjectPropertyRange::new(
+                                                    op_iri.into(),
+                                                    class_iri.into(),
+                                                    vec![],
+                                                )
+                                                .into(),
+                                            );
+                                        } else if o.annotation_property(&op_iri).is_some()
+                                            || options.is_annotation(&op_iri)
+                                        {
+                                            o.push_axiom(
+                                                AnnotationPropertyRange::new(
+                                                    op_iri.into(),
+                                                    class_iri.into(),
+                                                    vec![],
+                                                )
+                                                .into(),
+                                            );
+                                        }
                                     }
                                 }
                                 Value::Blank(bn) => {
                                     if let Some(cbn) = o.get_blank(bn) {
                                         match cbn {
                                             CollectedBlankNode::ClassConstructor(cc) => {
-                                                o.push_axiom(
-                                                    ObjectPropertyRange::new(
-                                                        op_iri.into(),
-                                                        cc.deref().clone(),
-                                                        vec![],
-                                                    )
-                                                    .into(),
-                                                );
+                                                if o.object_property_declaration(&op_iri).is_some()
+                                                    || options.is_object_prop(&op_iri)
+                                                {
+                                                    o.push_axiom(
+                                                        ObjectPropertyRange::new(
+                                                            op_iri.into(),
+                                                            cc.deref().clone(),
+                                                            vec![],
+                                                        )
+                                                        .into(),
+                                                    );
+                                                }
                                             }
                                         }
                                     }

@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::owl::{Axiom, IndividualIRI, ObjectPropertyConstructor, IRI};
+use crate::{
+    error::Error,
+    owl::{Axiom, IndividualIRI, ObjectPropertyConstructor, IRI},
+};
 
 use super::Annotation;
 
@@ -15,6 +18,13 @@ impl From<IRI> for ObjectPropertyIRI {
 impl From<ObjectPropertyIRI> for ObjectPropertyConstructor {
     fn from(iri: ObjectPropertyIRI) -> Self {
         Self::IRI(iri)
+    }
+}
+impl TryFrom<&str> for ObjectPropertyIRI {
+    type Error = Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        IRI::try_from(value).map(|iri| iri.into())
     }
 }
 impl ObjectPropertyIRI {

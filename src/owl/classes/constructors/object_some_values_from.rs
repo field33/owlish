@@ -5,7 +5,8 @@ use crate::owl::{Annotation, ClassConstructor, ClassIRI, ObjectPropertyConstruct
 pub struct ObjectSomeValuesFrom {
     #[serde(rename = "objectProperty")]
     pub object_property: ObjectPropertyConstructor,
-    pub cls: ClassIRI,
+    #[serde(rename = "classIRI")]
+    pub class_iri: ClassIRI,
     pub annotations: Vec<Annotation>,
 }
 
@@ -17,7 +18,7 @@ impl ObjectSomeValuesFrom {
     ) -> Self {
         Self {
             object_property,
-            cls,
+            class_iri: cls,
             annotations,
         }
     }
@@ -52,7 +53,7 @@ mod wasm {
     const WASM_API: &'static str = r#"
     export type ObjectSomeValuesFrom = {
         objectProperty: ObjectPropertyConstructor,
-        cls: IRI,
+        classIRI: IRI,
         annotations: Array<Annotation>,
 };
     "#;

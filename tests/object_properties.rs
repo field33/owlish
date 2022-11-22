@@ -16,12 +16,12 @@ fn object_properties() {
     let o = Ontology::parse(
         turtle,
         ParserOptions::builder()
-            .known(owlish::owl::Declaration::DataProperty(
-                IRI::new("http://field33.com/ontologies/test/TestDataProperty")
+            .known(owlish::owl::Declaration::DataProperty {
+                iri: IRI::new("http://field33.com/ontologies/test/TestDataProperty")
                     .unwrap()
                     .into(),
-                vec![],
-            ))
+                annotations: vec![],
+            })
             .build(),
     )
     .unwrap();

@@ -218,7 +218,7 @@ impl<'a> MatcherState<'a> {
         })
     }
 
-    pub fn last_literal(&self, name: &str) -> Option<Literal> {
+    pub fn _last_literal(&self, name: &str) -> Option<Literal> {
         self.variables.get(name).and_then(|vs| {
             let mut value = None;
             for v in vs {

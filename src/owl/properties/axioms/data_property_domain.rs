@@ -1,11 +1,11 @@
-use crate::owl::{Annotation, ClassIRI, DataPropertyIRI};
+use crate::owl::{Annotation, Axiom, ClassConstructor, DataPropertyIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataPropertyDomain {
     #[serde(rename = "dataPropertyIRI")]
     pub data_property_iri: DataPropertyIRI,
-    #[serde(rename = "classIRI")]
-    pub class_iri: ClassIRI,
+    #[serde(rename = "cls")]
+    pub cls: ClassConstructor,
     #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
@@ -13,14 +13,20 @@ pub struct DataPropertyDomain {
 impl DataPropertyDomain {
     pub fn new(
         data_property_iri: DataPropertyIRI,
-        class_iri: ClassIRI,
+        cls: ClassConstructor,
         annotations: Vec<Annotation>,
     ) -> Self {
         Self {
             data_property_iri,
-            class_iri,
+            cls,
             annotations,
         }
+    }
+}
+
+impl From<DataPropertyDomain> for Axiom {
+    fn from(dpd: DataPropertyDomain) -> Self {
+        Axiom::DataPropertyDomain(dpd)
     }
 }
 
@@ -31,7 +37,7 @@ mod wasm {
     const WASM_API: &'static str = r#"
 export type DataPropertyDomain = {
     dataPropertyIRI: IRI,
-    classIRI: IRI,
+    cls: ClassConstructor,
     annotations: Array<Annotation>,
 };
 "#;

@@ -1,4 +1,4 @@
-use crate::owl::{Annotation, DataPropertyIRI, DatatypeIRI};
+use crate::owl::{Annotation, Axiom, DataPropertyIRI, DatatypeIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataPropertyRange {
@@ -21,6 +21,12 @@ impl DataPropertyRange {
             datatype_iri,
             annotations,
         }
+    }
+}
+
+impl From<DataPropertyRange> for Axiom {
+    fn from(dpr: DataPropertyRange) -> Self {
+        Axiom::DataPropertyRange(dpr)
     }
 }
 

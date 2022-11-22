@@ -2,6 +2,7 @@ use crate::owl::{Annotation, ClassConstructor, IndividualIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectOneOf {
+    #[serde(rename = "individualIRIs")]
     pub individuals: Vec<IndividualIRI>,
     pub annotations: Vec<Annotation>,
 }
@@ -42,7 +43,7 @@ mod wasm {
     #[wasm_bindgen(typescript_custom_section)]
     const WASM_API: &'static str = r#"
 export type ObjectOneOf = {
-    individuals: Array<IRI>, 
+    individualIRIs: Array<IRI>, 
     annotations: Array<Annotation>
 };
 "#;

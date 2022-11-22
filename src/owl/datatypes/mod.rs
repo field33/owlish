@@ -36,9 +36,13 @@ impl DataPropertyIRI {
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct DataPropertyAssertion {
+    #[serde(rename = "dataPropertyIRI")]
     pub iri: DataPropertyIRI,
+    #[serde(rename = "subjectIRI")]
     pub subject: IndividualIRI,
+    #[serde(rename = "value")]
     pub value: Literal,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -56,8 +60,8 @@ impl DataPropertyAssertion {
         annotations: Vec<Annotation>,
     ) -> Self {
         Self {
-            iri,
-            subject,
+            iri: iri.into(),
+            subject: subject.into(),
             value,
             annotations,
         }
@@ -66,9 +70,13 @@ impl DataPropertyAssertion {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct NegativeDataPropertyAssertion {
-    pub iri: DataPropertyIRI,
+    #[serde(rename = "dataPropertyIRI")]
+    pub data_property_iri: DataPropertyIRI,
+    #[serde(rename = "subjectIRI")]
     pub subject: IndividualIRI,
+    #[serde(rename = "value")]
     pub value: Literal,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -80,7 +88,7 @@ impl NegativeDataPropertyAssertion {
         annotations: Vec<Annotation>,
     ) -> Self {
         Self {
-            iri,
+            data_property_iri: iri,
             subject,
             value,
             annotations,
@@ -101,11 +109,11 @@ export type DataPropertyAssertion = {
     /**
      * IRI of the property.
      */
-    iri: IRI,
+    dataPropertyIRI: IRI,
     /**
      * IRI of the subject Individual.
      */
-    subject: IRI,
+    subjectIRI: IRI,
     value: Value,
     annotations: Array<Annotation>,
 };
@@ -120,11 +128,11 @@ export type NegativeDataPropertyAssertion = {
     /**
      * IRI of the property.
      */
-    iri: IRI,
+    dataPropertyIRI: IRI,
     /**
      * IRI of the subject Individual.
      */
-    subject: IRI,
+    subjectIRI: IRI,
     value: Value,
     annotations: Array<Annotation>,
 }

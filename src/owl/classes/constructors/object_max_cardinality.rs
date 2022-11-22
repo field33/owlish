@@ -5,15 +5,20 @@ pub struct ObjectMaxCardinality {
     pub value: u64,
     #[serde(rename = "objectPropertyIRI")]
     pub object_property_iri: ObjectPropertyIRI,
-    pub cls: Option<ClassIRI>,
+    #[serde(rename = "classIRI")]
+    pub class_iri: Option<ClassIRI>,
 }
 
 impl ObjectMaxCardinality {
-    pub fn new(value: u64, object_property_iri: ObjectPropertyIRI, cls: Option<ClassIRI>) -> Self {
+    pub fn new(
+        value: u64,
+        object_property_iri: ObjectPropertyIRI,
+        class_iri: Option<ClassIRI>,
+    ) -> Self {
         Self {
             value,
             object_property_iri,
-            cls,
+            class_iri,
         }
     }
 }
@@ -48,7 +53,7 @@ mod wasm {
 export type ObjectMaxCardinality = {
     value: number, 
     objectPropertyIRI: IRI, 
-    cls: IRI | undefined
+    classIRI: IRI | undefined
 };
 "#;
 }

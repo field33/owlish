@@ -7,53 +7,182 @@ pub fn family() -> ApiOntology {
     let iri = IRI::builder("https://example.com/family#").unwrap();
     let owl = Ontology::new(
         vec![
-            Declaration::NamedIndividual(iri.new("John"), vec![]),
-            Declaration::NamedIndividual(iri.new("Mary"), vec![]),
-            Declaration::NamedIndividual(iri.new("Jim"), vec![]),
-            Declaration::NamedIndividual(iri.new("James"), vec![]),
-            Declaration::NamedIndividual(iri.new("Jack"), vec![]),
-            Declaration::NamedIndividual(iri.new("Bill"), vec![]),
-            Declaration::NamedIndividual(iri.new("Susan"), vec![]),
+            Declaration::NamedIndividual {
+                iri: iri.new("John"),
+                annotations: vec![],
+            },
+            Declaration::NamedIndividual {
+                iri: iri.new("Mary"),
+                annotations: vec![],
+            },
+            Declaration::NamedIndividual {
+                iri: iri.new("Jim"),
+                annotations: vec![],
+            },
+            Declaration::NamedIndividual {
+                iri: iri.new("James"),
+                annotations: vec![],
+            },
+            Declaration::NamedIndividual {
+                iri: iri.new("Jack"),
+                annotations: vec![],
+            },
+            Declaration::NamedIndividual {
+                iri: iri.new("Bill"),
+                annotations: vec![],
+            },
+            Declaration::NamedIndividual {
+                iri: iri.new("Susan"),
+                annotations: vec![],
+            },
             //
-            Declaration::Class(iri.new("Person"), vec![]),
-            Declaration::Class(iri.new("Woman"), vec![]),
-            Declaration::Class(iri.new("Parent"), vec![]),
-            Declaration::Class(iri.new("Father"), vec![]),
-            Declaration::Class(iri.new("Mother"), vec![]),
-            Declaration::Class(iri.new("SocialRole"), vec![]),
-            Declaration::Class(iri.new("Man"), vec![]),
-            Declaration::Class(iri.new("Teenager"), vec![]),
-            Declaration::Class(iri.new("ChildlessPerson"), vec![]),
-            Declaration::Class(iri.new("Human"), vec![]),
-            Declaration::Class(iri.new("Female"), vec![]),
-            Declaration::Class(iri.new("HappyPerson"), vec![]),
-            Declaration::Class(iri.new("JohnsChildren"), vec![]),
-            Declaration::Class(iri.new("NarcisticPerson"), vec![]),
-            Declaration::Class(iri.new("Dead"), vec![]),
-            Declaration::Class(iri.new("Orphan"), vec![]),
-            Declaration::Class(iri.new("Adult"), vec![]),
-            Declaration::Class(iri.new("YoungChild"), vec![]),
+            Declaration::Class {
+                iri: iri.new("Person"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Woman"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Parent"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Father"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Mother"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("SocialRole"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Man"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Teenager"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("ChildlessPerson"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Human"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Female"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("HappyPerson"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("JohnsChildren"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("NarcisticPerson"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Dead"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Orphan"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("Adult"),
+                annotations: vec![],
+            },
+            Declaration::Class {
+                iri: iri.new("YoungChild"),
+                annotations: vec![],
+            },
             //
-            Declaration::ObjectProperty(iri.new("hasWife"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasChild"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasDaughter"), vec![]),
-            Declaration::ObjectProperty(iri.new("loves"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasSpouse"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasGrandparent"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasParent"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasBrother"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasUncle"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasSon"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasAncestor"), vec![]),
-            Declaration::ObjectProperty(iri.new("hasHusband"), vec![]),
+            Declaration::ObjectProperty {
+                iri: iri.new("hasWife"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasChild"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasDaughter"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("loves"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasSpouse"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasGrandparent"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasParent"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasBrother"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasUncle"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasSon"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasAncestor"),
+                annotations: vec![],
+            },
+            Declaration::ObjectProperty {
+                iri: iri.new("hasHusband"),
+                annotations: vec![],
+            },
             //
-            Declaration::DataProperty(iri.new("hasAge"), vec![]),
-            Declaration::DataProperty(iri.new("hasSSN"), vec![]),
+            Declaration::DataProperty {
+                iri: iri.new("hasAge"),
+                annotations: vec![],
+            },
+            Declaration::DataProperty {
+                iri: iri.new("hasSSN"),
+                annotations: vec![],
+            },
             //
-            Declaration::Datatype(iri.new("personAge"), vec![]),
-            Declaration::Datatype(iri.new("minorAge"), vec![]),
-            Declaration::Datatype(iri.new("majorAge"), vec![]),
-            Declaration::Datatype(iri.new("toddlerAge"), vec![]),
+            Declaration::Datatype {
+                iri: iri.new("personAge"),
+                annotations: vec![],
+            },
+            Declaration::Datatype {
+                iri: iri.new("minorAge"),
+                annotations: vec![],
+            },
+            Declaration::Datatype {
+                iri: iri.new("majorAge"),
+                annotations: vec![],
+            },
+            Declaration::Datatype {
+                iri: iri.new("toddlerAge"),
+                annotations: vec![],
+            },
         ],
         vec![
             Axiom::AnnotationAssertion(AnnotationAssertion::new(
@@ -115,7 +244,7 @@ pub fn family() -> ApiOntology {
             )),
             Axiom::DataPropertyDomain(DataPropertyDomain::new(
                 iri.new("hasAge"),
-                iri.class("Person"),
+                iri.class("Person").into(),
                 vec![],
             )),
             Axiom::DataPropertyRange(DataPropertyRange::new(
@@ -185,8 +314,14 @@ pub fn family() -> ApiOntology {
                     DatatypeRestriction::new(
                         wk::xsd_integer(),
                         vec![
-                            Restriction::Numeric(wk::xsd_minExclusive(), Literal::from(12u8)),
-                            Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(19u8)),
+                            Restriction::Numeric {
+                                datatype_iri: wk::xsd_minExclusive(),
+                                value: Literal::from(12u8),
+                            },
+                            Restriction::Numeric {
+                                datatype_iri: wk::xsd_maxInclusive(),
+                                value: Literal::from(19u8),
+                            },
                         ],
                         vec![],
                     ),
@@ -403,8 +538,14 @@ pub fn family() -> ApiOntology {
                 DatatypeRestriction::new(
                     wk::xsd_integer(),
                     vec![
-                        Restriction::Numeric(wk::xsd_minInclusive(), Literal::from(0u8)),
-                        Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(150u8)),
+                        Restriction::Numeric {
+                            datatype_iri: wk::xsd_minInclusive(),
+                            value: Literal::from(0u8),
+                        },
+                        Restriction::Numeric {
+                            datatype_iri: wk::xsd_maxInclusive(),
+                            value: Literal::from(150u8),
+                        },
                     ],
                     vec![],
                 )
@@ -416,8 +557,14 @@ pub fn family() -> ApiOntology {
                 DatatypeRestriction::new(
                     wk::xsd_integer(),
                     vec![
-                        Restriction::Numeric(wk::xsd_minExclusive(), Literal::from(0u8)),
-                        Restriction::Numeric(wk::xsd_maxInclusive(), Literal::from(18u8)),
+                        Restriction::Numeric {
+                            datatype_iri: wk::xsd_minExclusive(),
+                            value: Literal::from(0u8),
+                        },
+                        Restriction::Numeric {
+                            datatype_iri: wk::xsd_maxInclusive(),
+                            value: Literal::from(18u8),
+                        },
                     ],
                     vec![],
                 )

@@ -189,12 +189,12 @@ export interface AxiomMatcher<R> {
 export function matchAxiom<R>(axiom: Axiom, matcher: AxiomMatcher<R>): R
 
 interface DeclarationMatcher<R> {
-    Class?: (cls: Declaration["Class"]) => R,
-    NamedIndividual?: (individual: Declaration["NamedIndividual"]) => R,
-    ObjectProperty?: (objectProp: Declaration["ObjectProperty"]) => R,
-    DataProperty?: (dataProp: Declaration["DataProperty"]) => R,
-    AnnotationProperty?: (annotationProp: Declaration["AnnotationProperty"]) => R,
-    Datatype?: (datatype: Declaration["Datatype"]) => R,
+    Class?: (cls: Required<Declaration>["Class"]) => R,
+    NamedIndividual?: (individual: Required<Declaration>["NamedIndividual"]) => R,
+    ObjectProperty?: (objectProp: Required<Declaration>["ObjectProperty"]) => R,
+    DataProperty?: (dataProp: Required<Declaration>["DataProperty"]) => R,
+    AnnotationProperty?: (annotationProp: Required<Declaration>["AnnotationProperty"]) => R,
+    Datatype?: (datatype: Required<Declaration>["Datatype"]) => R,
 
 }
 

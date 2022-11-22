@@ -29,12 +29,12 @@ pub fn parser_bench(b: &mut Bencher, turtle: &str) {
         Ontology::parse(
             turtle,
             ParserOptions::builder()
-                .known(owlish::owl::Declaration::AnnotationProperty(
-                    IRI::new("http://query-server.field33.com/ontology/query-field")
+                .known(owlish::owl::Declaration::AnnotationProperty {
+                    iri: IRI::new("http://query-server.field33.com/ontology/query-field")
                         .unwrap()
                         .into(),
-                    vec![],
-                ))
+                    annotations: vec![],
+                })
                 .build(),
         )
         .unwrap();

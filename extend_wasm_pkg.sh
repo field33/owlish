@@ -65,10 +65,10 @@ export function matchAxiom(axiom, matcher) {
     }
 }
 
-export function matchDeclaration(axiom, matcher) {
-    for (const key in axiom) {
+export function matchDeclaration(declaration, matcher) {
+    for (const key in declaration) {
         if (matcher[key]) {
-            matcher[key](axiom[key])
+            matcher[key](declaration[key])
             break
         }
     }

@@ -112,12 +112,12 @@ extern "C" {
 #[wasm_bindgen(typescript_custom_section)]
 const ONTOLOGY_TS_API: &'static str = r#"
 interface Declaration {
-    Class?: [IRI, Array<Annotation>],
-    NamedIndividual?: [IRI, Array<Annotation>],
-    ObjectProperty?: [IRI, Array<Annotation>],
-    DataProperty?: [IRI, Array<Annotation>],
-    AnnotationProperty?: [IRI, Array<Annotation>],
-    Datatype?: [IRI, Array<Annotation>],
+    Class?: {iri: IRI, annotations: Array<Annotation>},
+    NamedIndividual?: {iri: IRI, annotations: Array<Annotation>},
+    ObjectProperty?: {iri: IRI, annotations: Array<Annotation>},
+    DataProperty?: {iri: IRI, annotations: Array<Annotation>},
+    AnnotationProperty?: {iri: IRI, annotations: Array<Annotation>},
+    Datatype?: {iri: IRI, annotations: Array<Annotation>},
 }
 
 interface Axiom {
@@ -189,12 +189,12 @@ export interface AxiomMatcher<R> {
 export function matchAxiom<R>(axiom: Axiom, matcher: AxiomMatcher<R>): R
 
 interface DeclarationMatcher<R> {
-    Class?: (cls: [IRI, Array<Annotation>]) => R,
-    NamedIndividual?: (individual: [IRI, Array<Annotation>]) => R,
-    ObjectProperty?: (objectProp: [IRI, Array<Annotation>]) => R,
-    DataProperty?: (dataProp: [IRI, Array<Annotation>]) => R,
-    AnnotationProperty?: (annotationProp: [IRI, Array<Annotation>]) => R,
-    Datatype?: (datatype: [IRI, Array<Annotation>]) => R,
+    Class?: (cls: Declaration["Class"]) => R,
+    NamedIndividual?: (individual: Declaration["NamedIndividual"]) => R,
+    ObjectProperty?: (objectProp: Declaration["ObjectProperty"]) => R,
+    DataProperty?: (dataProp: Declaration["DataProperty"]) => R,
+    AnnotationProperty?: (annotationProp: Declaration["AnnotationProperty"]) => R,
+    Datatype?: (datatype: Declaration["Datatype"]) => R,
 
 }
 

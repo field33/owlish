@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.3 - 2022-11-22
+#### Bug Fixes
+- Fix wrong Declaration typescript types - (12e6c9a) - Florian Loers
+
+- - -
+
 ## v0.17.2 - 2022-11-22
 #### Bug Fixes
 - Parsing annotations on data properties did not work correctly - (5d50e9d) - Florian Loers

@@ -487,14 +487,16 @@ mod tests {
         @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
         <http://test#> rdf:type owl:Ontology .
 
-        :hasWife rdfs:domain :Man ;
+        
+        :hasWife rdf:type owl:ObjectProperty ;
+                 rdfs:domain :Man ;
                  rdfs:range  :Woman .
 
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
-        assert_eq!(o.declarations().len(), 0);
+        assert_eq!(o.declarations().len(), 1);
         assert_eq!(o.axioms().len(), 2);
 
         assert_eq!(
@@ -1380,5 +1382,122 @@ mod tests {
         println!("{:#?}", o);
         assert_eq!(o.declarations().len(), 6);
         assert_eq!(o.axioms().len(), 27);
+    }
+
+    #[test]
+    fn people_test() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+            @prefix : <http://field33.com/ontologies/@fld33/people/> .
+            @prefix owl: <http://www.w3.org/2002/07/owl#> .
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix xml: <http://www.w3.org/XML/1998/namespace> .
+            @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            @prefix registry: <http://field33.com/ontologies/REGISTRY/> .
+            @base <http://field33.com/ontologies/@fld33/people/> .
+            
+            <http://field33.com/ontologies/@fld33/people/> rdf:type owl:Ontology ;
+                                                            registry:author "Field 33 <contribution@field33.com>" ;
+                                                            registry:canonicalPrefix "people" ;
+                                                            registry:category "People" ,
+                                                                            "Upper Ontology" ;
+                                                            registry:keyword "Field 33 Package" ,
+                                                                            "People" ,
+                                                                            "Upper Ontology" ;
+                                                            registry:ontologyFormatVersion "v1" ;
+                                                            registry:packageName "@fld33/people" ;
+                                                            registry:packageVersion "0.1.5" ;
+                                                            registry:licenseSPDX "Apache-2.0" ;
+                                                            registry:repository "https://github.com/field33/ontologies/tree/main/%40fld33/people" ;
+                                                            registry:shortDescription "People upper ontology"@en ;
+                                                            rdfs:comment "# People Ontology<br>This package is part of the upper ontologies we use at Field 33 and describes non restrictive concepts around people."@en ;
+                                                            rdfs:label "People"@en .
+            
+            
+            #################################################################
+            #    Data properties
+            #################################################################
+            
+            ###  http://field33.com/ontologies/@fld33/people/FirstName
+            :FirstName rdf:type owl:DatatypeProperty ;
+                    rdfs:subPropertyOf :Name ;
+                    rdfs:domain :Person ;
+                    rdfs:range xsd:string ;
+                    rdfs:label "First Name"@en .
+            
+            
+            ###  http://field33.com/ontologies/@fld33/people/LastName
+            :LastName rdf:type owl:DatatypeProperty ;
+                    rdfs:subPropertyOf :Name ;
+                    rdfs:domain :Person ;
+                    rdfs:range xsd:string ;
+                    rdfs:label "Last Name"@en .
+            
+            
+            ###  http://field33.com/ontologies/@fld33/people/Name
+            :Name rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :Person ;
+                    rdfs:range xsd:string ;
+                    rdfs:label "Name"@en .
+            
+            
+            #################################################################
+            #    Classes
+            #################################################################
+            
+            ###  http://field33.com/ontologies/@fld33/people/Individual
+            :Individual rdf:type owl:Class ;
+                        rdfs:subClassOf :Person ;
+                        rdfs:label "Individual"@en .
+            
+            
+            ###  http://field33.com/ontologies/@fld33/people/Person
+            :Person rdf:type owl:Class ;
+                    rdfs:label "Person"@en .
+            
+            
+            ###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
+        // println!("{:#?}", o);
+
+        assert_eq!(
+            o.declarations()[0],
+            Declaration::DataProperty {
+                iri: IRI::new("http://field33.com/ontologies/@fld33/people/FirstName")
+                    .unwrap()
+                    .into(),
+                annotations: vec![],
+            }
+        );
+        assert_eq!(
+            o.axioms()[7],
+            DataPropertyDomain::new(
+                IRI::new("http://field33.com/ontologies/@fld33/people/FirstName")
+                    .unwrap()
+                    .into(),
+                IRI::new("http://field33.com/ontologies/@fld33/people/Person")
+                    .unwrap()
+                    .into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[8],
+            DataPropertyRange::new(
+                IRI::new("http://field33.com/ontologies/@fld33/people/FirstName")
+                    .unwrap()
+                    .into(),
+                IRI::new("http://www.w3.org/2001/XMLSchema#string")
+                    .unwrap()
+                    .into(),
+                vec![]
+            )
+            .into()
+        );
     }
 }

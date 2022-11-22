@@ -24,7 +24,7 @@ impl Display for AnnotationPropertyIRI {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct AnnotationPropertyDomain {
     pub iri: AnnotationPropertyIRI,
     pub cls: ClassIRI,
@@ -41,7 +41,7 @@ impl AnnotationPropertyDomain {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct AnnotationPropertyRange {
     pub iri: AnnotationPropertyIRI,
     pub datatype_iri: DatatypeIRI,
@@ -59,6 +59,18 @@ impl AnnotationPropertyRange {
             datatype_iri,
             annotations,
         }
+    }
+}
+
+impl From<AnnotationPropertyRange> for Axiom {
+    fn from(a: AnnotationPropertyRange) -> Self {
+        Self::AnnotationPropertyRange(a)
+    }
+}
+
+impl From<AnnotationPropertyDomain> for Axiom {
+    fn from(a: AnnotationPropertyDomain) -> Self {
+        Self::AnnotationPropertyDomain(a)
     }
 }
 

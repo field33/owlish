@@ -6,6 +6,8 @@ use crate::owl::*;
 pub enum Axiom {
     // Annotations
     AnnotationAssertion(AnnotationAssertion),
+    AnnotationPropertyRange(AnnotationPropertyRange),
+    AnnotationPropertyDomain(AnnotationPropertyDomain),
     // Properties
     SubObjectPropertyOf(SubObjectPropertyOf),
     EquivalentObjectProperties(EquivalentObjectProperties),
@@ -48,6 +50,8 @@ impl Axiom {
     pub fn annotations_mut(&mut self) -> &mut Vec<Annotation> {
         match self {
             Axiom::AnnotationAssertion(a) => &mut a.annotations,
+            Axiom::AnnotationPropertyDomain(a) => &mut a.annotations,
+            Axiom::AnnotationPropertyRange(a) => &mut a.annotations,
             Axiom::SubObjectPropertyOf(a) => &mut a.annotations,
             Axiom::EquivalentObjectProperties(a) => &mut a.annotations,
             Axiom::EquivalentDataProperties(a) => &mut a.annotations,

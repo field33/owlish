@@ -100,7 +100,7 @@ mod tests {
         let json = serde_json::to_string(&d).unwrap();
         assert_eq!(
             json,
-            r#"{"Class":[{"_type":"IRI","string":"http://example.com"},[]]}"#
+            r#"{"Class":{"iri":{"_type":"IRI","string":"http://example.com"},"annotations":[]}}"#
         );
     }
 }

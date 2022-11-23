@@ -124,6 +124,11 @@ fn push_dataprop_assertion(
     o: &mut OntologyCollector,
 ) -> Result<bool, Error> {
     let subject_iri = IRI::new(subject_iri)?;
+
+    if o.class_declaration(&subject_iri).is_some() {
+        return Ok(false);
+    }
+
     if let Some(object) = mstate.get("object") {
         match object {
             Value::Iri(_) => {

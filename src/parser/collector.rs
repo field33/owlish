@@ -48,7 +48,7 @@ pub(crate) struct OntologyCollector<'a> {
     blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode>,
 
     axiom_index: HashMap<(String, String, String), usize>,
-    declaration_index: HashMap<String, usize>,
+    declaration_index: HashMap<String, Vec<usize>>,
 }
 
 impl<'a> OntologyCollector<'a> {
@@ -89,8 +89,12 @@ impl<'a> OntologyCollector<'a> {
                 annotations: _,
             } => iri.as_iri(),
         };
-        self.declaration_index
-            .insert(iri.to_string(), self.declarations.len());
+        if let Some(list) = self.declaration_index.get_mut(&iri.to_string()) {
+            list.push(self.declarations.len());
+        } else {
+            self.declaration_index
+                .insert(iri.to_string(), vec![self.declarations.len()]);
+        }
         self.declarations.push(declaration)
     }
 
@@ -223,48 +227,79 @@ impl<'a> OntologyCollector<'a> {
     ) -> Option<(&AnnotationPropertyIRI, &Vec<Annotation>)> {
         self.declaration_index
             .get(iri.as_str())
-            .and_then(|index| self.declarations.get(*index))
-            .and_then(|d| match d {
-                Declaration::AnnotationProperty {
-                    iri: a,
-                    annotations,
-                } => {
-                    if a.as_iri() == iri {
-                        Some((a, annotations))
-                    } else {
-                        None
+            .map(|indexes| {
+                indexes
+                    .iter()
+                    .filter_map(|i| self.declarations.get(*i))
+                    .collect::<Vec<&Declaration>>()
+            })
+            .and_then(|ds| {
+                for d in ds {
+                    if let Declaration::AnnotationProperty {
+                        iri: a,
+                        annotations,
+                    } = d
+                    {
+                        return Some((a, annotations));
                     }
                 }
-                _ => None,
+                None
             })
     }
 
     pub(crate) fn class_declaration(&self, cls: &IRI) -> Option<&Declaration> {
         self.declaration_index
             .get(cls.as_str())
-            .and_then(|index| self.declarations.get(*index))
-            .and_then(|d| match d {
-                Declaration::Class { .. } => Some(d),
-                _ => None,
+            .map(|indexes| {
+                indexes
+                    .iter()
+                    .filter_map(|i| self.declarations.get(*i))
+                    .collect::<Vec<&Declaration>>()
+            })
+            .and_then(|ds| {
+                for d in ds {
+                    if let Declaration::Class { .. } = d {
+                        return Some(d);
+                    }
+                }
+                None
             })
     }
-    pub(crate) fn data_property_declaration(&self, dp: &IRI) -> Option<&Declaration> {
+    pub(crate) fn data_property_declaration(&self, iri: &IRI) -> Option<&Declaration> {
         self.declaration_index
-            .get(dp.as_str())
-            .and_then(|index| self.declarations.get(*index))
-            .and_then(|d| match d {
-                Declaration::DataProperty { .. } => Some(d),
-                _ => None,
+            .get(iri.as_str())
+            .map(|indexes| {
+                indexes
+                    .iter()
+                    .filter_map(|i| self.declarations.get(*i))
+                    .collect::<Vec<&Declaration>>()
+            })
+            .and_then(|ds| {
+                for d in ds {
+                    if let Declaration::DataProperty { .. } = d {
+                        return Some(d);
+                    }
+                }
+                None
             })
     }
 
     pub(crate) fn object_property_declaration(&self, iri: &IRI) -> Option<&Declaration> {
         self.declaration_index
             .get(iri.as_str())
-            .and_then(|index| self.declarations.get(*index))
-            .and_then(|d| match d {
-                Declaration::ObjectProperty { .. } => Some(d),
-                _ => None,
+            .map(|indexes| {
+                indexes
+                    .iter()
+                    .filter_map(|i| self.declarations.get(*i))
+                    .collect::<Vec<&Declaration>>()
+            })
+            .and_then(|ds| {
+                for d in ds {
+                    if let Declaration::ObjectProperty { .. } = d {
+                        return Some(d);
+                    }
+                }
+                None
             })
     }
 }

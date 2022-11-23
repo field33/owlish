@@ -1160,6 +1160,66 @@ mod tests {
     }
 
     #[test]
+    fn properties_that_are_data_and_annotations() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        @prefix : <http://test#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+        <http://test#> rdf:type owl:Ontology .
+
+        :Person rdf:type owl:Class .
+        :hasAge rdf:type owl:AnnotationProperty .
+        :hasAge rdf:type owl:DatatypeProperty .
+
+
+        :Person :hasAge "Test" .
+
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
+        println!("{:#?}", o);
+
+        assert_eq!(o.declarations().len(), 3);
+        assert_eq!(o.axioms().len(), 1);
+        assert_eq!(
+            o.declarations()[0],
+            Declaration::Class {
+                iri: IRI::new("http://test#Person").unwrap().into(),
+                annotations: vec![]
+            }
+        );
+        assert_eq!(
+            o.declarations()[1],
+            Declaration::AnnotationProperty {
+                iri: IRI::new("http://test#hasAge").unwrap().into(),
+                annotations: vec![]
+            }
+        );
+        assert_eq!(
+            o.declarations()[2],
+            Declaration::DataProperty {
+                iri: IRI::new("http://test#hasAge").unwrap().into(),
+                annotations: vec![]
+            }
+        );
+        assert_eq!(
+            o.axioms()[0],
+            AnnotationAssertion::new(
+                IRI::new("http://test#hasAge").unwrap().into(),
+                IRI::new("http://test#Person").unwrap().into(),
+                "Test".into(),
+                vec![]
+            )
+            .into()
+        );
+    }
+
+    #[test]
     fn computations_with_blank() {
         env_logger::try_init().ok();
         let turtle = r#"
@@ -1230,79 +1290,6 @@ mod tests {
             .into()
         );
     }
-
-    // TODO: Support this
-    // #[test]
-    // fn computations() {
-    //     env_logger::try_init().ok();
-
-    //     let turtle = r#"
-    //     @prefix onto1: <http://example.com/ONTO1/> .
-    //     @prefix query_server: <http://query-server.field33.com/ontology/> .
-    //     @prefix owl: <http://www.w3.org/2002/07/owl#> .
-    //     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-    //     @prefix xml: <http://www.w3.org/XML/1998/namespace> .
-    //     @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-    //     @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-
-    //     <http://query-server.field33.com/query/aaaa-bbbb-ccc-dddd> rdf:type owl:Ontology .
-
-    //     onto1:Individual1 rdf:type owl:NamedIndividual .
-    //     onto1:Individual1 rdfs:label "Person 1" .
-    //     onto1:Individual1LabelAnn1 rdf:type owl:Annotation .
-    //     onto1:Individual1LabelAnn1 owl:annotatedSource onto1:Individual1 .
-    //     onto1:Individual1LabelAnn1 owl:annotatedProperty rdfs:label .
-    //     onto1:Individual1LabelAnn1 owl:annotatedTarget "Person 1" .
-    //     onto1:Individual1LabelAnn1 query_server:query-field "my_label" .
-    //     "#;
-
-    //     harriet::TurtleDocument::parse_full(turtle).unwrap();
-    //     let options = ParserOptions::builder()
-    //     .known(Declaration::AnnotationProperty(
-    //         IRI::new("http://query-server.field33.com/ontology/query-field")
-    //             .unwrap()
-    //             .into(),
-    //         vec![],
-    //     ))
-    //     .build();
-    //     let o = Ontology::parse(turtle, options).unwrap();
-
-    //     println!("{:#?}", o);
-
-    //     assert_eq!(
-    //         o.iri.as_str(),
-    //         "http://query-server.field33.com/query/aaaa-bbbb-ccc-dddd"
-    //     );
-
-    //     assert_eq!(o.declarations().len(), 1);
-    //     assert_eq!(
-    //         o.declarations()[0],
-    //         Declaration::NamedIndividual(
-    //             IRI::new("http://example.com/ONTO1/Individual1")
-    //                 .unwrap()
-    //                 .into(),
-    //             vec![]
-    //         )
-    //     );
-
-    //     assert_eq!(o.axioms().len(), 2);
-    //     assert_eq!(
-    //         o.axioms()[0],
-    //         AnnotationAssertion(
-    //             well_known::rdfs_label(),
-    //             IRI::new("http://example.com/ONTO1/Individual1").unwrap(),
-    //             Literal::String("Person 1".into()).into(),
-    //             vec![Annotation(
-    //                 IRI::new("http://query-server.field33.com/ontology/query-field")
-    //                     .unwrap()
-    //                     .into(),
-    //                 Literal::String("my_label".into()).into(),
-    //                 vec![]
-    //             )]
-    //         )
-    //         .into()
-    //     );
-    // }
 
     #[test]
     fn meta_ontology() {

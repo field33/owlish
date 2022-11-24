@@ -568,6 +568,7 @@ impl RdfMatcher {
 ///
 /// parse x and y as IRI or blank nodes:
 /// ```ignore
+/// [:x] [B] [C] .
 /// [iob:x] [B] [C] .
 /// [+:y] [B] [C] .
 /// ```

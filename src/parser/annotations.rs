@@ -119,12 +119,6 @@ pub(crate) fn match_simple_annotation_assertions<'a>(
             [iob:subject] [*:predicate] [iol:object] .)?,
         Box::new(|mstate, o, options| {
             if let Some(predicate_iri) = get_iri_var("predicate", mstate)? {
-                println!(
-                    "check anno {:?} {:?} => {}",
-                    predicate_iri,
-                    mstate.get("subject"),
-                    o.annotation_property(&predicate_iri).is_some()
-                );
                 if o.annotation_property(&predicate_iri).is_some()
                     || options.is_annotation(&predicate_iri)
                     || WELL_KNOWN_ANNOTATIONS.contains(&predicate_iri.as_str())

@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.6 - 2022-11-24
+#### Bug Fixes
+- Remove print command in parser - (f7fc3d4) - Florian Loers
+
+- - -
+
 ## v0.17.5 - 2022-11-23
 #### Bug Fixes
 - Parse AnnotationProperties that have been defined as DataProperties as well - (ac8b229) - Florian Loers

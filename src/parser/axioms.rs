@@ -61,22 +61,18 @@ pub(crate) fn match_axioms(
                             );
                         }
                         Value::Blank(bn) => {
-                            if let Some(bnh) = o.get_blank(bn) {
-                                match bnh {
-                                    CollectedBlankNode::ClassConstructor(constr) => {
-                                        o.push_axiom(
-                                            SubClassOf::new(
-                                                ClassConstructor::IRI(
-                                                    IRI::new(subject_iri_str)?.into(),
-                                                )
-                                                .into(),
-                                                constr.clone(),
-                                                vec![],
-                                            )
+                            if let Some(CollectedBlankNode::ClassConstructor(constr)) =
+                                o.get_blank(bn)
+                            {
+                                o.push_axiom(
+                                    SubClassOf::new(
+                                        ClassConstructor::IRI(IRI::new(subject_iri_str)?.into())
                                             .into(),
-                                        );
-                                    }
-                                }
+                                        constr.clone(),
+                                        vec![],
+                                    )
+                                    .into(),
+                                );
                             }
                         }
                         Value::Literal { .. } => todo!(),
@@ -138,35 +134,31 @@ pub(crate) fn match_axioms(
                                     }
                                 }
                                 Value::Blank(bn) => {
-                                    if let Some(cbn) = o.get_blank(bn) {
-                                        match cbn {
-                                            CollectedBlankNode::ClassConstructor(cc) => {
-                                                if o.data_property_declaration(&op_iri).is_some()
-                                                    || options.is_data_prop(&op_iri)
-                                                {
-                                                    o.push_axiom(
-                                                        DataPropertyDomain::new(
-                                                            op_iri.into(),
-                                                            cc.deref().clone(),
-                                                            vec![],
-                                                        )
-                                                        .into(),
-                                                    );
-                                                } else if o
-                                                    .object_property_declaration(&op_iri)
-                                                    .is_some()
-                                                    || options.is_object_prop(&op_iri)
-                                                {
-                                                    o.push_axiom(
-                                                        ObjectPropertyDomain::new(
-                                                            op_iri.into(),
-                                                            cc.deref().clone(),
-                                                            vec![],
-                                                        )
-                                                        .into(),
-                                                    );
-                                                }
-                                            }
+                                    if let Some(CollectedBlankNode::ClassConstructor(cc)) =
+                                        o.get_blank(bn)
+                                    {
+                                        if o.data_property_declaration(&op_iri).is_some()
+                                            || options.is_data_prop(&op_iri)
+                                        {
+                                            o.push_axiom(
+                                                DataPropertyDomain::new(
+                                                    op_iri.into(),
+                                                    cc.deref().clone(),
+                                                    vec![],
+                                                )
+                                                .into(),
+                                            );
+                                        } else if o.object_property_declaration(&op_iri).is_some()
+                                            || options.is_object_prop(&op_iri)
+                                        {
+                                            o.push_axiom(
+                                                ObjectPropertyDomain::new(
+                                                    op_iri.into(),
+                                                    cc.deref().clone(),
+                                                    vec![],
+                                                )
+                                                .into(),
+                                            );
                                         }
                                     }
                                 }
@@ -233,21 +225,21 @@ pub(crate) fn match_axioms(
                                     }
                                 }
                                 Value::Blank(bn) => {
+                                    println!("rdfs:range for {:?}", bn);
                                     if let Some(cbn) = o.get_blank(bn) {
-                                        match cbn {
-                                            CollectedBlankNode::ClassConstructor(cc) => {
-                                                if o.object_property_declaration(&op_iri).is_some()
-                                                    || options.is_object_prop(&op_iri)
-                                                {
-                                                    o.push_axiom(
-                                                        ObjectPropertyRange::new(
-                                                            op_iri.into(),
-                                                            cc.deref().clone(),
-                                                            vec![],
-                                                        )
-                                                        .into(),
-                                                    );
-                                                }
+                                        println!("cbn {:?}", cbn);
+                                        if let CollectedBlankNode::ClassConstructor(cc) = cbn {
+                                            if o.object_property_declaration(&op_iri).is_some()
+                                                || options.is_object_prop(&op_iri)
+                                            {
+                                                o.push_axiom(
+                                                    ObjectPropertyRange::new(
+                                                        op_iri.into(),
+                                                        cc.deref().clone(),
+                                                        vec![],
+                                                    )
+                                                    .into(),
+                                                );
                                             }
                                         }
                                     }

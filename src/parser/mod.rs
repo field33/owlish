@@ -83,18 +83,20 @@ impl Ontology {
         // subject node -> [matcher_id, matched_triples]
         let mut matcher_instances: HashMap<usize, MatcherStateEntry> = HashMap::new();
         // let mut matcher_instance_id = 0;
-        for phase in 0..3 {
+        for phase in 0..4 {
             matchers.clear();
             matcher_instances.clear();
             match phase {
                 0 => {
-                    declarations::match_declarations(&mut matchers, &prefixes)?;
                     sequences::match_sequences(&mut matchers, &prefixes)?;
+                    declarations::match_declarations(&mut matchers, &prefixes)?;
+                }
+                1 => {
                     blank_nodes::match_blank_nodes(&mut matchers, &prefixes)?;
                     annotations::match_simple_annotation_assertions(&mut matchers, &prefixes)?;
                     data_props::match_simple_dataprop_assertions(&mut matchers, &prefixes)?;
                 }
-                1 => {
+                2 => {
                     annotations::match_annotations(&mut matchers, &prefixes)?;
                 }
                 _ => {
@@ -707,6 +709,113 @@ mod tests {
                 .build(),
         )
         .unwrap();
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 7);
+        assert_eq!(o.axioms().len(), 4);
+        assert_eq!(
+            o.axioms()[0],
+            ObjectPropertyDomain::new(
+                IRI::new("http://test#O1").unwrap().into(),
+                IRI::new("http://test#A").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[1],
+            ObjectPropertyRange::new(
+                IRI::new("http://test#O1").unwrap().into(),
+                IRI::new("http://test#B").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[2],
+            ObjectPropertyDomain::new(
+                IRI::new("http://test#O3").unwrap().into(),
+                ObjectUnionOf::new(
+                    vec![
+                        IRI::new("http://test#A").unwrap().into(),
+                        IRI::new("http://test#B").unwrap().into(),
+                    ],
+                    vec![]
+                )
+                .into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[3],
+            ObjectPropertyRange::new(
+                IRI::new("http://test#O3").unwrap().into(),
+                ObjectUnionOf::new(
+                    vec![
+                        IRI::new("http://test#C").unwrap().into(),
+                        IRI::new("http://test#D").unwrap().into(),
+                    ],
+                    vec![]
+                )
+                .into(),
+                vec![]
+            )
+            .into()
+        );
+    }
+
+    #[test]
+    fn unordered_lists_with_union_of() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        @prefix : <http://test#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+        <http://test#> rdf:type owl:Ontology .
+        :A rdf:type owl:Class .
+        :B rdf:type owl:Class .
+        :C rdf:type owl:Class .
+        :D rdf:type owl:Class .
+        
+        :O1 rdf:type owl:ObjectProperty .
+        :O2 rdf:type owl:ObjectProperty .
+        :O3 rdf:type owl:ObjectProperty .
+
+        :O1 rdfs:domain :A .
+        :O1 rdfs:range :B .
+
+        :O3 rdfs:domain _:94f820e0cfd1aa8d3c80ed2064719ab3 .
+        _:94f820e0cfd1aa8d3c80ed2064719ab3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+        _:94f820e0cfd1aa8d3c80ed2064719ab3 <http://www.w3.org/2002/07/owl#unionOf> _:69012f991a9ca09eff4128f2a17dd3a6 .
+        _:69012f991a9ca09eff4128f2a17dd3a6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> :A .
+        _:69012f991a9ca09eff4128f2a17dd3a6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:de25a34541cc5115325dd8d54feda424 .
+        _:de25a34541cc5115325dd8d54feda424 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> :B .
+        _:de25a34541cc5115325dd8d54feda424 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+  
+        :O3 rdfs:range _:1 .
+        _:1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+        _:1 <http://www.w3.org/2002/07/owl#unionOf> _:2 .
+        _:3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> :D .
+        _:3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+        _:2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> :C .
+        _:2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:3 .
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(
+            turtle,
+            ParserOptions::builder()
+                .known(Declaration::ObjectProperty {
+                    iri: IRI::new("http://test#foo").unwrap().into(),
+                    annotations: vec![],
+                })
+                .build(),
+        )
+        .unwrap();
+        println!("{:#?}", o);
         assert_eq!(o.declarations().len(), 7);
         assert_eq!(o.axioms().len(), 4);
         assert_eq!(

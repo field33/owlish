@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use crate::error::Error;
 
-use super::collector::MatcherHandler;
+use super::collector::{CollectedBlankNode, MatcherHandler};
 
 use crate::parser::matcher::RdfMatcher;
 
@@ -21,10 +21,16 @@ pub(crate) fn match_sequences(
         Box::new(|mstate, o, _| {
             if let Some(Value::Blank(bn)) = mstate.get("x") {
                 if let Some(object) = mstate.get("object").cloned() {
-                    if let Some(sequence) = o.get_sequence(bn) {
-                        sequence.push(object)
+                    if o.get_blank(bn).is_some() {
+                        o.update_blank_node_sequence(bn, Some(object), None);
                     } else {
-                        o.set_sequence_root(bn, object);
+                        o.insert_blank_node(
+                            bn.clone(),
+                            CollectedBlankNode::Sequence {
+                                first: Some(object),
+                                rest: None,
+                            },
+                        );
                     }
                 }
             }
@@ -38,7 +44,17 @@ pub(crate) fn match_sequences(
         Box::new(|mstate, o, _| {
             if let Some(Value::Blank(bn)) = mstate.get("x") {
                 if let Some(Value::Blank(rest)) = mstate.get("object").cloned() {
-                    o.set_sequence_tree(bn, rest)?;
+                    if o.get_blank(bn).is_some() {
+                        o.update_blank_node_sequence(bn, None, Some(rest));
+                    } else {
+                        o.insert_blank_node(
+                            bn.clone(),
+                            CollectedBlankNode::Sequence {
+                                first: None,
+                                rest: Some(rest),
+                            },
+                        );
+                    }
                 }
             }
             Ok(false)

@@ -36,7 +36,7 @@ pub(crate) fn match_blank_nodes(
                             let mut classes = Vec::new();
                             for v in seq {
                                 if let Value::Iri(iri) = v {
-                                    let iri = IRI::new(iri)?;
+                                    let iri = IRI::new(&iri)?;
                                     classes.push(ClassConstructor::IRI(iri.into()));
                                 }
                             }
@@ -74,7 +74,7 @@ pub(crate) fn match_blank_nodes(
                             let mut classes = Vec::new();
                             for v in seq {
                                 if let Value::Iri(iri) = v {
-                                    let iri = IRI::new(iri)?;
+                                    let iri = IRI::new(&iri)?;
                                     classes.push(ClassConstructor::IRI(iri.into()));
                                 }
                             }
@@ -89,7 +89,10 @@ pub(crate) fn match_blank_nodes(
                             todo!("support deeper nested blank nodes")
                         }
                     } else {
-                        return Err(Error::new("Could not find referenced sequence".into()));
+                        return Err(Error::new(format!(
+                            "Could not find referenced sequence: {:?}",
+                            bn
+                        )));
                     }
                 }
             }

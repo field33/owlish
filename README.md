@@ -42,6 +42,12 @@ Test:
 cargo test
 ```
 
+Run benchmark tests:
+
+```
+cargo bench
+```
+
 ## Commits and Releases
 
 This crate uses [convenentional commits](https://www.conventionalcommits.org/en/v1.0.0/) to create automated releases whenever the main branch is updated. In addition the CHANGELOG.md is automatically generated.

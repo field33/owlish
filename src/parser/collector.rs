@@ -16,8 +16,12 @@ pub(crate) type MatcherHandler<'a> = Box<
 >;
 
 #[derive(Debug, Clone)]
-pub(crate) enum CollectedBlankNode {
+pub(crate) enum CollectedBlankNode<'a> {
     ClassConstructor(Box<ClassConstructor>),
+    Sequence {
+        first: Option<Value<'a>>,
+        rest: Option<RdfBlankNode>,
+    },
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -38,14 +42,10 @@ pub(crate) struct OntologyCollector<'a> {
     iri: Option<IRI>,
     declarations: Vec<Declaration>,
     axioms: Vec<Axiom>,
-    // blank node -> IRI
-    sequences: HashMap<RdfBlankNode, Vec<Value<'a>>>,
-    // child node -> root node
-    sequence_tree: HashMap<RdfBlankNode, Option<RdfBlankNode>>,
 
     // annotations on things
     annotations: HashMap<CollectedAnnotationKey<'a>, CollectedAnnotation<'a>>,
-    blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode>,
+    blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode<'a>>,
 
     axiom_index: HashMap<(String, String, String), usize>,
     declaration_index: HashMap<String, Vec<usize>>,
@@ -149,11 +149,7 @@ impl<'a> OntologyCollector<'a> {
             .and_then(|index| self.axioms.get_mut(*index))
     }
 
-    // pub(crate) fn axioms_mut(&mut self) -> &mut Vec<Axiom> {
-    //     &mut self.axioms
-    // }
-
-    pub(crate) fn insert_blank_node(&mut self, bn: RdfBlankNode, bnh: CollectedBlankNode) {
+    pub(crate) fn insert_blank_node(&mut self, bn: RdfBlankNode, bnh: CollectedBlankNode<'a>) {
         self.blank_nodes.insert(bn, bnh);
     }
 
@@ -185,37 +181,37 @@ impl<'a> OntologyCollector<'a> {
         o
     }
 
-    pub(crate) fn set_sequence_root(&mut self, root: &RdfBlankNode, value: Value<'a>) {
-        self.sequence_tree.insert(root.clone(), None);
-        self.sequences.insert(root.clone(), vec![value]);
-    }
+    // pub(crate) fn set_sequence_root(&mut self, root: &RdfBlankNode, value: Value<'a>) {
+    //     self.sequence_tree.insert(root.clone(), None);
+    //     self.sequences.insert(root.clone(), vec![value]);
+    // }
 
-    pub(crate) fn get_sequence(&mut self, bn: &RdfBlankNode) -> Option<&mut Vec<Value<'a>>> {
-        match self.sequence_tree.get(bn) {
-            Some(Some(root)) => self.sequences.get_mut(root),
-            Some(None) => self.sequences.get_mut(bn),
-            _ => None,
-        }
-    }
+    // pub(crate) fn get_sequence(&mut self, bn: &RdfBlankNode) -> Option<&mut Vec<Value<'a>>> {
+    //     match self.sequence_tree.get(bn) {
+    //         Some(Some(root)) => self.sequences.get_mut(root),
+    //         Some(None) => self.sequences.get_mut(bn),
+    //         _ => None,
+    //     }
+    // }
 
-    pub(crate) fn set_sequence_tree(
-        &mut self,
-        parent: &RdfBlankNode,
-        leaf: RdfBlankNode,
-    ) -> Result<(), Error> {
-        match self.sequence_tree.get(parent).cloned() {
-            Some(None) => {
-                self.sequence_tree.insert(leaf, Some(parent.clone()));
-            }
-            Some(Some(parent)) => {
-                self.set_sequence_tree(&parent, leaf)?;
-            }
-            None => {
-                return Err(Error::new("Failed to save sequence".into()));
-            }
-        }
-        Ok(())
-    }
+    // pub(crate) fn set_sequence_tree(
+    //     &mut self,
+    //     parent: &RdfBlankNode,
+    //     leaf: RdfBlankNode,
+    // ) -> Result<(), Error> {
+    //     match self.sequence_tree.get(parent).cloned() {
+    //         Some(None) => {
+    //             self.sequence_tree.insert(leaf, Some(parent.clone()));
+    //         }
+    //         Some(Some(parent)) => {
+    //             self.set_sequence_tree(&parent, leaf)?;
+    //         }
+    //         None => {
+    //             return Err(Error::new("Failed to save sequence".into()));
+    //         }
+    //     }
+    //     Ok(())
+    // }
 
     pub(crate) fn get_blank(&self, bn: &RdfBlankNode) -> Option<&CollectedBlankNode> {
         self.blank_nodes.get(bn)
@@ -301,6 +297,51 @@ impl<'a> OntologyCollector<'a> {
                 }
                 None
             })
+    }
+
+    pub(crate) fn get_sequence(&self, bn: &RdfBlankNode) -> Option<Vec<Value<'a>>> {
+        if let Some(CollectedBlankNode::Sequence { first, rest }) = self.blank_nodes.get(bn) {
+            let mut values: Vec<Value<'a>> = Vec::new();
+            if let Some(value) = first {
+                values.push(value.clone());
+            }
+            let mut the_rest = rest;
+            while let Some(r) = the_rest {
+                the_rest = &None;
+                if let Some(CollectedBlankNode::Sequence { first, rest }) = self.blank_nodes.get(r)
+                {
+                    if let Some(value) = first {
+                        values.push(value.clone());
+                    }
+                    the_rest = rest;
+                }
+            }
+            Some(values)
+        } else {
+            None
+        }
+    }
+
+    // pub(crate) fn get_blank_mut(&self, bn: &RdfBlankNode) -> Option<&mut CollectedBlankNode> {
+    //     self.blank_nodes.get_mut(bn)
+    // }
+
+    pub(crate) fn update_blank_node_sequence(
+        &mut self,
+        bn: &RdfBlankNode,
+        first: Option<Value<'a>>,
+        rest: Option<RdfBlankNode>,
+    ) {
+        if let Some(CollectedBlankNode::Sequence { first: f, rest: r }) =
+            self.blank_nodes.get_mut(bn)
+        {
+            if let Some(first) = first {
+                *f = Some(first)
+            }
+            if let Some(rest) = rest {
+                *r = Some(rest)
+            }
+        }
     }
 }
 

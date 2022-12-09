@@ -197,7 +197,7 @@ pub struct IndexedParserOptions {
     index: HashMap<IRI, usize>,
 }
 impl IndexedParserOptions {
-    pub fn is_annotation(&self, iri: &IRI) -> bool {
+    pub fn is_annotation_prop(&self, iri: &IRI) -> bool {
         if let Some(i) = self.index.get(iri) {
             matches!(
                 self.known.get(*i),
@@ -289,7 +289,8 @@ mod tests {
             well_known, Annotation, AnnotationAssertion, Axiom, ClassAssertion,
             DataPropertyAssertion, DataPropertyDomain, DataPropertyRange, Declaration, Literal,
             LiteralOrIRI, ObjectIntersectionOf, ObjectPropertyAssertion, ObjectPropertyDomain,
-            ObjectPropertyRange, ObjectUnionOf, SubClassOf, IRI,
+            ObjectPropertyRange, ObjectUnionOf, SubAnnotationPropertyOf, SubClassOf,
+            SubDataPropertyOf, SubObjectPropertyOf, IRI,
         },
         parser::{ParserOptions, ParserOptionsBuilder},
     };
@@ -1570,7 +1571,7 @@ mod tests {
             }
         );
         assert_eq!(
-            o.axioms()[7],
+            o.axioms()[8],
             DataPropertyDomain::new(
                 IRI::new("http://field33.com/ontologies/@fld33/people/FirstName")
                     .unwrap()
@@ -1583,7 +1584,7 @@ mod tests {
             .into()
         );
         assert_eq!(
-            o.axioms()[8],
+            o.axioms()[9],
             DataPropertyRange::new(
                 IRI::new("http://field33.com/ontologies/@fld33/people/FirstName")
                     .unwrap()
@@ -1591,6 +1592,68 @@ mod tests {
                 IRI::new("http://www.w3.org/2001/XMLSchema#string")
                     .unwrap()
                     .into(),
+                vec![]
+            )
+            .into()
+        );
+    }
+
+    #[test]
+    fn sub_properties() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        @prefix : <http://test#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+        <http://test#> rdf:type owl:Ontology .
+
+        :aProp rdf:type owl:AnnotationProperty .
+        :dProp rdf:type owl:DatatypeProperty .
+        :oProp rdf:type owl:ObjectProperty .
+
+        :aPropC rdf:type owl:AnnotationProperty .
+        :dPropC rdf:type owl:DatatypeProperty .
+        :oPropC rdf:type owl:ObjectProperty .
+
+        :aPropC rdfs:subPropertyOf :aProp .
+        :dPropC rdfs:subPropertyOf :dProp .
+        :oPropC rdfs:subPropertyOf :oProp .
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
+
+        assert_eq!(o.declarations().len(), 6);
+        assert_eq!(o.axioms().len(), 3);
+
+        assert_eq!(
+            o.axioms()[0],
+            SubAnnotationPropertyOf::new(
+                IRI::new("http://test#aPropC").unwrap().into(),
+                IRI::new("http://test#aProp").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[1],
+            SubDataPropertyOf::new(
+                IRI::new("http://test#dPropC").unwrap().into(),
+                IRI::new("http://test#dProp").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[2],
+            SubObjectPropertyOf::new(
+                crate::owl::ObjectPropertyConstructor::IRI(
+                    IRI::new("http://test#oPropC").unwrap().into()
+                ),
+                IRI::new("http://test#oProp").unwrap().into(),
                 vec![]
             )
             .into()

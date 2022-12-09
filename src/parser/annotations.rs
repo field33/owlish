@@ -119,8 +119,8 @@ pub(crate) fn match_simple_annotation_assertions<'a>(
             [iob:subject] [*:predicate] [iol:object] .)?,
         Box::new(|mstate, o, options| {
             if let Some(predicate_iri) = get_iri_var("predicate", mstate)? {
-                if o.annotation_property(&predicate_iri).is_some()
-                    || options.is_annotation(&predicate_iri)
+                if o.annotation_property_declaration(&predicate_iri).is_some()
+                    || options.is_annotation_prop(&predicate_iri)
                     || WELL_KNOWN_ANNOTATIONS.contains(&predicate_iri.as_str())
                 {
                     if let Some(subject) = mstate.get("subject") {
@@ -163,8 +163,8 @@ pub(crate) fn match_annotation_assertions<'a>(
                     Err(_) => unreachable!(),
                 };
                 if let Some(predicate_iri) = get_iri_var("predicate", mstate)? {
-                    if o.annotation_property(&predicate_iri).is_some()
-                        || options.is_annotation(&predicate_iri)
+                    if o.annotation_property_declaration(&predicate_iri).is_some()
+                        || options.is_annotation_prop(&predicate_iri)
                         || WELL_KNOWN_ANNOTATIONS.contains(&predicate_iri.as_str())
                     {
                         if let Some(subject) = mstate.get("subject") {

@@ -1,6 +1,12 @@
 mod sub_object_property_of;
 pub use sub_object_property_of::*;
 
+mod sub_annotation_property_of;
+pub use sub_annotation_property_of::*;
+
+mod sub_data_property_of;
+pub use sub_data_property_of::*;
+
 mod equivalent_object_properties;
 pub use equivalent_object_properties::*;
 

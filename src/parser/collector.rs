@@ -217,7 +217,7 @@ impl<'a> OntologyCollector<'a> {
         self.blank_nodes.get(bn)
     }
 
-    pub(crate) fn annotation_property(
+    pub(crate) fn annotation_property_declaration(
         &self,
         iri: &IRI,
     ) -> Option<(&AnnotationPropertyIRI, &Vec<Annotation>)> {

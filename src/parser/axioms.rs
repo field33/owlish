@@ -10,7 +10,10 @@ use crate::owl::DataPropertyDomain;
 use crate::owl::DataPropertyRange;
 use crate::owl::ObjectPropertyDomain;
 use crate::owl::ObjectPropertyRange;
+use crate::owl::SubAnnotationPropertyOf;
 use crate::owl::SubClassOf;
+use crate::owl::SubDataPropertyOf;
+use crate::owl::SubObjectPropertyOf;
 use crate::owl::IRI;
 use crate::parser::matcher::RdfMatcher;
 use crate::parser::matcher::Value;
@@ -75,10 +78,16 @@ pub(crate) fn match_axioms(
                                 );
                             }
                         }
-                        Value::Literal { .. } => todo!(),
+                        Value::Literal { .. } => {
+                            // TODO
+                        }
                     },
-                    Value::Blank(_) => todo!(),
-                    Value::Literal { .. } => todo!(),
+                    Value::Blank(_) => {
+                        // TODO
+                    }
+                    Value::Literal { .. } => {
+                        // TODO
+                    }
                 }
             }
             Ok(false)
@@ -119,8 +128,10 @@ pub(crate) fn match_axioms(
                                                 )
                                                 .into(),
                                             );
-                                        } else if o.annotation_property(&op_iri).is_some()
-                                            || options.is_annotation(&op_iri)
+                                        } else if o
+                                            .annotation_property_declaration(&op_iri)
+                                            .is_some()
+                                            || options.is_annotation_prop(&op_iri)
                                         {
                                             o.push_axiom(
                                                 AnnotationPropertyDomain::new(
@@ -168,8 +179,12 @@ pub(crate) fn match_axioms(
                             }
                         }
                     }
-                    Value::Blank(_) => todo!(),
-                    Value::Literal { .. } => todo!(),
+                    Value::Blank(_) => {
+                        // TODO
+                    }
+                    Value::Literal { .. } => {
+                        // TODO
+                    }
                 }
             }
             Ok(false)
@@ -210,8 +225,10 @@ pub(crate) fn match_axioms(
                                                 )
                                                 .into(),
                                             );
-                                        } else if o.annotation_property(&op_iri).is_some()
-                                            || options.is_annotation(&op_iri)
+                                        } else if o
+                                            .annotation_property_declaration(&op_iri)
+                                            .is_some()
+                                            || options.is_annotation_prop(&op_iri)
                                         {
                                             o.push_axiom(
                                                 AnnotationPropertyRange::new(
@@ -250,8 +267,95 @@ pub(crate) fn match_axioms(
                             }
                         }
                     }
-                    Value::Blank(_) => todo!(),
-                    Value::Literal { .. } => todo!(),
+                    Value::Blank(_) => {
+                        // TODO
+                    }
+                    Value::Literal { .. } => {
+                        // TODO
+                    }
+                }
+            }
+            Ok(false)
+        }),
+    ));
+
+    matchers.push((
+        rdf_match!("SubProperty", prefixes,
+            [iob:subject] [rdfs:subPropertyOf] [iob:object] .
+        )?,
+        Box::new(|mstate, o, options| {
+            if let Some(vars) = get_vars!(mstate, subject, object) {
+                match vars.subject {
+                    Value::Iri(subject_iri_str) => match vars.object {
+                        Value::Iri(object_iri_str) => {
+                            if let Ok(subject) = IRI::new(subject_iri_str) {
+                                if let Ok(object) = IRI::new(object_iri_str) {
+                                    let subject_is_anno_prop =
+                                        o.annotation_property_declaration(&subject).is_some()
+                                            || options.is_annotation_prop(&subject);
+                                    let subject_is_object_prop =
+                                        o.object_property_declaration(&subject).is_some()
+                                            || options.is_object_prop(&subject);
+                                    let subject_is_data_prop =
+                                        o.data_property_declaration(&subject).is_some()
+                                            || options.is_data_prop(&subject);
+
+                                    let object_is_anno_prop =
+                                        o.annotation_property_declaration(&object).is_some()
+                                            || options.is_annotation_prop(&object);
+                                    let object_is_object_prop =
+                                        o.object_property_declaration(&object).is_some()
+                                            || options.is_object_prop(&object);
+                                    let object_is_data_prop =
+                                        o.data_property_declaration(&object).is_some()
+                                            || options.is_data_prop(&object);
+
+                                    if subject_is_anno_prop && object_is_anno_prop {
+                                        o.push_axiom(
+                                            SubAnnotationPropertyOf::new(
+                                                subject.into(),
+                                                object.into(),
+                                                vec![],
+                                            )
+                                            .into(),
+                                        );
+                                    } else if subject_is_data_prop && object_is_data_prop {
+                                        o.push_axiom(
+                                            SubDataPropertyOf::new(
+                                                subject.into(),
+                                                object.into(),
+                                                vec![],
+                                            )
+                                            .into(),
+                                        );
+                                    } else if subject_is_object_prop && object_is_object_prop {
+                                        o.push_axiom(
+                                            SubObjectPropertyOf::new(
+                                                crate::owl::ObjectPropertyConstructor::IRI(
+                                                    subject.into(),
+                                                ),
+                                                object.into(),
+                                                vec![],
+                                            )
+                                            .into(),
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                        Value::Blank(_) => {
+                            // TODO: Add support for complex object property constructors
+                        }
+                        Value::Literal { .. } => {
+                            // TODO
+                        }
+                    },
+                    Value::Blank(_) => {
+                        // TODO
+                    }
+                    Value::Literal { .. } => {
+                        // TODO
+                    }
                 }
             }
             Ok(false)

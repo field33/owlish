@@ -399,19 +399,19 @@ impl RdfMatcher {
                     MatchOrVar::Blank(_) => (false, None),
                     MatchOrVar::Var(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrBlankVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrLitVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::BlankVar(_) => (false, None),
                     MatchOrVar::LitVar(_) => (false, None),
@@ -423,16 +423,16 @@ impl RdfMatcher {
                     MatchOrVar::IriOrLitVar(_) => (false, None),
                     MatchOrVar::Var(var) => {
                         let value = Value::Blank(bn.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrBlankVar(var) => {
                         let value = Value::Blank(bn.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriVar(_) => (false, None),
                     MatchOrVar::BlankVar(var) => {
                         let value = Value::Blank(bn.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                 },
             };
@@ -444,19 +444,19 @@ impl RdfMatcher {
                     MatchOrVar::Blank(_) => (false, None),
                     MatchOrVar::Var(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrBlankVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrLitVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::BlankVar(_) => (false, None),
                     MatchOrVar::LitVar(_) => (false, None),
@@ -470,19 +470,19 @@ impl RdfMatcher {
                     MatchOrVar::Blank(_) => (false, None),
                     MatchOrVar::Var(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrBlankVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrLitVar(var) => {
                         let value = Value::Iri(iri.iri.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::BlankVar(_) => (false, None),
                     MatchOrVar::LitVar(_) => (false, None),
@@ -493,17 +493,17 @@ impl RdfMatcher {
                     MatchOrVar::LitVar(_) => (false, None),
                     MatchOrVar::Var(var) => {
                         let value = Value::Blank(bn.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrBlankVar(var) => {
                         let value = Value::Blank(bn.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriVar(_) => (false, None),
                     MatchOrVar::IriOrLitVar(_) => (false, None),
                     MatchOrVar::BlankVar(var) => {
                         let value = Value::Blank(bn.clone());
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                 },
                 RdfObject::Literal(lit) => match object_matcher {
@@ -511,17 +511,17 @@ impl RdfMatcher {
                     MatchOrVar::Blank(_) => (false, None),
                     MatchOrVar::Var(var) => {
                         let value = lit.clone().into();
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriVar(_) => (false, None),
                     MatchOrVar::BlankVar(_) => (false, None),
                     MatchOrVar::LitVar(var) => {
                         let value = lit.clone().into();
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrLitVar(var) => {
                         let value = lit.clone().into();
-                        mstate.check_var(*var, value)
+                        mstate.check_var(var, value)
                     }
                     MatchOrVar::IriOrBlankVar(_) => (false, None),
                 },

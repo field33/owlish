@@ -10,6 +10,8 @@ pub enum Axiom {
     AnnotationPropertyDomain(AnnotationPropertyDomain),
     // Properties
     SubObjectPropertyOf(SubObjectPropertyOf),
+    SubDataPropertyOf(SubDataPropertyOf),
+    SubAnnotationPropertyOf(SubAnnotationPropertyOf),
     EquivalentObjectProperties(EquivalentObjectProperties),
     EquivalentDataProperties(EquivalentDataProperties),
     InverseObjectProperties(InverseObjectProperties),
@@ -53,6 +55,8 @@ impl Axiom {
             Axiom::AnnotationPropertyDomain(a) => &mut a.annotations,
             Axiom::AnnotationPropertyRange(a) => &mut a.annotations,
             Axiom::SubObjectPropertyOf(a) => &mut a.annotations,
+            Axiom::SubAnnotationPropertyOf(a) => &mut a.annotations,
+            Axiom::SubDataPropertyOf(a) => &mut a.annotations,
             Axiom::EquivalentObjectProperties(a) => &mut a.annotations,
             Axiom::EquivalentDataProperties(a) => &mut a.annotations,
             Axiom::InverseObjectProperties(a) => &mut a.annotations,
@@ -88,5 +92,17 @@ impl Axiom {
 impl From<SubObjectPropertyOf> for Axiom {
     fn from(s: SubObjectPropertyOf) -> Self {
         Self::SubObjectPropertyOf(s)
+    }
+}
+
+impl From<SubAnnotationPropertyOf> for Axiom {
+    fn from(s: SubAnnotationPropertyOf) -> Self {
+        Self::SubAnnotationPropertyOf(s)
+    }
+}
+
+impl From<SubDataPropertyOf> for Axiom {
+    fn from(s: SubDataPropertyOf) -> Self {
+        Self::SubDataPropertyOf(s)
     }
 }

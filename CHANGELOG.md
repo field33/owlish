@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.18.1 - 2022-12-12
+#### Bug Fixes
+- Fix parsing UnionOf constructs - (5e75c47) - Florian Loers
+
+- - -
+
 ## v0.18.0 - 2022-12-09
 #### Features
 - Parse Sub*PropertyOf axioms - (2d58473) - Florian Loers

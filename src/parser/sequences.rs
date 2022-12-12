@@ -22,8 +22,10 @@ pub(crate) fn match_sequences(
             if let Some(Value::Blank(bn)) = mstate.get("x") {
                 if let Some(object) = mstate.get("object").cloned() {
                     if o.get_blank(bn).is_some() {
+                        println!("update {:?}, {}", bn, object);
                         o.update_blank_node_sequence(bn, Some(object), None);
                     } else {
+                        println!("insert {:?}, {}", bn, object);
                         o.insert_blank_node(
                             bn.clone(),
                             CollectedBlankNode::Sequence {
@@ -45,8 +47,11 @@ pub(crate) fn match_sequences(
             if let Some(Value::Blank(bn)) = mstate.get("x") {
                 if let Some(Value::Blank(rest)) = mstate.get("object").cloned() {
                     if o.get_blank(bn).is_some() {
+                        println!("R update {:?}, {:?}", bn, rest);
+
                         o.update_blank_node_sequence(bn, None, Some(rest));
                     } else {
+                        println!("R insert {:?}, {:?}", bn, rest);
                         o.insert_blank_node(
                             bn.clone(),
                             CollectedBlankNode::Sequence {

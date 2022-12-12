@@ -169,15 +169,6 @@ impl<'a> From<IRIOrBlank<'a>> for Value<'a> {
     }
 }
 
-// impl<'a> From<IRIOrBlank<'a>> for &Value<'a> {
-//     fn from(iob: IRIOrBlank<'a>) -> Self {
-//         match iob {
-//             IRIOrBlank::Iri(iri) => &Value::Iri(iri),
-//             IRIOrBlank::Blank(b) => &Value::Blank(b),
-//         }
-//     }
-// }
-
 #[derive(Debug, Clone)]
 pub struct MatcherState<'a> {
     variables: HashMap<String, Vec<Value<'a>>>,
@@ -190,6 +181,10 @@ impl<'a> MatcherState<'a> {
             variables: Default::default(),
             matches: Default::default(),
         }
+    }
+
+    pub fn vars(&self) -> &HashMap<String, Vec<Value<'a>>> {
+        &self.variables
     }
 
     pub fn push(&mut self, var: &str, value: Value<'a>) {
@@ -358,6 +353,9 @@ impl RdfMatcher {
         &self.name
     }
 
+    /// Matches the given triple in self.
+    ///
+    /// Mutates the given state when the triple matched to this definition.
     pub fn matches<'a>(
         &self,
         triple: Rc<RdfTriple<'a>>,
@@ -366,8 +364,6 @@ impl RdfMatcher {
         let triple_matches = self.match_triple(triple, mstate);
 
         let finished = mstate.matches.len() == self.match_triples.len();
-
-        parser_debug!(self, "Finished: {:?}", finished);
 
         if triple_matches {
             if finished {
@@ -381,13 +377,6 @@ impl RdfMatcher {
     }
 
     fn match_triple<'a>(&self, triple: Rc<RdfTriple<'a>>, mstate: &mut MatcherState<'a>) -> bool {
-        parser_debug!(
-            self,
-            "#############################################################"
-        );
-        parser_debug!(self, "{}", display(&triple));
-        parser_debug!(self, "{}", print(self, mstate));
-
         let mut triple_matches = false;
 
         for (matcher_id, (subject_matcher, predicate_matcher, object_matcher)) in

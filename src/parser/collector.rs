@@ -45,7 +45,7 @@ pub(crate) struct OntologyCollector<'a> {
 
     // annotations on things
     annotations: HashMap<CollectedAnnotationKey<'a>, CollectedAnnotation<'a>>,
-    blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode<'a>>,
+    pub blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode<'a>>,
 
     axiom_index: HashMap<(String, String, String), usize>,
     declaration_index: HashMap<String, Vec<usize>>,

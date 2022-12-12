@@ -8,7 +8,7 @@ use crate::{
     api::Ontology,
     error::Error,
     owl::{well_known, Declaration, IRI},
-    parser::matcher::{IRIOrBlank, MatchResult, RdfMatcher},
+    parser::matcher::{display, print, IRIOrBlank, MatchResult, RdfMatcher},
 };
 
 use self::matcher::{get_prefixes, MatcherState};
@@ -83,13 +83,14 @@ impl Ontology {
         // subject node -> [matcher_id, matched_triples]
         let mut matcher_instances: HashMap<usize, MatcherStateEntry> = HashMap::new();
         // let mut matcher_instance_id = 0;
+
         for phase in 0..4 {
             matchers.clear();
             matcher_instances.clear();
             match phase {
                 0 => {
-                    sequences::match_sequences(&mut matchers, &prefixes)?;
                     declarations::match_declarations(&mut matchers, &prefixes)?;
+                    sequences::match_sequences(&mut matchers, &prefixes)?;
                 }
                 1 => {
                     blank_nodes::match_blank_nodes(&mut matchers, &prefixes)?;
@@ -108,63 +109,84 @@ impl Ontology {
             }
 
             for triple in triples.iter() {
-                for (matcher_id, (m, _)) in matchers.iter().enumerate() {
-                    let subject: IRIOrBlank = triple.subject.clone().into();
-                    // (1) Take each ongoing matcher state and check whether it matches this new triple
-                    for (_, (matcher_id, triples, mstate, finished)) in matcher_instances.iter_mut()
-                    {
-                        let (m, _) = &matchers[*matcher_id];
-                        parser_debug!(
-                            m,
-                            "         ################### Matching ({:?}, {})",
-                            &subject,
-                            m.name()
-                        );
+                let subject: IRIOrBlank = triple.subject.clone().into();
 
-                        // (1) If so, keep matching. Maybe mark as finished.
-                        if let MatchResult::Matched(f) = m.matches(triple.clone(), mstate) {
-                            *finished = f;
-                            if !triples.iter().any(|t| Rc::ptr_eq(t, triple)) {
-                                triples.push(triple.clone());
+                for (matcher_id, (m, _)) in matchers.iter().enumerate() {
+                    let mut mstate = MatcherState::new();
+                    parser_debug!(
+                        m,
+                        "#############################################################"
+                    );
+                    parser_debug!(m, "{}", display(triple));
+
+                    // (1) Start matcher with new state (if there is no current matcher state)
+                    if let MatchResult::Matched(finished) = m.matches(triple.clone(), &mut mstate) {
+                        parser_debug!(m, "Matched for empty state: ({:?}, {})", &subject, m.name(),);
+
+                        // (2) If matching already finished -> call handler and continue
+                        if finished {
+                            let (_m, handler) = &matchers[matcher_id];
+                            if !handler(&mut mstate, &mut collector, &indexed_options)? {
+                                // todo: did not meet semantic criteria
+                            }
+                        } else {
+                            parser_debug!(m, "Check for ongoing matchers",);
+                            // (3) Check if there is an existing matcher instance
+                            match matcher_instances.get_mut(&matcher_id) {
+                                Some((_, _, ongoing_mstate, _)) => {
+                                    parser_debug!(m, "{}", print(m, &mstate));
+                                    let (matcher, handler) = &matchers[matcher_id];
+                                    // (4) If that does match as well -> it's state is now extended (by the new match)
+                                    match matcher.matches(triple.clone(), ongoing_mstate) {
+                                        MatchResult::Matched(finished) => {
+                                            parser_debug!(
+                                                m,
+                                                "Matched ongoing matcher {:?} {} {} {:?}",
+                                                triple,
+                                                matcher_id,
+                                                matcher.name(),
+                                                ongoing_mstate.vars()
+                                            );
+                                            if finished {
+                                                if !handler(
+                                                    ongoing_mstate,
+                                                    &mut collector,
+                                                    &indexed_options,
+                                                )? {
+                                                    // todo: did not meet semantic criteria
+                                                }
+                                                matcher_instances.remove(&matcher_id);
+                                            } else {
+                                                // TODO?
+                                            }
+                                        }
+                                        // (5) If there is an ongoing matcher of this kind
+                                        //     but it did not match at all it means, it started to match
+                                        //     on smth different, than what we found now:
+                                        //     (e.g.) We started a UnionOf on one blank node but now got another blank node which maches as well.
+                                        //     -> In such cases restart the matcher. For performance reasons only one instance of matcher runs
+                                        //     at a time which means meaningful constructs of multiple triples can not bleed into each other.
+                                        MatchResult::Nope => {
+                                            parser_debug!(
+                                                m,
+                                                "No match for ongoing matcher: Replacing state...",
+                                            );
+                                            matcher_instances.insert(
+                                                matcher_id,
+                                                (matcher_id, vec![], mstate, finished),
+                                            );
+                                        }
+                                    }
+                                }
+                                None => {
+                                    // (6) If there is no ongoing matcher, save a new one
+                                    parser_debug!(m, "No ongoing matchers",);
+                                    matcher_instances
+                                        .insert(matcher_id, (matcher_id, vec![], mstate, finished));
+                                }
                             }
                         }
                     }
-
-                    // (1) Start matcher with new state (if there is no current matcher state)
-                    let mut mstate = MatcherState::new();
-                    if let std::collections::hash_map::Entry::Vacant(e) =
-                        matcher_instances.entry(matcher_id)
-                    {
-                        if let MatchResult::Matched(finished) =
-                            m.matches(triple.clone(), &mut mstate)
-                        {
-                            parser_debug!(
-                                m,
-                                "New matching state for ({:?}, {})",
-                                &subject,
-                                m.name()
-                            );
-                            e.insert((matcher_id, vec![triple.clone()], mstate, finished));
-                        }
-                    }
-                }
-
-                // (2) Handle matchers that fully matched a set of triples
-                let mut finished_matcher_instances = Vec::new();
-                // let mut resolved_triples = Vec::new();
-                for (matcher_ins_id, (mid, _triples, mstate, finished)) in matcher_instances.iter()
-                {
-                    if *finished {
-                        finished_matcher_instances.push(*matcher_ins_id);
-                        let (_m, handler) = &matchers[*mid];
-                        if !handler(mstate, &mut collector, &indexed_options)? {
-                            // todo: did not meet semantic criteria
-                        }
-                    }
-                }
-                // (2) Remove all handled matcher instances
-                for matcher_ins_id in finished_matcher_instances {
-                    matcher_instances.remove(&matcher_ins_id);
                 }
             }
         }
@@ -759,6 +781,76 @@ mod tests {
                     vec![]
                 )
                 .into(),
+                vec![]
+            )
+            .into()
+        );
+    }
+
+    #[test]
+    fn object_property_range_domain_unsorted() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        <http://field33.com/query_result/05b62f05-fc55-4f59-8e47-7563e0cc6ba5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+             <http://field33.com/ontologies/@schmolo/ppr/CFAFBD> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+             _:1aed1bc93811d23de40180a8654db2f6 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+            _:84a5309bc04f5c90361bb9101e1ecd8b <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+            _:ca04f7914fb1f1bf6d53ebf2477f4e4e <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:a9dcc8a907b1c076413bd5b8f25392d7 .
+            _:a9dcc8a907b1c076413bd5b8f25392d7 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://field33.com/ontologies/@schmolo/ppr/RQ> .
+            _:ca04f7914fb1f1bf6d53ebf2477f4e4e <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <http://field33.com/ontologies/@schmolo/ppr/CASL> .
+            _:84a5309bc04f5c90361bb9101e1ecd8b <http://www.w3.org/2002/07/owl#unionOf> _:ca04f7914fb1f1bf6d53ebf2477f4e4e .
+            _:84a5309bc04f5c90361bb9101e1ecd8b <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+            <http://field33.com/ontologies/@schmolo/ppr/CFAFBD> <http://www.w3.org/2000/01/rdf-schema#range> _:84a5309bc04f5c90361bb9101e1ecd8b .
+            <http://field33.com/ontologies/@schmolo/ppr/CFAFBD> <http://www.w3.org/2000/01/rdf-schema#domain> <http://field33.com/ontologies/@schmolo/ppr/CFAR> .
+            <http://field33.com/ontologies/@schmolo/ppr/CFAFBD> <http://www.w3.org/2000/01/rdf-schema#label> "Followed By"@en .
+            <http://field33.com/ontologies/@schmolo/ppr/CFAFBD> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(
+            turtle,
+            ParserOptions::builder()
+                .known(Declaration::ObjectProperty {
+                    iri: IRI::new("http://test#foo").unwrap().into(),
+                    annotations: vec![],
+                })
+                .build(),
+        )
+        .unwrap();
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 2);
+        assert_eq!(o.axioms().len(), 3);
+        assert_eq!(
+            o.axioms()[1],
+            ObjectPropertyRange::new(
+                IRI::new("http://field33.com/ontologies/@schmolo/ppr/CFAFBD")
+                    .unwrap()
+                    .into(),
+                ObjectUnionOf::new(
+                    vec![
+                        IRI::new("http://field33.com/ontologies/@schmolo/ppr/CASL")
+                            .unwrap()
+                            .into(),
+                        IRI::new("http://field33.com/ontologies/@schmolo/ppr/RQ")
+                            .unwrap()
+                            .into(),
+                    ],
+                    vec![]
+                )
+                .into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[2],
+            ObjectPropertyDomain::new(
+                IRI::new("http://field33.com/ontologies/@schmolo/ppr/CFAFBD")
+                    .unwrap()
+                    .into(),
+                IRI::new("http://field33.com/ontologies/@schmolo/ppr/CFAR")
+                    .unwrap()
+                    .into(),
                 vec![]
             )
             .into()

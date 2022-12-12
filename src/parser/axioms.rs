@@ -242,7 +242,6 @@ pub(crate) fn match_axioms(
                                     }
                                 }
                                 Value::Blank(bn) => {
-                                    println!("rdfs:range for {:?}", bn);
                                     if let Some(cbn) = o.get_blank(bn) {
                                         println!("cbn {:?}", cbn);
                                         if let CollectedBlankNode::ClassConstructor(cc) = cbn {

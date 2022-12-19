@@ -309,10 +309,10 @@ mod tests {
         api::Ontology,
         owl::{
             well_known, Annotation, AnnotationAssertion, Axiom, ClassAssertion,
-            DataPropertyAssertion, DataPropertyDomain, DataPropertyRange, Declaration, Literal,
-            LiteralOrIRI, ObjectIntersectionOf, ObjectPropertyAssertion, ObjectPropertyDomain,
-            ObjectPropertyRange, ObjectUnionOf, SubAnnotationPropertyOf, SubClassOf,
-            SubDataPropertyOf, SubObjectPropertyOf, IRI,
+            DataPropertyAssertion, DataPropertyDomain, DataPropertyRange, Declaration,
+            EquivalentClasses, Literal, LiteralOrIRI, ObjectIntersectionOf,
+            ObjectPropertyAssertion, ObjectPropertyDomain, ObjectPropertyRange, ObjectUnionOf,
+            SubAnnotationPropertyOf, SubClassOf, SubDataPropertyOf, SubObjectPropertyOf, IRI,
         },
         parser::{ParserOptions, ParserOptionsBuilder},
     };
@@ -1746,6 +1746,41 @@ mod tests {
                     IRI::new("http://test#oPropC").unwrap().into()
                 ),
                 IRI::new("http://test#oProp").unwrap().into(),
+                vec![]
+            )
+            .into()
+        );
+    }
+
+    #[test]
+    fn equivalent_classes() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+        @prefix : <http://test#> .
+        @prefix owl: <http://www.w3.org/2002/07/owl#> .
+        @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+        @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+        <http://test#> rdf:type owl:Ontology .
+
+        :A rdf:type owl:Class .
+        :B rdf:type owl:Class .
+        :A owl:equivalentClass :B .
+
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
+
+        assert_eq!(o.declarations().len(), 2);
+        assert_eq!(o.axioms().len(), 1);
+
+        assert_eq!(
+            o.axioms()[0],
+            EquivalentClasses::new(
+                IRI::new("http://test#A").unwrap().into(),
+                IRI::new("http://test#B").unwrap().into(),
                 vec![]
             )
             .into()

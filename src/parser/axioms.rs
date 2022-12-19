@@ -8,6 +8,7 @@ use crate::owl::ClassAssertion;
 use crate::owl::ClassConstructor;
 use crate::owl::DataPropertyDomain;
 use crate::owl::DataPropertyRange;
+use crate::owl::EquivalentClasses;
 use crate::owl::ObjectPropertyDomain;
 use crate::owl::ObjectPropertyRange;
 use crate::owl::SubAnnotationPropertyOf;
@@ -77,6 +78,42 @@ pub(crate) fn match_axioms(
                                     .into(),
                                 );
                             }
+                        }
+                        Value::Literal { .. } => {
+                            // TODO
+                        }
+                    },
+                    Value::Blank(_) => {
+                        // TODO
+                    }
+                    Value::Literal { .. } => {
+                        // TODO
+                    }
+                }
+            }
+            Ok(false)
+        }),
+    ));
+    matchers.push((
+        rdf_match!("EquivalentClasses", prefixes,
+            [:subject] [owl:equivalentClass] [:object] .
+        )?,
+        Box::new(|mstate, o, _| {
+            if let Some(vars) = get_vars!(mstate, subject, object) {
+                match vars.subject {
+                    Value::Iri(subject_iri_str) => match vars.object {
+                        Value::Iri(object_iri_str) => {
+                            o.push_axiom(
+                                EquivalentClasses::new(
+                                    IRI::new(subject_iri_str)?.into(),
+                                    IRI::new(object_iri_str)?.into(),
+                                    vec![],
+                                )
+                                .into(),
+                            );
+                        }
+                        Value::Blank(_) => {
+                            // TODO
                         }
                         Value::Literal { .. } => {
                             // TODO

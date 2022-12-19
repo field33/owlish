@@ -1,4 +1,4 @@
-use crate::owl::{Annotation, Axiom, ClassConstructor, IndividualIRI};
+use crate::owl::{Annotation, Axiom, ClassConstructor, EquivalentClasses, IndividualIRI};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct SameIndividual {
@@ -75,6 +75,12 @@ impl ClassAssertion {
 impl From<ClassAssertion> for Axiom {
     fn from(ca: ClassAssertion) -> Self {
         Axiom::ClassAssertion(ca)
+    }
+}
+
+impl From<EquivalentClasses> for Axiom {
+    fn from(ec: EquivalentClasses) -> Self {
+        Axiom::EquivalentClasses(ec)
     }
 }
 

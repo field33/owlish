@@ -26,7 +26,7 @@ fn object_properties() {
     )
     .unwrap();
     assert_eq!(o.declarations().len(), 197);
-    assert_eq!(o.axioms().len(), 432);
+    assert_eq!(o.axioms().len(), 433);
 
     let mut domain_to_check = None;
     let mut range_to_check = None;

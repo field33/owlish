@@ -26,8 +26,11 @@ impl Display for AnnotationPropertyIRI {
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct AnnotationPropertyDomain {
+    #[serde(rename = "annotationIRI")]
     pub iri: AnnotationPropertyIRI,
-    pub cls: ClassIRI,
+    #[serde(rename = "classIRI")]
+    pub class_iri: ClassIRI,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -35,7 +38,7 @@ impl AnnotationPropertyDomain {
     pub fn new(iri: AnnotationPropertyIRI, cls: ClassIRI, annotations: Vec<Annotation>) -> Self {
         Self {
             iri,
-            cls,
+            class_iri: cls,
             annotations,
         }
     }
@@ -43,8 +46,11 @@ impl AnnotationPropertyDomain {
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct AnnotationPropertyRange {
+    #[serde(rename = "annotationIRI")]
     pub iri: AnnotationPropertyIRI,
+    #[serde(rename = "datatypeIRI")]
     pub datatype_iri: DatatypeIRI,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -76,9 +82,13 @@ impl From<AnnotationPropertyDomain> for Axiom {
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct AnnotationAssertion {
+    #[serde(rename = "annotationIRI")]
     pub iri: AnnotationPropertyIRI,
+    #[serde(rename = "subjectIRI")]
     pub subject: IRI,
+    #[serde(rename = "value")]
     pub value: LiteralOrIRI,
+    #[serde(rename = "annotations")]
     pub annotations: Vec<Annotation>,
 }
 
@@ -115,17 +125,33 @@ mod wasm {
  */
 export type AnnotationAssertion = {
     /**
-     * The IRI of this annoration.
+     * The IRI of this annotation.
      */
-    iri: IRI, 
+    annotationIRI: IRI, 
     /**
      * The subject IRI.
      */
-    subject: IRI, 
+    subjectIRI: IRI, 
     /**
      * The asserted value.
      */
     value: LiteralOrIRI, 
+    annotations: Array<Annotation>
+};
+export type AnnotationAssertionDomain = {
+    /**
+     * The IRI of this annotation.
+     */
+    annotationIRI: IRI, 
+    classIRI: IRI, 
+    annotations: Array<Annotation>
+};
+export type AnnotationAssertionRange = {
+    /**
+     * The IRI of this annotation.
+     */
+    annotationIRI: IRI, 
+    datatypeIRI: IRI, 
     annotations: Array<Annotation>
 };
 "#;
@@ -136,9 +162,9 @@ export type Annotation = {
     /**
      * The annotation IRI.
      */
-    iri: IRI,
+    annotationIRI: IRI,
     /**
-     * The annotated value.
+     * The annotation value.
      */
     value: LiteralOrIRI,
     annotations: Array<Annotation>,

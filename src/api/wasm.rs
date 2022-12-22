@@ -208,32 +208,32 @@ export interface IRI {
 export type Value = {
     _type: "string",
     value: string,
-    datatypeIri: string,
+    datatypeIRI: string,
     lang: null,
 } | {
     _type: "raw",
     value: Uint8Array,
-    datatypeIri: string,
+    datatypeIRI: string,
     lang: null,
 } | {
     _type: "dateTime",
     value: string,
-    datatypeIri: string,
+    datatypeIRI: string,
     lang: null,
 } | {
     _type: "langString",
     value: string,
-    datatypeIri: string,
+    datatypeIRI: string,
     lang: string,
 } | {
     _type: "number",
     value: number,
-    datatypeIri: string,
+    datatypeIRI: string,
     lang: null,
 } | {
     _type: "boolean",
     value: boolean,
-    datatypeIri: string,
+    datatypeIRI: string,
     lang: null,
 }
 

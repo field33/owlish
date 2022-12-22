@@ -5,7 +5,7 @@ pub struct ObjectExactCardinality {
     pub value: u64,
     #[serde(rename = "objectPropertyIRI")]
     pub object_property_iri: ObjectPropertyIRI,
-    pub cls: Option<ClassIRI>,
+    pub class_iri: Option<ClassIRI>,
 }
 
 impl ObjectExactCardinality {
@@ -13,7 +13,7 @@ impl ObjectExactCardinality {
         Self {
             value,
             object_property_iri,
-            cls,
+            class_iri: cls,
         }
     }
 }

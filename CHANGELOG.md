@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.19.1 - 2022-12-22
+#### Bug Fixes
+- Fix error in public type generation - (dd85aed) - Florian Loers
+
+- - -
+
 ## v0.19.0 - 2022-12-19
 #### Features
 - Parse EquivalentOfClasses axioms - (0e99c1d) - Florian Loers

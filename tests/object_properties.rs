@@ -32,7 +32,7 @@ fn object_properties() {
     let mut range_to_check = None;
     for a in o.axioms().iter() {
         if let Axiom::ObjectPropertyDomain(d) = &a {
-            if d.object_property_iri
+            if d.iri
                 .as_iri()
                 .as_str()
                 .ends_with("AccountabilityFulfillingOf")
@@ -41,7 +41,7 @@ fn object_properties() {
             }
         }
         if let Axiom::ObjectPropertyRange(r) = &a {
-            if r.object_property_iri
+            if r.iri
                 .as_iri()
                 .as_str()
                 .ends_with("AccountabilityFulfillingOf")

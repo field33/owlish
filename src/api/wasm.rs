@@ -66,8 +66,8 @@ impl Ontology {
     }
 
     /// Get the IRI of this ontology.
-    #[wasm_bindgen(getter)]
-    pub fn iri(&self) -> IRI {
+    #[wasm_bindgen(getter, js_name = "iri")]
+    pub fn get_iri(&self) -> IRI {
         let s = serde_json::to_string(&self.iri).unwrap();
         JSON::parse(&s).unwrap().into()
     }
@@ -414,6 +414,38 @@ pub fn set_query_parameter(iri: &IRI, name: &str, value: &str) -> Option<IRI> {
 }
 
 #[wasm_bindgen]
+pub fn replace_leaf(iri: &IRI, new_leaf_name: Option<String>) -> Option<IRI> {
+    match JSON::stringify(iri) {
+        Ok(s) => match s.as_string() {
+            Some(s) => match serde_json::from_str::<crate::owl::IRI>(&s) {
+                Ok(mut iri) => {
+                    if let Err(e) = iri.set_leaf(new_leaf_name) {
+                        error_1(&e.into());
+                        return None;
+                    }
+                    iri_to_js_iri(&iri)
+                }
+                Err(e) => {
+                    error_1(&format!("Failed to set query parameter: {}", e).into());
+                    None
+                }
+            },
+            None => {
+                error_1(
+                    &format!("Failed to set query parameter: Value could not be stringified.")
+                        .into(),
+                );
+                None
+            }
+        },
+        Err(e) => {
+            error_1(&format!("Failed to set query parameter: {:?}", e).into());
+            None
+        }
+    }
+}
+
+#[wasm_bindgen]
 #[allow(non_camel_case_types)]
 pub struct well_known {
     // generate namespace in wasm
@@ -422,25 +454,88 @@ pub struct well_known {
 #[wasm_bindgen]
 impl well_known {
     pub fn owl_AnnotationProperty() -> IRI {
-        iri_to_js_iri(crate::owl::well_known::owl_AnnotationProperty().as_iri()).unwrap()
+        iri_to_js_iri(&crate::owl::well_known::owl_AnnotationProperty()).unwrap()
     }
     pub fn owl_AsymmetricProperty() -> IRI {
-        iri_to_js_iri(crate::owl::well_known::owl_AsymmetricProperty().as_iri()).unwrap()
+        iri_to_js_iri(&crate::owl::well_known::owl_AsymmetricProperty()).unwrap()
     }
     pub fn owl_Class() -> IRI {
         iri_to_js_iri(crate::owl::well_known::owl_Class().as_iri()).unwrap()
     }
     pub fn owl_ObjectProperty() -> IRI {
-        iri_to_js_iri(crate::owl::well_known::owl_ObjectProperty().as_iri()).unwrap()
+        iri_to_js_iri(&crate::owl::well_known::owl_ObjectProperty()).unwrap()
     }
     pub fn owl_Ontology() -> IRI {
         iri_to_js_iri(&crate::owl::well_known::owl_Ontology()).unwrap()
     }
     pub fn owl_SymmetricProperty() -> IRI {
-        iri_to_js_iri(crate::owl::well_known::owl_SymmetricProperty().as_iri()).unwrap()
+        iri_to_js_iri(&crate::owl::well_known::owl_SymmetricProperty()).unwrap()
     }
     pub fn owl_Thing() -> IRI {
         iri_to_js_iri(crate::owl::well_known::owl_Thing().as_iri()).unwrap()
+    }
+    pub fn owl_allValuesFrom() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_allValuesFrom()).unwrap()
+    }
+    pub fn owl() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl()).unwrap()
+    }
+    pub fn owl_cardinality() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_cardinality()).unwrap()
+    }
+    pub fn owl_Restriction() -> IRI {
+        iri_to_js_iri(crate::owl::well_known::owl_Restriction().as_iri()).unwrap()
+    }
+    pub fn owl_complementOf() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_complementOf()).unwrap()
+    }
+    pub fn owl_Datatype() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_Datatype()).unwrap()
+    }
+    pub fn owl_DatatypeProperty() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_DatatypeProperty()).unwrap()
+    }
+    pub fn owl_hasSelf() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_hasSelf()).unwrap()
+    }
+    pub fn owl_intersectionOf() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_intersectionOf()).unwrap()
+    }
+    pub fn owl_qualifiedCardinality() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_qualifiedCardinality()).unwrap()
+    }
+    pub fn owl_maxCardinality() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_maxCardinality()).unwrap()
+    }
+    pub fn owl_maxQualifiedCardinality() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_maxQualifiedCardinality()).unwrap()
+    }
+    pub fn owl_minQualifiedCardinality() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_minQualifiedCardinality()).unwrap()
+    }
+    pub fn owl_NamedIndividual() -> IRI {
+        iri_to_js_iri(crate::owl::well_known::owl_NamedIndividual().as_iri()).unwrap()
+    }
+    pub fn owl_onClass() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_onClass()).unwrap()
+    }
+    pub fn owl_onDataRange() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_onDataRange()).unwrap()
+    }
+    pub fn owl_oneOf() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_oneOf()).unwrap()
+    }
+    pub fn owl_onProperties() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_onProperties()).unwrap()
+    }
+    pub fn owl_onProperty() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_onProperty()).unwrap()
+    }
+    pub fn owl_someValuesFrom() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_someValuesFrom()).unwrap()
+    }
+    pub fn owl_unionOf() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_unionOf()).unwrap()
     }
 
     pub fn rdf_type() -> IRI {

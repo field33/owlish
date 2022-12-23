@@ -17,3 +17,4 @@ pub mod owl;
 
 pub mod examples;
 pub mod parser;
+pub mod serializer;

@@ -3,6 +3,7 @@ use std::{borrow::Cow, collections::HashMap, fmt::Display, str::FromStr};
 use crate::error::Error;
 
 use super::{ClassIRI, ObjectPropertyIRI};
+use iref::Fragment;
 use pct_str::{PctString, URIReserved};
 use serde::{de::Visitor, ser::SerializeMap, Deserialize, Serialize};
 
@@ -84,6 +85,30 @@ impl IRI {
             iribuf: iref::IriBuf::from_str(prefix)?,
             imports: Default::default(),
         })
+    }
+
+    pub fn set_leaf(&mut self, new_leaf_name: Option<String>) -> Result<(), String> {
+        if self.0.fragment().is_some() {
+            if let Some(frag) = new_leaf_name {
+                let frag = Fragment::try_from(frag.as_str())
+                    .map_err(|e| format!("Failed to set iri fragment: {}", e))?;
+                self.0.set_fragment(Some(frag));
+            } else {
+                self.0.set_fragment(None);
+            }
+        } else {
+            if let Some(name) = new_leaf_name {
+                let temp_iri = iref::IriBuf::from_string(format!("http://a/{}", name))
+                    .map_err(|e| format!("Failed to parse given iri segment: {:?}", e))?;
+                self.0.path_mut().pop();
+                if let Some(seg) = temp_iri.path().segments().last() {
+                    self.0.path_mut().push(seg);
+                } else {
+                    return Err(format!("Failed to set last segment."));
+                }
+            }
+        }
+        Ok(())
     }
 
     pub fn set_query_parameter(&mut self, name: &str, value: &str) -> Result<(), String> {
@@ -271,5 +296,18 @@ mod tests {
             iri.as_str(),
             "https://test.org?source=http%3A%2F%2Ffield33.com%2Fdataset%2Fp%2311#asdf"
         );
+    }
+
+    #[test]
+    pub fn test_set_leaf() {
+        let mut iri = IRI::new("https://test.org#asdf").unwrap();
+
+        iri.set_leaf(Some("Foobar")).unwrap();
+        assert_eq!(iri.as_str(), "https://test.org#Foobar");
+
+        let mut iri = IRI::new("https://test.org/asdf").unwrap();
+
+        iri.set_leaf(Some("Foobar")).unwrap();
+        assert_eq!(iri.as_str(), "https://test.org/Foobar");
     }
 }

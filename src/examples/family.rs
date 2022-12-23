@@ -186,7 +186,7 @@ pub fn family() -> ApiOntology {
         ],
         vec![
             Axiom::AnnotationAssertion(AnnotationAssertion::new(
-                iri.new("comment"),
+                wk::rdfs_comment(),
                 iri.new("Person"),
                 LiteralOrIRI::from("Represents the set of all people"),
                 vec![],

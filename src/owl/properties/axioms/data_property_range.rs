@@ -3,7 +3,7 @@ use crate::owl::{Annotation, Axiom, DataPropertyIRI, DatatypeIRI};
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DataPropertyRange {
     #[serde(rename = "dataPropertyIRI")]
-    pub data_property_iri: DataPropertyIRI,
+    pub iri: DataPropertyIRI,
     #[serde(rename = "datatypeIRI")]
     pub datatype_iri: DatatypeIRI,
     #[serde(rename = "annotations")]
@@ -17,7 +17,7 @@ impl DataPropertyRange {
         annotations: Vec<Annotation>,
     ) -> Self {
         Self {
-            data_property_iri,
+            iri: data_property_iri,
             datatype_iri,
             annotations,
         }

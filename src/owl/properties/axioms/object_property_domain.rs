@@ -3,7 +3,7 @@ use crate::owl::{Annotation, Axiom, ClassConstructor, ObjectPropertyIRI};
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectPropertyDomain {
     #[serde(rename = "objectPropertyIRI")]
-    pub object_property_iri: ObjectPropertyIRI,
+    pub iri: ObjectPropertyIRI,
     #[serde(rename = "cls")]
     pub cls: ClassConstructor,
     #[serde(rename = "annotations")]
@@ -17,7 +17,7 @@ impl ObjectPropertyDomain {
         annotations: Vec<Annotation>,
     ) -> Self {
         Self {
-            object_property_iri,
+            iri: object_property_iri,
             cls,
             annotations,
         }

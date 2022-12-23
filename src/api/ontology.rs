@@ -13,7 +13,7 @@ pub struct Ontology {
 }
 
 #[cfg(not(feature = "wasm"))]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Ontology {
     pub(crate) iri: IRI,
     pub(crate) imports: HashMap<String, IRI>,
@@ -28,6 +28,10 @@ impl Ontology {
             imports: Default::default(),
             owl: crate::owl::Ontology::new(vec![], vec![]),
         }
+    }
+
+    pub fn iri(&self) -> &IRI {
+        &self.iri
     }
 
     /// Get the map of all imports

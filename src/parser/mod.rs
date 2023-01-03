@@ -1135,6 +1135,91 @@ mod tests {
     }
 
     #[test]
+    fn reification() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+            @prefix : <http://test#> .
+            @prefix owl: <http://www.w3.org/2002/07/owl#> .
+            @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+            <http://test#> rdf:type owl:Ontology .
+
+            :Bob rdf:type owl:NamedIndividual .
+            :description rdf:type owl:AnnotationProperty .
+            :hasAge rdf:type owl:DatatypeProperty .
+            :createdAt rdf:type owl:AnnotationProperty .
+
+            :Annotation1 rdf:type owl:Axiom .
+            :Annotation1 owl:annotatedSource :Bob .
+            :Annotation1 owl:annotatedProperty :description .
+            :Annotation1 owl:annotatedTarget "Bob is Bob" .
+
+            :DP1 rdf:type owl:Axiom .
+            :DP1 owl:annotatedSource :Bob .
+            :DP1 owl:annotatedProperty :hasAge .
+            :DP1 owl:annotatedTarget 123 .
+
+            :Annotation1 :createdAt "2019" .
+
+            :Bob :description "Bob is Bob" .
+            
+            :Bob :hasAge 123 .
+        "##;
+
+        let options = ParserOptions::builder().build();
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(turtle, options).unwrap();
+
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 4);
+        assert_eq!(o.axioms().len(), 3);
+        assert_eq!(
+            o.axioms()[0],
+            AnnotationAssertion::new(
+                IRI::new("http://test#createdAt").unwrap().into(),
+                IRI::new("http://test#Annotation1").unwrap(),
+                Literal::String("2019".into()).into(),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[1],
+            AnnotationAssertion::new(
+                IRI::new("http://test#description").unwrap().into(),
+                IRI::new("http://test#Bob").unwrap(),
+                Literal::String("Bob is Bob".into()).into(),
+                vec![Annotation::new(
+                    well_known::owl_annotatedSource().into(),
+                    IRI::new("http://test#Annotation1").unwrap().into(),
+                    vec![]
+                )]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[2],
+            DataPropertyAssertion::new(
+                IRI::new("http://test#hasAge").unwrap().into(),
+                IRI::new("http://test#Bob").unwrap().into(),
+                Literal::Number {
+                    number: 123.into(),
+                    type_iri: Some(well_known::xsd_integer())
+                },
+                vec![Annotation::new(
+                    well_known::owl_annotatedSource().into(),
+                    IRI::new("http://test#DP1").unwrap().into(),
+                    vec![]
+                )]
+            )
+            .into()
+        );
+    }
+
+    #[test]
     fn annotations_on_annotations_unsorted() {
         env_logger::try_init().ok();
         let turtle = r##"
@@ -1226,8 +1311,8 @@ mod tests {
                 IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/Team2").unwrap().into(),
                 Literal::Number {
                     number: 0.into(),
-                    type_iri: Some(well_known::xsd_decimal().into())
-                }.into(),
+                    type_iri: Some(well_known::xsd_decimal())
+                },
                 vec![Annotation::new(
                     IRI::new("http://query-server.field33.com/ontology/query-field").unwrap().into(),
                     LiteralOrIRI::Literal("index-1".into()),
@@ -1413,7 +1498,7 @@ mod tests {
             o.axioms()[0],
             AnnotationAssertion::new(
                 IRI::new("http://test#hasAge").unwrap().into(),
-                IRI::new("http://test#Person").unwrap().into(),
+                IRI::new("http://test#Person").unwrap(),
                 "Test".into(),
                 vec![]
             )

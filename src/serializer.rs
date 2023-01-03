@@ -29,6 +29,7 @@ impl ToTtl for Ontology {
 
         let mut sorted_imports: Vec<(&String, &IRI)> = self.imports.iter().collect();
         sorted_imports.sort_by(|a, b| {
+            #[allow(clippy::comparison_chain)]
             if a.0.len() > b.0.len() {
                 Ordering::Greater
             } else if a.0.len() == b.0.len() {

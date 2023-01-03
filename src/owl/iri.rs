@@ -96,16 +96,14 @@ impl IRI {
             } else {
                 self.0.set_fragment(None);
             }
-        } else {
-            if let Some(name) = new_leaf_name {
-                let temp_iri = iref::IriBuf::from_string(format!("http://a/{}", name))
-                    .map_err(|e| format!("Failed to parse given iri segment: {:?}", e))?;
-                self.0.path_mut().pop();
-                if let Some(seg) = temp_iri.path().segments().last() {
-                    self.0.path_mut().push(seg);
-                } else {
-                    return Err(format!("Failed to set last segment."));
-                }
+        } else if let Some(name) = new_leaf_name {
+            let temp_iri = iref::IriBuf::from_string(format!("http://a/{}", name))
+                .map_err(|e| format!("Failed to parse given iri segment: {:?}", e))?;
+            self.0.path_mut().pop();
+            if let Some(seg) = temp_iri.path().segments().last() {
+                self.0.path_mut().push(seg);
+            } else {
+                return Err("Failed to set last segment.".to_string());
             }
         }
         Ok(())
@@ -302,12 +300,12 @@ mod tests {
     pub fn test_set_leaf() {
         let mut iri = IRI::new("https://test.org#asdf").unwrap();
 
-        iri.set_leaf(Some("Foobar")).unwrap();
+        iri.set_leaf(Some("Foobar".into())).unwrap();
         assert_eq!(iri.as_str(), "https://test.org#Foobar");
 
         let mut iri = IRI::new("https://test.org/asdf").unwrap();
 
-        iri.set_leaf(Some("Foobar")).unwrap();
+        iri.set_leaf(Some("Foobar".into())).unwrap();
         assert_eq!(iri.as_str(), "https://test.org/Foobar");
     }
 }

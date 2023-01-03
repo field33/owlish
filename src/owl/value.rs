@@ -35,6 +35,12 @@ impl From<Literal> for LiteralOrIRI {
     }
 }
 
+impl From<IRI> for LiteralOrIRI {
+    fn from(l: IRI) -> Self {
+        Self::IRI(l)
+    }
+}
+
 const KEY_LITERAL: &str = "Literal";
 const KEY_IRI: &str = "IRI";
 
@@ -479,12 +485,6 @@ impl<'de> Deserialize<'de> for Literal {
             }
         }
         deserializer.deserialize_map(ValueVisitor)
-    }
-}
-
-impl From<IRI> for LiteralOrIRI {
-    fn from(iri: IRI) -> Self {
-        Self::IRI(iri)
     }
 }
 

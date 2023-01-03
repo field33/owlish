@@ -498,6 +498,9 @@ impl well_known {
     pub fn owl_hasSelf() -> IRI {
         iri_to_js_iri(&crate::owl::well_known::owl_hasSelf()).unwrap()
     }
+    pub fn owl_annotatedSource() -> IRI {
+        iri_to_js_iri(&crate::owl::well_known::owl_annotatedSource()).unwrap()
+    }
     pub fn owl_intersectionOf() -> IRI {
         iri_to_js_iri(&crate::owl::well_known::owl_intersectionOf()).unwrap()
     }

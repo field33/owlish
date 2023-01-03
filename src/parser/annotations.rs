@@ -72,27 +72,41 @@ pub(crate) fn match_annotations<'a>(
                         if let Some(Value::Iri(subject)) = mstate.last("subject") {
                             if let Some(Value::Iri(predicate)) = mstate.last("predicate") {
                                 match mstate.last("object") {
-                                    Some(Value::Iri(object)) => o.insert_annotation(
-                                        CollectedAnnotationKey::Iri(iri.clone()),
-                                        CollectedAnnotation {
-                                            subject: subject.clone(),
-                                            predicate: predicate.clone(),
-                                            object: object.clone(),
-                                        },
-                                    ),
-                                    Some(Value::Literal {
-                                        lexical_form,
-                                        datatype_iri: _,
-                                        language_tag: _,
-                                    }) => {
+                                    Some(Value::Iri(object)) => {
                                         o.insert_annotation(
                                             CollectedAnnotationKey::Iri(iri.clone()),
                                             CollectedAnnotation {
                                                 subject: subject.clone(),
                                                 predicate: predicate.clone(),
-                                                object: lexical_form.clone(),
+                                                object: object.clone(),
                                             },
                                         );
+                                    }
+                                    Some(Value::Literal {
+                                        lexical_form,
+                                        datatype_iri: _,
+                                        language_tag: _,
+                                    }) => {
+                                        if let Some(axiom) =
+                                            o.get_from_index_mut(subject, predicate, lexical_form)
+                                        {
+                                            if let Ok(anno_iri) = IRI::new(iri) {
+                                                axiom.annotations_mut().push(Annotation::new(
+                                                    well_known::owl_annotatedSource().into(),
+                                                    LiteralOrIRI::IRI(anno_iri),
+                                                    vec![],
+                                                ))
+                                            }
+                                        } else {
+                                            o.insert_annotation(
+                                                CollectedAnnotationKey::Iri(iri.clone()),
+                                                CollectedAnnotation {
+                                                    subject: subject.clone(),
+                                                    predicate: predicate.clone(),
+                                                    object: lexical_form.clone(),
+                                                },
+                                            );
+                                        }
                                     }
                                     _ => todo!(),
                                 }

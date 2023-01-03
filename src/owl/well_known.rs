@@ -128,7 +128,6 @@ pub fn rdfs_range() -> IRI {
     IRI::new(rdfs_range_str).unwrap()
 }
 
-
 #[allow(non_upper_case_globals)]
 pub const rdfs_comment_str: &str = "http://www.w3.org/2000/01/rdf-schema#comment";
 
@@ -246,6 +245,12 @@ pub const owl_allValuesFrom_str: &str = "http://www.w3.org/2002/07/owl#allValues
 #[allow(non_snake_case)]
 pub fn owl_allValuesFrom() -> IRI {
     IRI::new(owl_allValuesFrom_str).unwrap()
+}
+#[allow(non_upper_case_globals)]
+pub const owl_annotatedSource_str: &str = "http://www.w3.org/2002/07/owl#annotatedSource";
+#[allow(non_snake_case)]
+pub fn owl_annotatedSource() -> IRI {
+    IRI::new(owl_annotatedSource_str).unwrap()
 }
 
 #[allow(non_upper_case_globals)]

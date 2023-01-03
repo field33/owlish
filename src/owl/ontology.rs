@@ -60,7 +60,7 @@ impl Declaration {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Ontology {
     pub(crate) declarations: Vec<Declaration>,
     pub(crate) axioms: Vec<Axiom>,

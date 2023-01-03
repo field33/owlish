@@ -5,7 +5,7 @@ use crate::owl::{Axiom, Declaration, IRIBuilder, IRI};
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen::prelude::wasm_bindgen]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Ontology {
     pub(crate) iri: IRI,
     pub(crate) imports: HashMap<String, IRI>,

@@ -18,6 +18,9 @@ impl ClassIRI {
     pub fn as_iri(&self) -> &IRI {
         &self.0
     }
+    pub fn as_str(&self) -> &str {
+        self.as_iri().as_str()
+    }
 }
 
 impl From<IRI> for ClassIRI {

@@ -59,7 +59,7 @@ export function matchValue(value, matcher) {
 export function matchAxiom(axiom, matcher) {
     for (const key in axiom) {
         if (matcher[key]) {
-            matcher[key](axiom[key])
+            return matcher[key](axiom[key])
             break
         }
     }
@@ -68,7 +68,7 @@ export function matchAxiom(axiom, matcher) {
 export function matchDeclaration(declaration, matcher) {
     for (const key in declaration) {
         if (matcher[key]) {
-            matcher[key](declaration[key])
+            return matcher[key](declaration[key])
             break
         }
     }
@@ -77,7 +77,7 @@ export function matchDeclaration(declaration, matcher) {
 export function matchClassConst(axiom, matcher) {
     for (const key in axiom) {
         if (matcher[key]) {
-            matcher[key](axiom[key])
+            return matcher[key](axiom[key])
             break
         }
     }

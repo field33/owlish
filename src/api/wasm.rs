@@ -350,6 +350,8 @@ extern "C" {
     pub type IRI;
     #[wasm_bindgen(typescript_type = "Value")]
     pub type Value;
+    #[wasm_bindgen(typescript_type = "Triple")]
+    pub type Triple;
     #[wasm_bindgen(typescript_type = "ParserOptions")]
     pub type ParserOptions;
 
@@ -662,3 +664,36 @@ interface ParserOptions {
     known: Array<Declaration>
 }
 "#;
+
+#[wasm_bindgen(typescript_custom_section)]
+const TRIPLE: &'static str = r#"
+interface Triple {
+    subject: IRI,
+    predicate: IRI,
+    value: LiteralOrIRI
+}
+"#;
+
+#[wasm_bindgen]
+pub fn parse_triple(triple: String) -> Option<Triple> {
+    let t = crate::parser::triple::parse_triple(&triple);
+    match serde_json::to_string(&t) {
+        Ok(s) => match JSON::parse(&s) {
+            Ok(value) => Some(value.unchecked_into()),
+            Err(e) => {
+                error_1(
+                    &format!(
+                        "Failed to create JS triple from value {:?}: {:?}",
+                        triple, e
+                    )
+                    .into(),
+                );
+                None
+            }
+        },
+        Err(e) => {
+            error_1(&format!("Failed to create JS triple from value {:?}: {}", triple, e).into());
+            None
+        }
+    }
+}

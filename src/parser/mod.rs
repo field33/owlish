@@ -24,6 +24,7 @@ mod data_props;
 mod declarations;
 mod object_property_assertions;
 mod sequences;
+pub mod triple;
 
 static mut RDF_MATCHER: Option<Option<String>> = None;
 

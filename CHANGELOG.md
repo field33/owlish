@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.20.2 - 2023-01-10
+#### Bug Fixes
+- Parse ClassAssertions based on ClassDeclarations provided in the known array - (99e6350) - Florian Loers
+
+- - -
+
 ## v0.20.1 - 2023-01-10
 #### Bug Fixes
 - Matcher implementations now return values - (983b890) - Florian Loers

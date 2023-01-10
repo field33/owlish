@@ -30,12 +30,12 @@ pub(crate) fn match_axioms(
         rdf_match!("ClassAssertions", prefixes,
             [*:x] [rdf:type] [*:cls] .
         )?,
-        Box::new(|mstate, o, _| {
+        Box::new(|mstate, o, options| {
             if let Some(individual_iri) = mstate.last_iri("x") {
                 if let Some(cls) = mstate.last_iri("cls") {
                     let individual_iri = IRI::new(individual_iri)?;
                     let cls = IRI::new(cls)?;
-                    if o.class_declaration(&cls).is_some() {
+                    if o.class_declaration(&cls).is_some() || options.is_class(&cls) {
                         o.push_axiom(
                             ClassAssertion::new(cls.into(), individual_iri.into(), vec![]).into(),
                         )

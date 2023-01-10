@@ -245,6 +245,14 @@ impl IndexedParserOptions {
             false
         }
     }
+
+    pub fn is_class(&self, iri: &IRI) -> bool {
+        if let Some(i) = self.index.get(iri) {
+            matches!(self.known.get(*i), Some(Declaration::Class { .. }))
+        } else {
+            false
+        }
+    }
 }
 
 impl From<ParserOptions> for IndexedParserOptions {

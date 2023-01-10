@@ -466,7 +466,7 @@ checksum = "9b7820b9daea5457c9f21c69448905d723fbd21136ccf521748f23fd49e723ee"
 
 [[package]]
 name = "owlish"
-version = "0.20.2"
+version = "0.21.0"
 dependencies = [
  "console_error_panic_hook",
  "criterion",

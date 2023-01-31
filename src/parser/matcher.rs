@@ -70,9 +70,7 @@ impl<'a> TryInto<Literal> for Value<'a> {
                             .map_err(|_| ())
                             .map(Literal::Bool)
                     } else if datatype_iri == well_known::xsd_dateTime_str {
-                        serde_json::from_str(&lexical_form)
-                            .map_err(|_| ())
-                            .map(|n| Literal::DateTime(n))
+                        Ok(Literal::DateTime(lexical_form.to_string()))
                     } else {
                         IRI::new(&datatype_iri)
                             .map_err(|_| ())

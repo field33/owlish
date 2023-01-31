@@ -572,13 +572,14 @@ mod tests {
         :Person rdfs:comment "3.14"^^xsd:float .
         :Person rdfs:comment "true"^^xsd:boolean .
         :Person rdfs:comment false .
+        :Person rdfs:comment "2023-01-31T08:39:54"^^xsd:dateTime .
 
         "##;
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
         assert_eq!(o.declarations().len(), 1);
-        assert_eq!(o.axioms().len(), 7);
+        assert_eq!(o.axioms().len(), 8);
         assert_eq!(
             o.axioms()[0],
             AnnotationAssertion::new(
@@ -651,6 +652,16 @@ mod tests {
                 well_known::rdfs_comment(),
                 IRI::new("http://test#Person").unwrap(),
                 LiteralOrIRI::Literal(Literal::Bool(false)),
+                vec![]
+            )
+            .into()
+        );
+        assert_eq!(
+            o.axioms()[7],
+            AnnotationAssertion::new(
+                well_known::rdfs_comment(),
+                IRI::new("http://test#Person").unwrap(),
+                LiteralOrIRI::Literal(Literal::DateTime("2023-01-31T08:39:54".into())),
                 vec![]
             )
             .into()

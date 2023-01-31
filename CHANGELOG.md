@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.21.2 - 2023-01-31
+#### Bug Fixes
+- Fix broken parsing of datetime types - (08c7bce) - Florian Loers
+
+- - -
+
 ## v0.21.1 - 2023-01-31
 #### Bug Fixes
 - Add missing date type handling to parser - (e13278a) - Florian Loers

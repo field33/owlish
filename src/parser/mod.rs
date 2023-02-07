@@ -1343,6 +1343,61 @@ mod tests {
     }
 
     #[test]
+    fn annotations_on_object_property_assertions() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+            <http://field33.com/query_result/00000000-0000-0000-0000-000000000000> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+            <http://field33.com/query_result/2060abc6-f459-47ed-9248-0b7fe12c971c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+            <http://www.w3.org/2000/01/rdf-schema#label> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+            <http://field33.com/ontologies/@fld33/relations/Has> <http://www.w3.org/2000/01/rdf-schema#label> "Has"@en .
+            <http://field33.com/ontologies/@fld33/relations/Has> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+            <http://field33.com/org/org_evlGiemVNyAUTJ7D/node/f63c8031-a7d9-40db-ae87-be04c99537c7> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
+            <http://field33.com/org/org_evlGiemVNyAUTJ7D/node/f63c8031-a7d9-40db-ae87-be04c99537c7> <http://www.w3.org/2002/07/owl#annotatedTarget> <http://field33.com/org/org_evlGiemVNyAUTJ7D/node/fe6fdda1-fc21-4b99-9269-8c19fc6359b8> .
+            <http://field33.com/org/org_evlGiemVNyAUTJ7D/node/f63c8031-a7d9-40db-ae87-be04c99537c7> <http://www.w3.org/2002/07/owl#annotatedProperty> <http://field33.com/ontologies/@fld33/relations/Has> .
+            <http://field33.com/org/org_evlGiemVNyAUTJ7D/node/f63c8031-a7d9-40db-ae87-be04c99537c7> <http://www.w3.org/2002/07/owl#annotatedSource> <http://field33.com/org/org_evlGiemVNyAUTJ7D/node/1afda1af-bbde-48de-a5d7-5f43d389b2a6> .
+            <http://field33.com/org/org_evlGiemVNyAUTJ7D/node/1afda1af-bbde-48de-a5d7-5f43d389b2a6> <http://field33.com/ontologies/@fld33/relations/Has> <http://field33.com/org/org_evlGiemVNyAUTJ7D/node/fe6fdda1-fc21-4b99-9269-8c19fc6359b8> .
+            
+
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(
+            turtle,
+            ParserOptionsBuilder::default()
+                .known(Declaration::AnnotationProperty {
+                    iri: IRI::new("http://query-server.field33.com/ontology/query-field")
+                        .unwrap()
+                        .into(),
+                    annotations: vec![],
+                })
+                .build(),
+        )
+        .unwrap();
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 2);
+        assert_eq!(o.axioms().len(), 2);
+        assert_eq!(
+            o.axioms()[1],
+            Axiom::ObjectPropertyAssertion(ObjectPropertyAssertion::new(
+                IRI::new("http://field33.com/ontologies/@fld33/relations/Has")
+                    .unwrap()
+                    .into(),
+                IRI::new("http://field33.com/org/org_evlGiemVNyAUTJ7D/node/1afda1af-bbde-48de-a5d7-5f43d389b2a6")
+                    .unwrap()
+                    .into(),
+                IRI::new("http://field33.com/org/org_evlGiemVNyAUTJ7D/node/fe6fdda1-fc21-4b99-9269-8c19fc6359b8")
+                    .unwrap()
+                    .into(),
+                vec![Annotation::new(
+                    well_known::owl_annotatedSource().into(),
+                    IRI::new("http://field33.com/org/org_evlGiemVNyAUTJ7D/node/f63c8031-a7d9-40db-ae87-be04c99537c7").unwrap().into(),
+                    vec![]
+                )]
+            ))
+        );
+    }
+
+    #[test]
     fn class_assertion() {
         env_logger::try_init().ok();
         let turtle = r##"

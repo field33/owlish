@@ -30,7 +30,7 @@ pub(crate) enum CollectedAnnotationKey<'a> {
     Iri(Cow<'a, str>),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct CollectedAnnotation<'a> {
     pub(crate) subject: Cow<'a, str>,
     pub(crate) predicate: Cow<'a, str>,
@@ -45,6 +45,7 @@ pub(crate) struct OntologyCollector<'a> {
 
     // annotations on things
     annotations: HashMap<CollectedAnnotationKey<'a>, CollectedAnnotation<'a>>,
+    annotations_rev: HashMap<CollectedAnnotation<'a>, CollectedAnnotationKey<'a>>,
     pub blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode<'a>>,
 
     axiom_index: HashMap<(String, String, String), usize>,
@@ -158,7 +159,8 @@ impl<'a> OntologyCollector<'a> {
         key: CollectedAnnotationKey<'a>,
         value: CollectedAnnotation<'a>,
     ) {
-        self.annotations.insert(key, value);
+        self.annotations.insert(key.clone(), value.clone());
+        self.annotations_rev.insert(value, key);
     }
 
     pub(crate) fn annotation(
@@ -166,6 +168,13 @@ impl<'a> OntologyCollector<'a> {
         ann: CollectedAnnotationKey<'a>,
     ) -> Option<&CollectedAnnotation<'a>> {
         self.annotations.get(&ann)
+    }
+
+    pub(crate) fn annotation_on_triple(
+        &self,
+        ann: &CollectedAnnotation<'a>,
+    ) -> Option<&CollectedAnnotationKey<'a>> {
+        self.annotations_rev.get(ann)
     }
 
     pub(crate) fn ontology(self) -> Ontology {

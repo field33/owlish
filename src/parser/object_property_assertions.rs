@@ -1,6 +1,10 @@
+use super::collector::CollectedAnnotation;
+use super::collector::CollectedAnnotationKey;
 use super::collector::MatcherHandler;
 use crate::error::Error;
 use crate::get_vars;
+use crate::owl::well_known;
+use crate::owl::Annotation;
 use crate::owl::ObjectPropertyAssertion;
 use crate::owl::IRI;
 use crate::parser::matcher::RdfMatcher;
@@ -33,12 +37,29 @@ pub(crate) fn push(
                                     if o.object_property_declaration(&predicate).is_some()
                                         || options.is_object_prop(&predicate)
                                     {
+                                        let mut annotations = Vec::new();
+                                        if let Some(CollectedAnnotationKey::Iri(iri)) = o
+                                            .annotation_on_triple(&CollectedAnnotation {
+                                                subject: subject.as_str().into(),
+                                                predicate: predicate.as_str().into(),
+                                                object: object.as_str().into(),
+                                            })
+                                        {
+                                            if let Ok(iri) = IRI::new(iri) {
+                                                annotations.push(Annotation {
+                                                    annotations: vec![],
+                                                    iri: well_known::owl_annotatedSource().into(),
+                                                    value: iri.into(),
+                                                })
+                                            }
+                                        }
+
                                         o.push_axiom(
                                             ObjectPropertyAssertion::new(
                                                 predicate.into(),
                                                 subject.into(),
                                                 object.into(),
-                                                vec![],
+                                                annotations,
                                             )
                                             .into(),
                                         )

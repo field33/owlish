@@ -108,7 +108,7 @@ pub(crate) fn handle_dataprop_on_bn(
     let predicate = annotate.predicate;
     let object = annotate.object;
 
-    if let Some(axiom) = o.get_from_index_mut(&subject, &predicate, &object) {
+    if let Some((axiom, _)) = o.get_from_index_mut(&subject, &predicate, &object) {
         axiom
             .annotations_mut()
             .push(Annotation::new(predicate_iri.into(), value.into(), vec![]))

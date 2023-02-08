@@ -87,7 +87,7 @@ pub(crate) fn match_annotations<'a>(
                                         datatype_iri: _,
                                         language_tag: _,
                                     }) => {
-                                        if let Some(axiom) =
+                                        if let Some((axiom, index)) =
                                             o.get_from_index_mut(subject, predicate, lexical_form)
                                         {
                                             if let Ok(anno_iri) = IRI::new(iri) {
@@ -95,18 +95,18 @@ pub(crate) fn match_annotations<'a>(
                                                     well_known::owl_annotatedSource().into(),
                                                     LiteralOrIRI::IRI(anno_iri),
                                                     vec![],
-                                                ))
+                                                ));
+                                                o.insert_used_annotation(iri, index)
                                             }
-                                        } else {
-                                            o.insert_annotation(
-                                                CollectedAnnotationKey::Iri(iri.clone()),
-                                                CollectedAnnotation {
-                                                    subject: subject.clone(),
-                                                    predicate: predicate.clone(),
-                                                    object: lexical_form.clone(),
-                                                },
-                                            );
                                         }
+                                        o.insert_annotation(
+                                            CollectedAnnotationKey::Iri(iri.clone()),
+                                            CollectedAnnotation {
+                                                subject: subject.clone(),
+                                                predicate: predicate.clone(),
+                                                object: lexical_form.clone(),
+                                            },
+                                        );
                                     }
                                     _ => todo!(),
                                 }
@@ -142,7 +142,6 @@ pub(crate) fn match_simple_annotation_assertions<'a>(
                             Value::Iri(subject_iri) => {
                                 return push_annotation_assertion(
                                     subject_iri,
-                                    // value,
                                     predicate_iri,
                                     mstate,
                                     o,
@@ -183,21 +182,24 @@ pub(crate) fn match_annotation_assertions<'a>(
                     {
                         if let Some(subject) = mstate.get("subject") {
                             match subject {
-                                Value::Iri(_subject_iri) => {
-                                    // if o.annotation(Ann::Iri(subject_iri.clone())).is_some() {
-                                    //     return Ok(false);
-                                    // }
-                                    // if let Some(annotate) =
-                                    //     o.annotation(Ann::Iri(subject_iri.clone())).cloned()
-                                    // {
-                                    //     return handle_like_blank_but_with_iri(
-                                    //         o,
-                                    //         annotate,
-                                    //         predicate_iri,
-                                    //         value,
-                                    //     );
-                                    // }
-                                    // TODO
+                                Value::Iri(subject_iri) => {
+                                    // Here we handle AnnotationAssertions like <A> <p> <V> where <A> is an iri
+                                    // that was previously defined via rdfs:annotatedSource as annotation on
+                                    // another OWL axiom.
+                                    // Those assertions need to be added to the annotation array of said OWL axiom.
+                                    if let Some(annotations) =
+                                        o.get_used_annotation(subject_iri).cloned()
+                                    {
+                                        for a in annotations {
+                                            if let Some(axiom) = o.axiom_mut(a) {
+                                                axiom.annotations_mut().push(Annotation::new(
+                                                    predicate_iri.clone().into(),
+                                                    value.clone().into(),
+                                                    vec![],
+                                                ))
+                                            }
+                                        }
+                                    }
                                 }
                                 Value::Blank(subject_bn) => {
                                     return handle_annotation_on_bn(
@@ -237,7 +239,7 @@ fn handle_annotation_on_bn(
     let predicate = annotate.predicate;
     let object = annotate.object;
 
-    if let Some(axiom) = o.get_from_index_mut(&subject, &predicate, &object) {
+    if let Some((axiom, _)) = o.get_from_index_mut(&subject, &predicate, &object) {
         axiom
             .annotations_mut()
             .push(Annotation::new(predicate_iri.into(), value.into(), vec![]))
@@ -252,6 +254,9 @@ fn push_annotation_assertion(
     mstate: &MatcherState,
     o: &mut OntologyCollector,
 ) -> Result<bool, Error> {
+    if let Some(a) = o.annotation(CollectedAnnotationKey::Iri(subject_iri.into())) {
+        println!("{:#?}", a);
+    }
     let subject_iri = IRI::new(subject_iri)?;
     if let Some(object) = mstate.get("object") {
         match object {

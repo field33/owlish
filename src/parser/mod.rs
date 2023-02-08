@@ -2,6 +2,7 @@ use std::{collections::HashMap, rc::Rc};
 
 use harriet::triple_production::RdfTriple;
 
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -112,12 +113,13 @@ impl Ontology {
             for triple in triples.iter() {
                 let subject: IRIOrBlank = triple.subject.clone().into();
 
+                debug!("===============");
+                debug!("{:?}", triple);
+                debug!("===============");
+
                 for (matcher_id, (m, _)) in matchers.iter().enumerate() {
                     let mut mstate = MatcherState::new();
-                    parser_debug!(
-                        m,
-                        "#############################################################"
-                    );
+                    parser_debug!(m, "################ {} #######################", m.name());
                     parser_debug!(m, "{}", display(triple));
 
                     // (1) Start matcher with new state (if there is no current matcher state)
@@ -1212,11 +1214,18 @@ mod tests {
                 IRI::new("http://test#description").unwrap().into(),
                 IRI::new("http://test#Bob").unwrap(),
                 Literal::String("Bob is Bob".into()).into(),
-                vec![Annotation::new(
-                    well_known::owl_annotatedSource().into(),
-                    IRI::new("http://test#Annotation1").unwrap().into(),
-                    vec![]
-                )]
+                vec![
+                    Annotation::new(
+                        well_known::owl_annotatedSource().into(),
+                        IRI::new("http://test#Annotation1").unwrap().into(),
+                        vec![]
+                    ),
+                    Annotation::new(
+                        IRI::new("http://test#createdAt").unwrap().into(),
+                        "2019".into(),
+                        vec![]
+                    )
+                ]
             )
             .into()
         );
@@ -1393,6 +1402,74 @@ mod tests {
                     IRI::new("http://field33.com/org/org_evlGiemVNyAUTJ7D/node/f63c8031-a7d9-40db-ae87-be04c99537c7").unwrap().into(),
                     vec![]
                 )]
+            ))
+        );
+    }
+
+    #[test]
+    fn annotations_on_annotation_assertions() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+            <http://field33.com/query_result/00000000-0000-0000-0000-000000000000> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+            <http://www.w3.org/2000/01/rdf-schema#comment> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+
+            <http://field33.com/ontologies/core_change_tracking/createdByImport> <http://www.w3.org/2000/01/rdf-schema#label> "Created By"@en .
+            <http://field33.com/ontologies/core_change_tracking/createdByImport> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5cAnnotation3> <http://field33.com/ontologies/core_change_tracking/createdByImport> "GitHub" .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5cAnnotation3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5cAnnotation3> <http://www.w3.org/2002/07/owl#annotatedTarget> "foo bar" .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5cAnnotation3> <http://www.w3.org/2002/07/owl#annotatedProperty> <http://www.w3.org/2000/01/rdf-schema#comment> .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5cAnnotation3> <http://www.w3.org/2002/07/owl#annotatedSource> <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5c> .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5c> <http://www.w3.org/2000/01/rdf-schema#comment> "foo bar" .
+            
+            <http://field33.com/ontologies/core_change_tracking/createdAt> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5cAnnotation3> <http://field33.com/ontologies/core_change_tracking/createdAt> "2023-02-07T14:42:17Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(
+            turtle,
+            ParserOptionsBuilder::default()
+                .known(Declaration::AnnotationProperty {
+                    iri: IRI::new("http://query-server.field33.com/ontology/query-field")
+                        .unwrap()
+                        .into(),
+                    annotations: vec![],
+                })
+                .build(),
+        )
+        .unwrap();
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 4);
+        assert_eq!(o.axioms().len(), 4);
+        assert_eq!(
+            o.axioms()[2],
+            Axiom::AnnotationAssertion(AnnotationAssertion::new(
+                IRI::new("http://www.w3.org/2000/01/rdf-schema#comment")
+                    .unwrap()
+                    .into(),
+                IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5c")
+                    .unwrap()
+                    .into(),
+                "foo bar".into(),
+                vec![
+                    Annotation::new(
+                        well_known::owl_annotatedSource().into(),
+                        IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/E528ddffc3bf541ffe030ffc413c26b2c7aafa5cAnnotation3").unwrap().into(),
+                        vec![]
+                    ),
+                    Annotation::new(
+                        IRI::new("http://field33.com/ontologies/core_change_tracking/createdByImport").unwrap().into(),
+                        "GitHub".into(),
+                        vec![]
+                    ),
+                    Annotation::new(
+                        IRI::new("http://field33.com/ontologies/core_change_tracking/createdAt").unwrap().into(),
+                        Literal::DateTime("2023-02-07T14:42:17Z".into()).into(),
+                        vec![]
+                    ),
+                ]
             ))
         );
     }

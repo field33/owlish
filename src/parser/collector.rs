@@ -45,7 +45,13 @@ pub(crate) struct OntologyCollector<'a> {
 
     // annotations on things
     annotations: HashMap<CollectedAnnotationKey<'a>, CollectedAnnotation<'a>>,
+    // TODO: we probably don't need both. There may be a conceptional bug
     annotations_rev: HashMap<CollectedAnnotation<'a>, CollectedAnnotationKey<'a>>,
+
+    // annotation definitions that were assigned to other things
+    // (to handle multiple assertions for one annotation which is assigned to e.g. one data prop assertion)
+    used_annotations: HashMap<String, Vec<usize>>,
+
     pub blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode<'a>>,
 
     axiom_index: HashMap<(String, String, String), usize>,
@@ -144,10 +150,15 @@ impl<'a> OntologyCollector<'a> {
         self.axioms.push(axiom);
     }
 
-    pub(crate) fn get_from_index_mut(&mut self, s: &str, p: &str, o: &str) -> Option<&mut Axiom> {
+    pub(crate) fn get_from_index_mut(
+        &mut self,
+        s: &str,
+        p: &str,
+        o: &str,
+    ) -> Option<(&mut Axiom, usize)> {
         self.axiom_index
             .get(&(s.into(), p.into(), o.into()))
-            .and_then(|index| self.axioms.get_mut(*index))
+            .and_then(|index| self.axioms.get_mut(*index).map(|a| (a, *index)))
     }
 
     pub(crate) fn insert_blank_node(&mut self, bn: RdfBlankNode, bnh: CollectedBlankNode<'a>) {
@@ -351,6 +362,22 @@ impl<'a> OntologyCollector<'a> {
                 *r = Some(rest)
             }
         }
+    }
+
+    pub(crate) fn insert_used_annotation(&mut self, anno_iri: &str, index: usize) {
+        if let Some(indexes) = self.used_annotations.get_mut(anno_iri) {
+            indexes.push(index)
+        } else {
+            self.used_annotations
+                .insert(anno_iri.to_string(), vec![index]);
+        }
+    }
+    pub(crate) fn get_used_annotation(&self, anno_iri: &str) -> Option<&Vec<usize>> {
+        self.used_annotations.get(anno_iri)
+    }
+
+    pub(crate) fn axiom_mut(&mut self, i: usize) -> Option<&mut Axiom> {
+        self.axioms.get_mut(i)
     }
 }
 

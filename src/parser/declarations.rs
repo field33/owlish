@@ -14,7 +14,6 @@ pub(crate) fn match_declarations(
     matchers.push((
         rdf_match!("Ontology", prefixes, [*:subject] [rdf:type] [owl:Ontology] .)?,
         Box::new(|mstate, o, _| {
-            println!("push ontology");
             if let Some(iri) = get_iri_var("subject", mstate)? {
                 o.set_iri(iri);
             }

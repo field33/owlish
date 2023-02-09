@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.22.1 - 2023-02-09
+#### Bug Fixes
+- Annotations on axioms are correctly added to the annotations arrays - (4dc1697) - Florian Loers
+
+- - -
+
 ## v0.22.0 - 2023-02-07
 #### Features
 - Parse annotations on object properties - (50bffcb) - Florian Loers

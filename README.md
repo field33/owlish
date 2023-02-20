@@ -28,6 +28,26 @@ owlish provides two APIs:
 2. A conceptional api that concatenates OWL data for relevant types.
    - TBD
 
+## Usage (Node.js)
+
+To initialize the module in a Node.js environment, it is currently recommend to load the WASM module via the `fs` API and
+pass it explicitly to the initialization function.
+
+Example:
+```js
+import path from 'path';
+import { readFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
+
+// The next two lines are only required if running the Node script as an ESM module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Load .wasm file from the package
+const owlishWasm = await readFile(path.join(__dirname, "../node_modules/owlish/owlish_bg.wasm"));
+// Initialize module, after executing this line, all functions from `owlish` can be used like normal.
+await owlish(owlishWasm)
+```
+
 ## Dev stuff
 
 Build:

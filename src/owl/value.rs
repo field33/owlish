@@ -10,6 +10,7 @@ use crate::owl::IRI;
 
 use super::{well_known, DatatypeIRI, Lang};
 
+/// A value that is either a Literal or an IRI.
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum LiteralOrIRI {
     IRI(IRI),
@@ -153,6 +154,9 @@ impl<'de> Deserialize<'de> for LiteralOrIRI {
     }
 }
 
+/// A Literal value.
+/// 
+/// Supported types are strings (with locales), booleans, numbers, dates and raw byte arrays.
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum Literal {
     Raw {

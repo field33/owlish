@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     error::Error,
-    owl::{Axiom, IndividualIRI, ObjectPropertyConstructor, IRI},
+    owl::{Axiom, IRIList, IndividualIRI, ObjectPropertyConstructor, IRI},
 };
 
 use super::Annotation;
@@ -35,9 +35,9 @@ impl ObjectPropertyIRI {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectPropertyAssertion {
-    pub iri: ObjectPropertyIRI,
     pub subject: IndividualIRI,
-    pub object: IndividualIRI,
+    pub iri: ObjectPropertyIRI,
+    pub object: IRIList,
     pub annotations: Vec<Annotation>,
 }
 
@@ -51,7 +51,20 @@ impl ObjectPropertyAssertion {
         Self {
             iri,
             subject,
-            object,
+            object: IRIList::IRI(object.as_iri().clone()),
+            annotations,
+        }
+    }
+    pub fn new_with_list(
+        iri: ObjectPropertyIRI,
+        subject: IndividualIRI,
+        object: Vec<IRI>,
+        annotations: Vec<Annotation>,
+    ) -> Self {
+        Self {
+            iri,
+            subject,
+            object: IRIList::List(object),
             annotations,
         }
     }
@@ -105,9 +118,9 @@ export type ObjectPropertyAssertion = {
      */
     subject: IRI,
     /**
-     * The object Individual
+     * The object Individual(s).
      */
-    object: IRI,
+    object: IRIList,
     annotations: Array<Annotation>,
 };
 "#;

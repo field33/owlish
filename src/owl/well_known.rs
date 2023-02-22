@@ -423,6 +423,23 @@ pub fn owl_Datatype() -> IRI {
     IRI::new(owl_Datatype_str).unwrap()
 }
 
+// fno
+#[allow(non_upper_case_globals)]
+pub const fno_base_str: &str = "https://w3id.org/function/ontology#";
+
+#[allow(non_snake_case)]
+pub fn fno() -> IRI {
+    IRI::new(fno_base_str).unwrap()
+}
+
+#[allow(non_upper_case_globals)]
+pub const fno_Function_str: &str = "https://w3id.org/function/ontology#Function";
+
+#[allow(non_snake_case)]
+pub fn fno_Function() -> IRI {
+    IRI::new(fno_Function_str).unwrap()
+}
+
 #[cfg(test)]
 mod test {
 

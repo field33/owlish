@@ -1,6 +1,9 @@
 mod iri;
 pub use iri::*;
 
+mod iri_or_list;
+pub use iri_or_list::*;
+
 pub mod well_known;
 
 mod value;

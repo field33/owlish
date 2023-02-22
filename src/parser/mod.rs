@@ -1010,7 +1010,7 @@ mod tests {
 
         harriet::TurtleDocument::parse_full(turtle).unwrap();
         let o = Ontology::parse(turtle, Default::default()).unwrap();
-
+        println!("{:#?}", o);
         assert_eq!(o.declarations().len(), 3);
         assert_eq!(o.axioms().len(), 1);
         assert_eq!(
@@ -2022,5 +2022,138 @@ mod tests {
             )
             .into()
         );
+    }
+
+    #[test]
+    fn computation() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+            @prefix :     <http://test#> .
+            @prefix owl:  <http://www.w3.org/2002/07/owl#> .
+            @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+            @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+            @prefix fno:  <https://w3id.org/function/ontology#> .
+            @prefix comp: <http://field33.com/ontologies/@fld33/computation/> .
+
+            <http://test#> rdf:type owl:Ontology .
+
+            ## required knowledge
+
+            fno:Function rdf:type owl:Class .
+            fno:Parameter rdf:type owl:Class .
+            fno:expects rdf:type owl:ObjectProperty .
+            fno:returns rdf:type owl:ObjectProperty .
+            fno:predicate rdf:type owl:ObjectProperty .
+            fno:type rdf:type owl:ObjectProperty .
+            fno:required rdf:type owl:DatatypeProperty .
+            fno:Output rdf:type owl:Class .
+
+            comp:sparqlVariable rdf:type owl:DatatypeProperty .
+            comp:sparqlQuery rdf:type owl:DatatypeProperty .
+
+            ## actual test
+
+            :AgileTeam rdf:type owl:Class .
+
+            :DeploymentFrequency
+                rdf:type           owl:DatatypeProperty ;
+                rdfs:domain        :AgileTeam ;
+                rdfs:range         xsd:decimal ;
+                rdfs:label         "Deployment Frequency"@en .
+
+            :DeploymentFrequencyOutput
+                rdf:type            fno:Output ;
+                fno:predicate       :DeploymentFrequency ;
+                comp:sparqlVariable "DeploymentCountPerAgileTeam" ;
+                fno:required        "false"^^xsd:boolean ;
+                fno:type            xsd:decimal .
+
+            :TeamParam
+                rdf:type            fno:Parameter ;
+                fno:predicate       comp:computationSubject ;
+                comp:sparqlVariable "AgileTeam" ;
+                fno:type            :AgileTeam ;
+                fno:required        "true"^^xsd:boolean .
+
+            :FromDateParam
+                rdf:type             fno:Parameter ;
+                comp:sparqlVariable "FromDate" ;
+                fno:type            :createdAt ;
+                fno:required        "true"^^xsd:boolean .
+
+            :ToDateParam
+                rdf:type            fno:Parameter ;
+                comp:sparqlVariable "ToDate" ;
+                fno:type            :createdAt ;
+                fno:required        "true"^^xsd:boolean .
+              
+            :ComputeDeploymentFrequency
+                rdf:type        fno:Function ;
+                rdf:type        comp:Computation ;
+                fno:expects      ( :TeamParam :FromDateParam :ToDateParam ) ;
+                fno:returns      ( :DeploymentFrequencyOutput ) ;
+                comp:sparqlQuery """
+                    PREFIX : <http://field33.com/ontologies/@fld33_domain/dora_metrics/>
+                    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+                    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX xml: <http://www.w3.org/XML/1998/namespace>
+                    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX org: <http://field33.com/ontologies/@fld33/organization/>
+                    PREFIX metric: <http://field33.com/ontologies/@fld33_domain/software_team_metric/>
+                    PREFIX develop: <http://field33.com/ontologies/@fld33_domain/software_development/>
+
+                    SELECT ?AgileTeam ?DeploymentCountPerAgileTeam
+                    WHERE {
+                        ?AgileTeam rdf:type :AgileTeam .
+                        ?AgileTeam rdf:type owl:NamedIndividual .
+
+                        LATERAL {
+                            OPTIONAL
+                            {
+                                SELECT ?AgileTeam ?FromDate ?ToDate (count(?deployment) AS ?countDeploymentsOnDate)
+                                WHERE {
+                                    ?employee :partOf ?AgileTeam .
+                                    ?employee rdf:type :Employee .
+                                    ?employee rdf:type owl:NamedIndividual .
+
+                                    ?deployment :authoredBy ?employee .
+                                    ?deployment rdf:type develop:Deployment .
+                                    ?deployment rdf:type owl:NamedIndividual .
+                                    ?deployment :deploymentDate ?deploymentDate .
+                                    
+                                    BIND(
+                                        xsd:date(CONCAT(
+                                            YEAR(?deploymentDate),
+                                            "-",
+                                            MONTH(?deploymentDate),
+                                            "-",
+                                            DAY(?deploymentDate)
+                                        )) AS ?dateGrouping)
+
+                                    FILTER (?deploymentDate >= xsd:dateTime(?FromDate)) .
+                                    FILTER (?deploymentDate <= xsd:dateTime(?ToDate)) .
+                                } GROUP BY ?AgileTeam ?dateGrouping ?FromDate ?ToDate
+                            }
+                        }
+                        BIND((xsd:dateTime(?ToDate) - xsd:dateTime(?FromDate)) AS ?duration) .
+                        BIND(COALESCE(xsd:integer(REPLACE(STR(?duration), "[^0-9]", "", "i")), 0) AS ?d) .
+                        # BIND( (?d / 7) AS ?numberOfWeeksBetween) .
+                        BIND( coalesce(?countDeploymentsOnDate, 0) AS ?countOfDeployments) .
+                        BIND( ( ?countOfDeployments / ?d ) AS ?DeploymentCountPerAgileTeam ) .
+                    }
+                """ .
+
+        "##;
+
+        // let a = harriet::TurtleDocument::parse_full(turtle).unwrap();
+        // let ts = harriet::triple_production::TripleProducer::produce_for_document(&a).unwrap();
+        // for t in ts {
+        //     println!("{:?} {:?} {:?}", t.subject, t.predicate, t.object);
+        // }
+
+        let o = Ontology::parse(turtle, Default::default()).unwrap();
+        println!("{:#?}", o);
     }
 }

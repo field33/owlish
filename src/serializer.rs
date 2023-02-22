@@ -757,7 +757,7 @@ mod tests {
 
     use super::ToTtl;
 
-    const EXPECTED: &str = include_str!("expected.ttl");
+    const EXPECTED: &str = include_str!("../tests/expected.ttl");
 
     #[test]
     fn test() {
@@ -767,8 +767,6 @@ mod tests {
         onto.imports.insert("rdfs".into(), well_known::rdfs());
         onto.imports.insert("rdf".into(), well_known::rdf());
         onto.imports.insert("xsd".into(), well_known::xsd());
-        // let mut fi = std::fs::File::create("expected.ttl").unwrap();
-        // write!(fi, "{}", onto.ttl()).unwrap();
         assert_eq!(onto.ttl(), EXPECTED)
     }
 }

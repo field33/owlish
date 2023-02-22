@@ -37,8 +37,15 @@ pub(crate) fn match_axioms(
                     let cls = IRI::new(cls)?;
                     if o.class_declaration(&cls).is_some() || options.is_class(&cls) {
                         o.push_axiom(
-                            ClassAssertion::new(cls.into(), individual_iri.into(), vec![]).into(),
-                        )
+                            ClassAssertion::new(cls.into(), individual_iri.clone().into(), vec![])
+                                .into(),
+                        );
+                        // if o.individual_declaration(&individual_iri).is_none() {
+                        //     o.push_declaration(crate::owl::Declaration::NamedIndividual {
+                        //         iri: individual_iri.into(),
+                        //         annotations: vec![],
+                        //     })
+                        // }
                     }
                 }
             }
@@ -280,7 +287,6 @@ pub(crate) fn match_axioms(
                                 }
                                 Value::Blank(bn) => {
                                     if let Some(cbn) = o.get_blank(bn) {
-                                        println!("cbn {:?}", cbn);
                                         if let CollectedBlankNode::ClassConstructor(cc) = cbn {
                                             if o.object_property_declaration(&op_iri).is_some()
                                                 || options.is_object_prop(&op_iri)

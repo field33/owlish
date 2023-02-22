@@ -281,6 +281,26 @@ impl<'a> OntologyCollector<'a> {
                 None
             })
     }
+
+    pub(crate) fn _individual_declaration(&self, iri: &IRI) -> Option<&Declaration> {
+        self.declaration_index
+            .get(iri.as_str())
+            .map(|indexes| {
+                indexes
+                    .iter()
+                    .filter_map(|i| self.declarations.get(*i))
+                    .collect::<Vec<&Declaration>>()
+            })
+            .and_then(|ds| {
+                for d in ds {
+                    if let Declaration::NamedIndividual { .. } = d {
+                        return Some(d);
+                    }
+                }
+                None
+            })
+    }
+
     pub(crate) fn data_property_declaration(&self, iri: &IRI) -> Option<&Declaration> {
         self.declaration_index
             .get(iri.as_str())

@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.23.0 - 2023-02-23
+#### Documentation
+- Add Node.js usage instructions to README - (0834fc6) - Maximilian Goisser
+#### Features
+- Support field33 computations - (9a912b7) - Florian Loers
+
+- - -
+
 ## v0.22.1 - 2023-02-09
 #### Bug Fixes
 - Annotations on axioms are correctly added to the annotations arrays - (4dc1697) - Florian Loers

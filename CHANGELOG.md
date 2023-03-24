@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.24.0 - 2023-03-24
+#### Features
+- Expose computations to WASM - (21cdd98) - Maximilian Goisser
+
+- - -
+
 ## v0.23.0 - 2023-02-23
 #### Documentation
 - Add Node.js usage instructions to README - (0834fc6) - Maximilian Goisser

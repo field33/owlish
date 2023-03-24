@@ -1,10 +1,12 @@
 use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     api::{Ontology, IRI},
     owl::{well_known, Axiom, ClassAssertion, ClassConstructor},
 };
 
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Computation {
     iri: IRI,
     axioms: Vec<Axiom>,
@@ -19,7 +21,7 @@ impl Computation {
     }
 }
 
-trait GetComputations {
+pub trait GetComputations {
     fn computations(&self) -> Vec<Computation>;
 }
 

@@ -6,6 +6,7 @@ use super::Ontology;
 use js_sys::{Array, Number, JSON};
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::console::error_1;
+use crate::computation::GetComputations;
 
 #[wasm_bindgen]
 impl Ontology {
@@ -99,6 +100,20 @@ impl Ontology {
         }
         array.unchecked_into()
     }
+
+    /// Get all FNO/Oxolotl computations of this ontology.
+    #[wasm_bindgen(js_name = "computations")]
+    pub fn wasm_computations(&self) -> ComputationArray {
+        let array = Array::new();
+        for a in self.computations() {
+            if let Ok(s) = serde_json::to_string(&a) {
+                if let Ok(value) = JSON::parse(&s) {
+                    array.push(&value);
+                }
+            }
+        }
+        array.unchecked_into()
+    }
 }
 
 #[wasm_bindgen]
@@ -107,6 +122,8 @@ extern "C" {
     pub type AxiomArray;
     #[wasm_bindgen(typescript_type = "Array<Declaration>")]
     pub type DeclarationArray;
+    #[wasm_bindgen(typescript_type = "Array<Computation>")]
+    pub type ComputationArray;
 }
 
 #[wasm_bindgen(typescript_custom_section)]
@@ -151,6 +168,11 @@ interface Axiom {
     DataPropertyAssertion?: DataPropertyAssertion
     NegativeDataPropertyAssertion?: NegativeDataPropertyAssertion
     HasKey?: HasKey
+}
+
+interface Computation {
+    iri: IRI,
+    axioms: Array<Axiom>,
 }
 
 export interface AxiomMatcher<R> {

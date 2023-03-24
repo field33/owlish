@@ -327,6 +327,7 @@ mod tests {
         },
         parser::{ParserOptions, ParserOptionsBuilder},
     };
+    use crate::computation::GetComputations;
 
     #[test]
     fn ontology() {

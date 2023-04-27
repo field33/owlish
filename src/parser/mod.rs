@@ -1353,6 +1353,61 @@ mod tests {
     }
 
     #[test]
+    fn annotations_on_data_property_assertions_with_iri_object() {
+        env_logger::try_init().ok();
+        let turtle = r##"
+            <http://field33.com/query_result/00000000-0000-0000-0000-000000000000> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://query-server.field33.com/ontology/query-field> <urn:test> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://www.w3.org/2002/07/owl#annotatedTarget> "0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://www.w3.org/2002/07/owl#annotatedProperty> <http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://www.w3.org/2002/07/owl#annotatedSource> <http://field33.com/ontologies/@fld33_domain/dora_metrics/Team2> .
+            _:896a965c9c5ef70e6855ff27a3009712 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Axiom> .
+            <http://field33.com/ontologies/@fld33_domain/dora_metrics/Team2> <http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate> "0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+
+        "##;
+
+        harriet::TurtleDocument::parse_full(turtle).unwrap();
+        let o = Ontology::parse(
+            turtle,
+            ParserOptionsBuilder::default()
+                .known(Declaration::AnnotationProperty{
+                    iri: IRI::new("http://query-server.field33.com/ontology/query-field")
+                        .unwrap()
+                        .into(),
+                    annotations: vec![],
+                })
+                .known(Declaration::DataProperty{
+                    iri: IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate")
+                        .unwrap()
+                        .into(),
+                    annotations: vec![],
+                })
+                .build(),
+        )
+            .unwrap();
+        println!("{:#?}", o);
+        assert_eq!(o.declarations().len(), 0);
+        assert_eq!(o.axioms().len(), 1);
+        assert_eq!(
+            o.axioms()[0],
+            Axiom::DataPropertyAssertion(DataPropertyAssertion::new(
+                IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/TeamChangeFailureRate").unwrap().into(),
+                IRI::new("http://field33.com/ontologies/@fld33_domain/dora_metrics/Team2").unwrap().into(),
+                Literal::Number {
+                    number: 0.into(),
+                    type_iri: Some(well_known::xsd_decimal())
+                },
+                vec![Annotation::new(
+                    IRI::new("http://query-server.field33.com/ontology/query-field").unwrap().into(),
+                    LiteralOrIRI::IRI(IRI::new("urn:test").unwrap().into()),
+                    vec![]
+                )]
+            ))
+        );
+    }
+
+
+    #[test]
     fn annotations_on_object_property_assertions() {
         env_logger::try_init().ok();
         let turtle = r##"

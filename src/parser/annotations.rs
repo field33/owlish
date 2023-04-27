@@ -168,10 +168,10 @@ pub(crate) fn match_annotation_assertions<'a>(
 ) -> Result<(), Error> {
     matchers.push((
         rdf_match!("AnnotationAssertion", _prefixes, 
-            [iob:subject] [*:predicate] [lt:object] .)?,
+            [iob:subject] [*:predicate] [iol:object] .)?,
         Box::new(|mstate, o, options| {
             if let Some(obj) = mstate.get("object") {
-                let value: Literal = match obj.clone().try_into() {
+                let value: LiteralOrIRI = match obj.clone().try_into() {
                     Ok(l) => l,
                     Err(_) => unreachable!(),
                 };
@@ -226,7 +226,7 @@ fn handle_annotation_on_bn(
     o: &mut OntologyCollector,
     subject_bn: harriet::triple_production::RdfBlankNode,
     predicate_iri: IRI,
-    value: Literal,
+    value: LiteralOrIRI,
 ) -> Result<bool, Error> {
     let annotate = o
         .annotation(CollectedAnnotationKey::Bn(subject_bn))

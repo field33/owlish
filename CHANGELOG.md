@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.24.1 - 2023-04-27
+#### Bug Fixes
+- Fix broken parsing of annotation assertions with IRI value - (e24da52) - Maximilian Goisser
+
+- - -
+
 ## v0.24.0 - 2023-03-24
 #### Features
 - Expose computations to WASM - (21cdd98) - Maximilian Goisser

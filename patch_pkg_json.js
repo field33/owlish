@@ -4,7 +4,7 @@ const packageJSON = JSON.parse(packageFileContent)
 packageJSON.type = 'module'
 packageJSON.main = packageJSON.module
 packageJSON.exports = './' + packageJSON.module
-packageJSON.dependencies = { typescript: '^4.8.3' }
+packageJSON.dependencies = { typescript: '^5.0.0' }
 packageJSON.scripts = { tsc: 'tsc owlish.d.ts' }
 fs.writeFileSync(
     './pkg/package.json',

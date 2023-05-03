@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.25.0 - 2023-05-03
+#### Features
+- Update Typescript dependency to new major version - (40158bd) - Maximilian Goisser
+
+- - -
+
 ## v0.24.1 - 2023-04-27
 #### Bug Fixes
 - Fix broken parsing of annotation assertions with IRI value - (e24da52) - Maximilian Goisser

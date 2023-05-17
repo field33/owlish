@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.26.0 - 2023-05-17
+#### Features
+- **(parsing)** Add support for parsing duration Literals - (3afe3a9) - Maximilian Goisser
+
+- - -
+
 ## v0.25.0 - 2023-05-03
 #### Features
 - Update Typescript dependency to new major version - (40158bd) - Maximilian Goisser

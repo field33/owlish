@@ -482,6 +482,7 @@ dependencies = [
  "iref",
  "js-sys",
  "log",
+ "oxsdatatypes",
  "pct-str",
  "serde",
  "serde-wasm-bindgen",
@@ -497,6 +498,16 @@ name = "oxiri"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb175ec8981211357b7b379869c2f8d555881c55ea62311428ec0de46d89bd5c"
+
+[[package]]
+name = "oxsdatatypes"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0c09de95cd9f6fb74cc35fc98689bf3da7d4a5e242f53b52b946fd2e87b60fd9"
+dependencies = [
+ "js-sys",
+ "nom",
+]
 
 [[package]]
 name = "pct-str"

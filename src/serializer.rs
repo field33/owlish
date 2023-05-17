@@ -361,6 +361,9 @@ impl IriToTtl for Literal {
                 Some(type_iri) => format!("\"{}\"^^{}", number, type_iri.ttl(imports)),
                 None => format!("{}", number),
             },
+            Literal::Duration(duration) => format!("\"{}\"^^{}", duration, well_known::xsd_duration().ttl(imports)),
+            Literal::YearMonthDuration(duration) => format!("\"{}\"^^{}", duration, well_known::xsd_yearMonthDuration().ttl(imports)),
+            Literal::DayTimeDuration(duration) => format!("\"{}\"^^{}", duration, well_known::xsd_dayTimeDuration().ttl(imports)),
             Literal::Bool(b) => format!("{}", b),
         }
     }

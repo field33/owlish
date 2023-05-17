@@ -5,9 +5,9 @@ use std::{
     hash::Hash,
     rc::Rc,
 };
-
+use std::str::FromStr;
 use harriet::triple_production::{RdfBlankNode, RdfLiteral, RdfObject, RdfSubject, RdfTriple};
-
+use oxsdatatypes::{DayTimeDuration, Duration, YearMonthDuration};
 use crate::{
     owl::{well_known, Literal, LiteralOrIRI, IRI},
     parser_debug,
@@ -71,6 +71,14 @@ impl<'a> TryInto<Literal> for Value<'a> {
                             .map(Literal::Bool)
                     } else if datatype_iri == well_known::xsd_dateTime_str {
                         Ok(Literal::DateTime(lexical_form.to_string()))
+                    }else if datatype_iri == well_known::xsd_duration_str {
+                        Ok(Literal::Duration(Duration::from_str(lexical_form.as_ref())
+                            .map_err(|_| ())
+                            ?))
+                    }else if datatype_iri == well_known::xsd_yearMonthDuration_str {
+                        Ok(Literal::YearMonthDuration(YearMonthDuration::from_str(lexical_form.as_ref()).map_err(|_| ())?))
+                    }else if datatype_iri == well_known::xsd_dayTimeDuration_str {
+                        Ok(Literal::DayTimeDuration(DayTimeDuration::from_str(lexical_form.as_ref()).map_err(|_| ())?))
                     } else {
                         IRI::new(&datatype_iri)
                             .map_err(|_| ())

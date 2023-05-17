@@ -36,6 +36,30 @@ pub fn xsd_dateTime() -> DatatypeIRI {
 }
 
 #[allow(non_upper_case_globals)]
+pub const xsd_duration_str: &str = "http://www.w3.org/2001/XMLSchema#duration";
+
+#[allow(non_snake_case)]
+pub fn xsd_duration() -> DatatypeIRI {
+    IRI::new(xsd_duration_str).unwrap().into()
+}
+
+#[allow(non_upper_case_globals)]
+pub const xsd_yearMonthDuration_str: &str = "http://www.w3.org/2001/XMLSchema#yearMonthDuration";
+
+#[allow(non_snake_case)]
+pub fn xsd_yearMonthDuration() -> DatatypeIRI {
+    IRI::new(xsd_yearMonthDuration_str).unwrap().into()
+}
+
+#[allow(non_upper_case_globals)]
+pub const xsd_dayTimeDuration_str: &str = "http://www.w3.org/2001/XMLSchema#dayTimeDuration";
+
+#[allow(non_snake_case)]
+pub fn xsd_dayTimeDuration() -> DatatypeIRI {
+    IRI::new(xsd_dayTimeDuration_str).unwrap().into()
+}
+
+#[allow(non_upper_case_globals)]
 pub const xsd_boolean_str: &str = "http://www.w3.org/2001/XMLSchema#boolean";
 
 #[allow(non_snake_case)]

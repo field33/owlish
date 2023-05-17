@@ -1,7 +1,9 @@
+use oxsdatatypes::{DayTimeDuration, Duration, YearMonthDuration};
 use std::{
     convert::{TryFrom, TryInto},
     fmt::Debug,
 };
+use std::str::FromStr;
 
 use serde::{de::Visitor, ser::SerializeMap, Deserialize, Serialize};
 use time::format_description::well_known::Rfc3339;
@@ -155,7 +157,7 @@ impl<'de> Deserialize<'de> for LiteralOrIRI {
 }
 
 /// A Literal value.
-/// 
+///
 /// Supported types are strings (with locales), booleans, numbers, dates and raw byte arrays.
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub enum Literal {
@@ -173,6 +175,9 @@ pub enum Literal {
         number: serde_json::Number,
         type_iri: Option<DatatypeIRI>,
     },
+    Duration(Duration),
+    YearMonthDuration(YearMonthDuration),
+    DayTimeDuration(DayTimeDuration),
     Bool(bool),
 }
 
@@ -187,6 +192,9 @@ impl std::fmt::Display for Literal {
                 number,
                 type_iri: _,
             } => write!(f, "{}", number,),
+            Literal::Duration(duration) => write!(f, "{}", duration),
+            Literal::YearMonthDuration(duration) => write!(f, "{}", duration),
+            Literal::DayTimeDuration(duration) => write!(f, "{}", duration),
             Literal::Bool(b) => write!(f, "{}", b),
         }
     }
@@ -198,11 +206,21 @@ const VALUE_DATETIME_TYPE: &str = "dateTime";
 const VALUE_LANG_STRING_TYPE: &str = "langString";
 const VALUE_NUMBER_TYPE: &str = "number";
 const VALUE_BOOLEAN_TYPE: &str = "boolean";
+const VALUE_DURATION_TYPE: &str = "duration";
 
 const KEY_TYPE: &str = "_type";
 const KEY_DATATYPE: &str = "datatypeIRI";
 const KEY_VALUE: &str = "value";
 const KEY_LANG: &str = "lang";
+
+// Keys for the Duration object. Follows the structure from the `date-fns` library (https://date-fns.org/v2.30.0/docs/Duration).
+// `weeks` key is omitted, as that is not tracked in any of the `xsd` datatypes.
+const KEY_DURATION_YEARS: &str = "years";
+const KEY_DURATION_MONTHS: &str = "months";
+const KEY_DURATION_DAYS: &str = "days";
+const KEY_DURATION_HOURS: &str = "hours";
+const KEY_DURATION_MINUTES: &str = "minutes";
+const KEY_DURATION_SECONDS: &str = "seconds";
 
 impl Serialize for Literal {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -280,6 +298,45 @@ impl Serialize for Literal {
 
                 map.serialize_key(KEY_VALUE)?;
                 map.serialize_value(number)?;
+
+                map.serialize_key(KEY_LANG)?;
+                map.serialize_value(&serde_json::Value::Null)?;
+            }
+            Literal::Duration(duration) => {
+                map.serialize_key(KEY_TYPE)?;
+                map.serialize_value(VALUE_DURATION_TYPE)?;
+
+                map.serialize_key(KEY_DATATYPE)?;
+                map.serialize_value(well_known::xsd_duration_str)?;
+
+                map.serialize_key(KEY_VALUE)?;
+                map.serialize_value(&SerializeDuration(duration))?;
+
+                map.serialize_key(KEY_LANG)?;
+                map.serialize_value(&serde_json::Value::Null)?;
+            }
+            Literal::YearMonthDuration(duration) => {
+                map.serialize_key(KEY_TYPE)?;
+                map.serialize_value(VALUE_DURATION_TYPE)?;
+
+                map.serialize_key(KEY_DATATYPE)?;
+                map.serialize_value(well_known::xsd_yearMonthDuration_str)?;
+
+                map.serialize_key(KEY_VALUE)?;
+                map.serialize_value(&SerializeYearMonthDuration(duration))?;
+
+                map.serialize_key(KEY_LANG)?;
+                map.serialize_value(&serde_json::Value::Null)?;
+            }
+            Literal::DayTimeDuration(duration) => {
+                map.serialize_key(KEY_TYPE)?;
+                map.serialize_value(VALUE_DURATION_TYPE)?;
+
+                map.serialize_key(KEY_DATATYPE)?;
+                map.serialize_value(well_known::xsd_dayTimeDuration_str)?;
+
+                map.serialize_key(KEY_VALUE)?;
+                map.serialize_value(&SerializeDayTimeDuration(duration))?;
 
                 map.serialize_key(KEY_LANG)?;
                 map.serialize_value(&serde_json::Value::Null)?;
@@ -652,8 +709,73 @@ impl From<bool> for LiteralOrIRI {
     }
 }
 
+struct SerializeDuration<'a>(&'a Duration);
+
+impl<'a> Serialize for SerializeDuration<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut map = serializer.serialize_map(Some(6))?;
+        map.serialize_key(KEY_DURATION_YEARS)?;
+        map.serialize_value(&self.0.years())?;
+        map.serialize_key(KEY_DURATION_MONTHS)?;
+        map.serialize_value(&self.0.months())?;
+        // Weeks are not tracked in xsd:duration
+        map.serialize_key(KEY_DURATION_DAYS)?;
+        map.serialize_value(&self.0.days())?;
+        map.serialize_key(KEY_DURATION_HOURS)?;
+        map.serialize_value(&self.0.hours())?;
+        map.serialize_key(KEY_DURATION_MINUTES)?;
+        map.serialize_value(&self.0.minutes())?;
+        map.serialize_key(KEY_DURATION_SECONDS)?;
+        // HACK: Loosing sub-second precision here
+        map.serialize_value(&i128::from_str(&format!("{}", self.0.seconds().round())).unwrap())?;
+        map.end()
+    }
+}
+
+struct SerializeYearMonthDuration<'a>(&'a YearMonthDuration);
+
+impl<'a> Serialize for SerializeYearMonthDuration<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer,
+    {
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_key(KEY_DURATION_YEARS)?;
+        map.serialize_value(&self.0.years())?;
+        map.serialize_key(KEY_DURATION_MONTHS)?;
+        map.serialize_value(&self.0.months())?;
+        map.end()
+    }
+}
+
+struct SerializeDayTimeDuration<'a>(&'a DayTimeDuration);
+
+impl<'a> Serialize for SerializeDayTimeDuration<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer,
+    {
+        let mut map = serializer.serialize_map(Some(4))?;
+        map.serialize_key(KEY_DURATION_DAYS)?;
+        map.serialize_value(&self.0.days())?;
+        map.serialize_key(KEY_DURATION_HOURS)?;
+        map.serialize_value(&self.0.hours())?;
+        map.serialize_key(KEY_DURATION_MINUTES)?;
+        map.serialize_value(&self.0.minutes())?;
+        map.serialize_key(KEY_DURATION_SECONDS)?;
+        // HACK: Loosing sub-second precision here
+        map.serialize_value(&i128::from_str(&format!("{}", self.0.seconds().round())).unwrap())?;
+        map.end()
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
     use super::*;
 
     #[test]
@@ -670,7 +792,12 @@ mod tests {
         assert_eq!(
             serde_json::to_string(&lit).unwrap(),
             r#"{"_type":"raw","datatypeIRI":"http://www.w3.org/2001/XMLSchema#float","value":[1,2,3,4],"lang":null}"#
-        )
+        );
+        let lit = Literal::Duration(Duration::from_str("P2Y6M5DT12H35M30.10S").unwrap());
+        assert_eq!(
+            serde_json::to_string(&lit).unwrap(),
+            r#"{"_type":"duration","datatypeIRI":"http://www.w3.org/2001/XMLSchema#duration","value":{"years":2,"months":6,"days":5,"hours":12,"minutes":35,"seconds":30},"lang":null}"#
+        );
     }
     #[test]
     fn test_deserialize() {

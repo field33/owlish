@@ -257,6 +257,21 @@ export type Value = {
     value: boolean,
     datatypeIRI: string,
     lang: null,
+} | {
+    _type: "duration",
+    value: Duration,
+    datatypeIRI: string,
+    lang: null,
+}
+
+// Duration format based on `date-fns` NPM package.
+export interface Duration {
+  years?: number
+  months?: number
+  days?: number
+  hours?: number
+  minutes?: number
+  seconds?: number
 }
 
 export type LiteralOrIRI = { _type: "Literal", Literal: Value } | { _type: "IRI", IRI: IRI }
@@ -310,6 +325,14 @@ type ValueMatcher<R> =
                   }
               >
           ) => R
+          duration?: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'duration'
+                  }
+              >
+          ) => R
           default: (value: Value) => R
       }
     | {
@@ -357,6 +380,14 @@ type ValueMatcher<R> =
                   Value,
                   {
                       _type: 'boolean'
+                  }
+              >
+          ) => R
+          duration: (
+              value: Extract<
+                  Value,
+                  {
+                      _type: 'duration'
                   }
               >
           ) => R

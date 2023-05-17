@@ -9,6 +9,7 @@ export function matchValue(value, matcher) {
         matcher.boolean &&
         matcher.dateTime &&
         matcher.number &&
+        matcher.duration &&
         matcher.raw
     ) {
         switch (value._type) {
@@ -23,6 +24,8 @@ export function matchValue(value, matcher) {
                 return matcher.number(value)
             case 'boolean':
                 return matcher.boolean(value)
+            case 'duration':
+                return matcher.duration(value)
         }
     } else if (matcher.default) {
         switch (value._type) {
@@ -46,6 +49,10 @@ export function matchValue(value, matcher) {
             case 'boolean':
                 return matcher.boolean !== undefined
                     ? matcher.boolean(value)
+                    : matcher.default(value)
+            case 'duration':
+                return matcher.duration !== undefined
+                    ? matcher.duration(value)
                     : matcher.default(value)
             default:
                 return matcher.default(value)

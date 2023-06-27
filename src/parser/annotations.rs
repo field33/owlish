@@ -2,7 +2,7 @@ use std::{collections::HashMap, convert::TryInto};
 
 use crate::{
     error::Error,
-    owl::{well_known, Annotation, AnnotationAssertion, Literal, LiteralOrIRI, IRI},
+    owl::{well_known, Annotation, AnnotationAssertion, LiteralOrIRI, IRI},
     parser::matcher::{RdfMatcher, Value},
     rdf_match,
 };
@@ -45,16 +45,20 @@ pub(crate) fn match_reifications<'a>(
             let Some(Value::Iri(predicate)) = mstate.last("predicate") else {
                 return Ok(false)
             };
-            let raw_object = mstate.last("object");
+            let Some(raw_object) = mstate.last("object") else {
+                return Ok(false)
+            };
             let object = match raw_object {
-                Some(Value::Iri(object)) => object.clone(),
+                Value::Iri(object) => object.clone(),
                 // TODO: Reification should probably take more than just lexical form into account.
-                Some(Value::Literal {
+                Value::Literal {
                     lexical_form,
                     datatype_iri: _,
                     language_tag: _,
-                }) => lexical_form.clone(),
-                _ => todo!(),
+                } => lexical_form.clone(),
+                Value::Blank(_) => {
+                    todo!("Blank nodes as annotatedTarget in reification is not supported yet.")
+                }
             };
 
             let collected_reification = CollectedReification {
@@ -76,9 +80,9 @@ pub(crate) fn match_reifications<'a>(
 
             // Some special case?
             if let Value::Iri(reification_iri) = reification_id {
-                if let Some(Value::Literal { lexical_form, .. }) = raw_object {
+                if let Value::Literal { lexical_form, .. } = raw_object {
                     if let Some((axiom, index)) =
-                        o.get_from_index_mut(subject, predicate, lexical_form)
+                        o.get_from_axiom_index_mut(subject, predicate, lexical_form)
                     {
                         if let Ok(anno_iri) = IRI::new(reification_iri) {
                             axiom.annotations_mut().push(Annotation::new(
@@ -204,7 +208,7 @@ fn handle_annotation_on_bn(
     value: LiteralOrIRI,
 ) -> Result<bool, Error> {
     let annotate = o
-        .annotation(CollectedReificationKey::Bn(subject_bn))
+        .annotation(CollectedReificationKey::Bn(subject_bn.clone()))
         .cloned();
     if annotate.is_none() {
         return Ok(false);
@@ -214,11 +218,15 @@ fn handle_annotation_on_bn(
     let predicate = annotate.predicate;
     let object = annotate.object;
 
-    if let Some((axiom, _)) = o.get_from_index_mut(&subject, &predicate, &object) {
+    // Either apply now, or save for later
+    if let Some((axiom, _)) = o.get_from_axiom_index_mut(&subject, &predicate, &object) {
         axiom
             .annotations_mut()
             .push(Annotation::new(predicate_iri.into(), value.into(), vec![]))
+    } else {
+        o.annotations_for_later.entry((subject.into(), predicate.into(), object.into())).or_insert_with(Vec::new).push(Annotation::new(predicate_iri.into(), value.into(), vec![]));
     }
+
 
     Ok(false)
 }
@@ -232,38 +240,26 @@ fn push_annotation_assertion(
     if let Some(a) = o.annotation(CollectedReificationKey::Iri(subject_iri.into())) {
         println!("{:#?}", a);
     }
+
     let subject_iri = IRI::new(subject_iri)?;
-    if let Some(object) = mstate.get("object") {
-        match object {
-            Value::Iri(object_iri) => {
-                o.push_axiom(
-                    AnnotationAssertion::new(
-                        predicate_iri.into(),
-                        subject_iri,
-                        LiteralOrIRI::IRI(IRI::new(object_iri)?),
-                        vec![],
-                    )
-                    .into(),
-                );
-                return Ok(true);
-            }
-            Value::Literal { .. } => {
-                if let Ok(lit) = object.clone().try_into() {
-                    o.push_axiom(
-                        AnnotationAssertion::new(
-                            predicate_iri.into(),
-                            subject_iri,
-                            LiteralOrIRI::Literal(lit),
-                            vec![],
-                        )
-                        .into(),
-                    );
-                    return Ok(true);
-                }
+    let Some(object) = mstate.get("object") else {
+        return Ok(false);
+    };
+
+    let object: LiteralOrIRI = match object {
+        Value::Iri(object_iri) => LiteralOrIRI::IRI(IRI::new(object_iri)?),
+        Value::Literal { .. } => {
+            if let Ok(lit) = object.clone().try_into() {
+                LiteralOrIRI::Literal(lit)
+            } else {
                 return Ok(false);
             }
-            Value::Blank(_) => todo!(),
         }
-    }
-    Ok(false)
+        Value::Blank(_) => todo!(),
+    };
+
+    o.push_axiom(
+        AnnotationAssertion::new(predicate_iri.into(), subject_iri, object, vec![]).into(),
+    );
+    Ok(true)
 }

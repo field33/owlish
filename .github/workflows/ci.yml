@@ -61,7 +61,6 @@ jobs:
       - name: Release crate and npm package
         run: |
           curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-          wasm-pack --version
           echo npm version:
           npm --version
           cargo install cargo-bump

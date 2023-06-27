@@ -25,13 +25,13 @@ pub(crate) enum CollectedBlankNode<'a> {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub(crate) enum CollectedAnnotationKey<'a> {
+pub(crate) enum CollectedReificationKey<'a> {
     Bn(RdfBlankNode),
     Iri(Cow<'a, str>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(crate) struct CollectedAnnotation<'a> {
+pub(crate) struct CollectedReification<'a> {
     pub(crate) subject: Cow<'a, str>,
     pub(crate) predicate: Cow<'a, str>,
     pub(crate) object: Cow<'a, str>,
@@ -43,10 +43,10 @@ pub(crate) struct OntologyCollector<'a> {
     declarations: Vec<Declaration>,
     axioms: Vec<Axiom>,
 
-    // annotations on things
-    annotations: HashMap<CollectedAnnotationKey<'a>, CollectedAnnotation<'a>>,
+    // reified triples
+    reifications: HashMap<CollectedReificationKey<'a>, CollectedReification<'a>>,
     // TODO: we probably don't need both. There may be a conceptional bug
-    annotations_rev: HashMap<CollectedAnnotation<'a>, CollectedAnnotationKey<'a>>,
+    reifications_rev: HashMap<CollectedReification<'a>, CollectedReificationKey<'a>>,
 
     // annotation definitions that were assigned to other things
     // (to handle multiple assertions for one annotation which is assigned to e.g. one data prop assertion)
@@ -165,27 +165,27 @@ impl<'a> OntologyCollector<'a> {
         self.blank_nodes.insert(bn, bnh);
     }
 
-    pub(crate) fn insert_annotation(
+    pub(crate) fn insert_reification(
         &mut self,
-        key: CollectedAnnotationKey<'a>,
-        value: CollectedAnnotation<'a>,
+        key: CollectedReificationKey<'a>,
+        value: CollectedReification<'a>,
     ) {
-        self.annotations.insert(key.clone(), value.clone());
-        self.annotations_rev.insert(value, key);
+        self.reifications.insert(key.clone(), value.clone());
+        self.reifications_rev.insert(value, key);
     }
 
     pub(crate) fn annotation(
         &self,
-        ann: CollectedAnnotationKey<'a>,
-    ) -> Option<&CollectedAnnotation<'a>> {
-        self.annotations.get(&ann)
+        ann: CollectedReificationKey<'a>,
+    ) -> Option<&CollectedReification<'a>> {
+        self.reifications.get(&ann)
     }
 
     pub(crate) fn annotation_on_triple(
         &self,
-        ann: &CollectedAnnotation<'a>,
-    ) -> Option<&CollectedAnnotationKey<'a>> {
-        self.annotations_rev.get(ann)
+        ann: &CollectedReification<'a>,
+    ) -> Option<&CollectedReificationKey<'a>> {
+        self.reifications_rev.get(ann)
     }
 
     pub(crate) fn ontology(self) -> Ontology {

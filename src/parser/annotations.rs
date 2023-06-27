@@ -9,7 +9,8 @@ use crate::{
 
 use super::{
     collector::{
-        get_iri_var, CollectedAnnotation, CollectedAnnotationKey, MatcherHandler, OntologyCollector,
+        get_iri_var, CollectedReification, CollectedReificationKey, MatcherHandler,
+        OntologyCollector,
     },
     matcher::MatcherState,
 };
@@ -22,98 +23,72 @@ const WELL_KNOWN_ANNOTATIONS: [&str; 2] = [
 
 /// annotations
 /// https://www.w3.org/TR/2012/REC-owl2-mapping-to-rdf-20121211/#Parsing_of_Annotations
-pub(crate) fn match_annotations<'a>(
+pub(crate) fn match_reifications<'a>(
     matchers: &mut Vec<(RdfMatcher, MatcherHandler<'a>)>,
     prefixes: &HashMap<String, String>,
 ) -> Result<(), Error> {
-    // annotations on things
+    // allows for annotations on triples via reification
     matchers.push((
-        rdf_match!("Annotation", prefixes,
+        rdf_match!("Reification", prefixes,
             [iob:a] [rdf:type] [owl:Axiom] .
             [iob:a] [owl:annotatedSource] [:subject] .
             [iob:a] [owl:annotatedProperty] [*:predicate] .
             [iob:a] [owl:annotatedTarget] [:object] .
         )?,
         Box::new(|mstate, o, _| {
-            if let Some(bn) = mstate.last("a") {
-                match bn {
-                    Value::Blank(bn) => {
-                        if let Some(Value::Iri(subject)) = mstate.last("subject") {
-                            if let Some(Value::Iri(predicate)) = mstate.last("predicate") {
-                                match mstate.last("object") {
-                                    Some(Value::Iri(object)) => o.insert_annotation(
-                                        CollectedAnnotationKey::Bn(bn.clone()),
-                                        CollectedAnnotation {
-                                            subject: subject.clone(),
-                                            predicate: predicate.clone(),
-                                            object: object.clone(),
-                                        },
-                                    ),
-                                    Some(Value::Literal {
-                                        lexical_form,
-                                        datatype_iri: _,
-                                        language_tag: _,
-                                    }) => {
-                                        o.insert_annotation(
-                                            CollectedAnnotationKey::Bn(bn.clone()),
-                                            CollectedAnnotation {
-                                                subject: subject.clone(),
-                                                predicate: predicate.clone(),
-                                                object: lexical_form.clone(),
-                                            },
-                                        );
-                                    }
-                                    _ => todo!(),
-                                }
-                            }
+            let Some(reification_id) = mstate.last("a") else {
+                return Ok(false)
+            };
+            let Some(Value::Iri(subject)) = mstate.last("subject") else {
+                return Ok(false)
+            };
+            let Some(Value::Iri(predicate)) = mstate.last("predicate") else {
+                return Ok(false)
+            };
+            let raw_object = mstate.last("object");
+            let object = match raw_object {
+                Some(Value::Iri(object)) => object.clone(),
+                // TODO: Reification should probably take more than just lexical form into account.
+                Some(Value::Literal {
+                    lexical_form,
+                    datatype_iri: _,
+                    language_tag: _,
+                }) => lexical_form.clone(),
+                _ => todo!(),
+            };
+
+            let collected_reification = CollectedReification {
+                subject: subject.clone(),
+                predicate: predicate.clone(),
+                object: object.clone(),
+            };
+
+            let reification_key = match reification_id {
+                Value::Blank(reification_bn) => CollectedReificationKey::Bn(reification_bn.clone()),
+                Value::Iri(reification_iri) => {
+                    CollectedReificationKey::Iri(reification_iri.clone())
+                }
+                Value::Literal { .. } => {
+                    unreachable!("Literals can't be reification IDs.")
+                }
+            };
+            o.insert_reification(reification_key, collected_reification);
+
+            // Some special case?
+            if let Value::Iri(reification_iri) = reification_id {
+                if let Some(Value::Literal { lexical_form, .. }) = raw_object {
+                    if let Some((axiom, index)) =
+                        o.get_from_index_mut(subject, predicate, lexical_form)
+                    {
+                        if let Ok(anno_iri) = IRI::new(reification_iri) {
+                            axiom.annotations_mut().push(Annotation::new(
+                                well_known::owl_annotatedSource().into(),
+                                LiteralOrIRI::IRI(anno_iri),
+                                vec![],
+                            ));
+                            o.insert_used_annotation(reification_iri, index)
                         }
                     }
-                    Value::Iri(iri) => {
-                        if let Some(Value::Iri(subject)) = mstate.last("subject") {
-                            if let Some(Value::Iri(predicate)) = mstate.last("predicate") {
-                                match mstate.last("object") {
-                                    Some(Value::Iri(object)) => {
-                                        o.insert_annotation(
-                                            CollectedAnnotationKey::Iri(iri.clone()),
-                                            CollectedAnnotation {
-                                                subject: subject.clone(),
-                                                predicate: predicate.clone(),
-                                                object: object.clone(),
-                                            },
-                                        );
-                                    }
-                                    Some(Value::Literal {
-                                        lexical_form,
-                                        datatype_iri: _,
-                                        language_tag: _,
-                                    }) => {
-                                        if let Some((axiom, index)) =
-                                            o.get_from_index_mut(subject, predicate, lexical_form)
-                                        {
-                                            if let Ok(anno_iri) = IRI::new(iri) {
-                                                axiom.annotations_mut().push(Annotation::new(
-                                                    well_known::owl_annotatedSource().into(),
-                                                    LiteralOrIRI::IRI(anno_iri),
-                                                    vec![],
-                                                ));
-                                                o.insert_used_annotation(iri, index)
-                                            }
-                                        }
-                                        o.insert_annotation(
-                                            CollectedAnnotationKey::Iri(iri.clone()),
-                                            CollectedAnnotation {
-                                                subject: subject.clone(),
-                                                predicate: predicate.clone(),
-                                                object: lexical_form.clone(),
-                                            },
-                                        );
-                                    }
-                                    _ => todo!(),
-                                }
-                            }
-                        }
-                    }
-                    _ => todo!(),
                 }
             }
             Ok(false)
@@ -229,7 +204,7 @@ fn handle_annotation_on_bn(
     value: LiteralOrIRI,
 ) -> Result<bool, Error> {
     let annotate = o
-        .annotation(CollectedAnnotationKey::Bn(subject_bn))
+        .annotation(CollectedReificationKey::Bn(subject_bn))
         .cloned();
     if annotate.is_none() {
         return Ok(false);
@@ -254,7 +229,7 @@ fn push_annotation_assertion(
     mstate: &MatcherState,
     o: &mut OntologyCollector,
 ) -> Result<bool, Error> {
-    if let Some(a) = o.annotation(CollectedAnnotationKey::Iri(subject_iri.into())) {
+    if let Some(a) = o.annotation(CollectedReificationKey::Iri(subject_iri.into())) {
         println!("{:#?}", a);
     }
     let subject_iri = IRI::new(subject_iri)?;

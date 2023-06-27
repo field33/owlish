@@ -86,10 +86,10 @@ impl From<AnnotationPropertyDomain> for Axiom {
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct AnnotationAssertion {
-    #[serde(rename = "annotationIRI")]
-    pub iri: AnnotationPropertyIRI,
     #[serde(rename = "subjectIRI")]
     pub subject: IRI,
+    #[serde(rename = "annotationIRI")]
+    pub iri: AnnotationPropertyIRI,
     #[serde(rename = "value")]
     pub value: LiteralOrIRI,
     #[serde(rename = "annotations")]

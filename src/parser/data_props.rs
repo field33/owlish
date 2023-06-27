@@ -8,7 +8,7 @@ use crate::{
 };
 
 use super::{
-    collector::{get_iri_var, CollectedAnnotationKey, MatcherHandler, OntologyCollector},
+    collector::{get_iri_var, CollectedReificationKey, MatcherHandler, OntologyCollector},
     matcher::MatcherState,
 };
 
@@ -98,7 +98,7 @@ pub(crate) fn handle_dataprop_on_bn(
     value: Literal,
 ) -> Result<bool, Error> {
     let annotate = o
-        .annotation(CollectedAnnotationKey::Bn(subject_bn))
+        .annotation(CollectedReificationKey::Bn(subject_bn))
         .cloned();
     if annotate.is_none() {
         return Ok(false);

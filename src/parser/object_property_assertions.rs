@@ -1,5 +1,5 @@
-use super::collector::CollectedAnnotation;
-use super::collector::CollectedAnnotationKey;
+use super::collector::CollectedReification;
+use super::collector::CollectedReificationKey;
 use super::collector::MatcherHandler;
 use crate::error::Error;
 use crate::get_vars;
@@ -39,8 +39,8 @@ pub(crate) fn push(
                                             || options.is_object_prop(&predicate)
                                         {
                                             let mut annotations = Vec::new();
-                                            if let Some(CollectedAnnotationKey::Iri(iri)) = o
-                                                .annotation_on_triple(&CollectedAnnotation {
+                                            if let Some(CollectedReificationKey::Iri(iri)) = o
+                                                .annotation_on_triple(&CollectedReification {
                                                     subject: subject.as_str().into(),
                                                     predicate: predicate.as_str().into(),
                                                     object: object.as_str().into(),

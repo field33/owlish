@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.27.0 - 2023-06-27
+#### Bug Fixes
+- wasm-pack in CI breakage - (eadd2bf) - Maximilian Goisser
+#### Features
+- Make annotations on OPAs work - (fa9ffd3) - Maximilian Goisser
+#### Refactoring
+- Rename reification mechanisms that were previously called annotation - (1e0e773) - Maximilian Goisser
+
+- - -
+
 ## v0.26.0 - 2023-05-17
 #### Features
 - **(parsing)** Add support for parsing duration Literals - (3afe3a9) - Maximilian Goisser

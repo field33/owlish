@@ -51,6 +51,8 @@ pub(crate) struct OntologyCollector<'a> {
     // annotation definitions that were assigned to other things
     // (to handle multiple assertions for one annotation which is assigned to e.g. one data prop assertion)
     used_annotations: HashMap<String, Vec<usize>>,
+    // During matching, an axiom may not have been parsed yet, but we already have found an annotation for it.
+    pub(crate) annotations_for_later: HashMap<(String, String, String), Vec<Annotation>>,
 
     pub blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode<'a>>,
 
@@ -105,52 +107,73 @@ impl<'a> OntologyCollector<'a> {
         self.declarations.push(declaration)
     }
 
-    pub(crate) fn push_axiom(&mut self, axiom: Axiom) {
-        match &axiom {
+    pub(crate) fn push_axiom(&mut self, mut axiom: Axiom) {
+        let axiom_triple: Option<(String, String, String)> = match &axiom {
             Axiom::SubClassOf(sco) => {
                 if let ClassConstructor::IRI(subject) = sco.cls.as_ref() {
                     if let ClassConstructor::IRI(parent) = sco.parent_class.as_ref() {
-                        self.axiom_index.insert(
-                            (
-                                subject.as_iri().to_string(),
-                                well_known::rdfs_subClassOf_str.to_string(),
-                                parent.as_iri().to_string(),
-                            ),
-                            self.axioms.len(),
-                        );
+                        Some((
+                            subject.as_iri().to_string(),
+                            well_known::rdfs_subClassOf_str.to_string(),
+                            parent.as_iri().to_string(),
+                        ))
+                    } else {
+                        None
                     }
+                } else {
+                    None
                 }
             }
             Axiom::AnnotationAssertion(ann) => {
                 let sub = &ann.subject;
                 let iri = &ann.iri;
                 let val = &ann.value;
-                self.axiom_index.insert(
-                    (sub.to_string(), iri.to_string(), val.to_string()),
-                    self.axioms.len(),
-                );
+                Some((sub.to_string(), iri.to_string(), val.to_string()))
             }
             Axiom::DataPropertyAssertion(ann) => {
                 let sub = &ann.subject;
                 let iri = &ann.iri;
                 let val = &ann.value;
-                self.axiom_index.insert(
-                    (
+                Some((
+                    sub.as_iri().to_string(),
+                    iri.as_iri().to_string(),
+                    val.to_string(),
+                ))
+            }
+            Axiom::ObjectPropertyAssertion(assertion) => {
+                let sub = &assertion.subject;
+                let iri = &assertion.iri;
+                let val = &assertion.object;
+                match val {
+                    IRIList::IRI(val) => Some((
                         sub.as_iri().to_string(),
                         iri.as_iri().to_string(),
                         val.to_string(),
-                    ),
-                    self.axioms.len(),
-                );
+                    )),
+                    IRIList::List(_) => {
+                        None
+                        // unimplemented!("ObjectPropertyAssertions with List in object positions are not supported yet.")
+                    }
+                }
             }
             _ => {
                 // TODO
+                None
             }
+        };
+
+        if let Some(ref axiom_triple) = axiom_triple {
+            if let Some(mut annotations_to_apply) = self.annotations_for_later.remove(&axiom_triple)
+            {
+                axiom.annotations_mut().append(&mut annotations_to_apply);
+            }
+            self.axiom_index
+                .insert(axiom_triple.clone(), self.axioms.len());
         }
         self.axioms.push(axiom);
     }
 
-    pub(crate) fn get_from_index_mut(
+    pub(crate) fn get_from_axiom_index_mut(
         &mut self,
         s: &str,
         p: &str,

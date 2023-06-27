@@ -327,7 +327,6 @@ mod tests {
         },
         parser::{ParserOptions, ParserOptionsBuilder},
     };
-    use crate::computation::GetComputations;
 
     #[test]
     fn ontology() {
@@ -1406,7 +1405,6 @@ mod tests {
         );
     }
 
-
     #[test]
     fn annotations_on_object_property_assertions() {
         env_logger::try_init().ok();
@@ -1463,7 +1461,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn annotations_on_object_property_assertions_blank_node() {
         env_logger::try_init().ok();
         let turtle = r##"
@@ -1493,7 +1490,7 @@ mod tests {
                 })
                 .build(),
         )
-            .unwrap();
+        .unwrap();
         println!("{:#?}", o);
         assert_eq!(o.declarations().len(), 3);
         assert_eq!(o.axioms().len(), 2);
@@ -1509,11 +1506,13 @@ mod tests {
                 IRI::new("http://field33.com/org/org_evlGiemVNyAUTJ7D/node/fe6fdda1-fc21-4b99-9269-8c19fc6359b8")
                     .unwrap()
                     .into(),
-                vec![Annotation::new(
-                    well_known::owl_annotatedSource().into(),
-                    IRI::new("http://field33.com/org/org_evlGiemVNyAUTJ7D/node/f63c8031-a7d9-40db-ae87-be04c99537c7").unwrap().into(),
-                    vec![]
-                )]
+                vec![
+                     Annotation::new(
+                         IRI::new("http://field33.com/ontologies/core_change_tracking/createdByImport").unwrap().into(),
+                         "GitHub".into(),
+                         vec![]
+                     ),
+                ]
             ))
         );
     }

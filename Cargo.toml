@@ -27,7 +27,9 @@ wasm-bindgen = { version = "0.2", features = [
 js-sys = "0.3"
 web-sys = { version = "0.3", features = ["console"] }
 # harriet = { git = "https://github.com/field33/harriet" }
-harriet = "0.3"
+harriet = "0.3.1"
+# Toggle on the serde support of harriets dependency
+snowflake = { version = "1.3.0", features = ["serde_support"] }
 oxsdatatypes = "0.1.1"
 time = { version = "0.3", features = ["formatting"] }
 # The `console_error_panic_hook` crate provides better debugging of panics by

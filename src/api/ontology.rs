@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::owl::{Axiom, Declaration, IRIBuilder, IRI};
+use crate::owl::{AnnotationAssertion, Axiom, Declaration, IRIBuilder, ResourceId, IRI};
 
 #[cfg(feature = "wasm")]
 #[wasm_bindgen::prelude::wasm_bindgen]
@@ -58,6 +58,60 @@ impl Ontology {
     /// Get all OWL axioms of this ontology.
     pub fn axioms(&self) -> &Vec<Axiom> {
         &self.owl.axioms
+    }
+
+    /// Finds all annotations assertions for a given `ResourceId`.
+    pub fn annotation_assertions_for_resource_id(
+        &self,
+        resource_id: &ResourceId,
+    ) -> Vec<AnnotationAssertion> {
+        let mut annotations = vec![];
+        // Add annotations that are on the axiom directly
+        for axiom in self.axioms() {
+            if let Some(axiom_annotations) = match axiom {
+                Axiom::AnnotationAssertion(apa) => {
+                    if apa.resource_ids.contains(resource_id) {
+                        Some(apa.annotations.clone())
+                    } else {
+                        None
+                    }
+                }
+                Axiom::DataPropertyAssertion(dpa) => {
+                    if dpa.resource_ids.contains(resource_id) {
+                        Some(dpa.annotations.clone())
+                    } else {
+                        None
+                    }
+                }
+                Axiom::ObjectPropertyAssertion(opa) => {
+                    if opa.resource_ids.contains(resource_id) {
+                        Some(opa.annotations.clone())
+                    } else {
+                        None
+                    }
+                }
+                _ => {
+                    None
+                    // unimplemented!("`annotationsForResourceId` is only implemented for assertions right now")
+                }
+            } {
+                for annotation in &axiom_annotations {
+                    annotations.push(annotation.clone().to_assertion(resource_id.to_owned()));
+                }
+            }
+        }
+        // Find additional AnnotationAssertions via matching their subject to resource_id
+        for axiom in self.axioms() {
+            if let Axiom::AnnotationAssertion(annotation_assertion) = axiom {
+                if &annotation_assertion.subject == resource_id {
+                    annotations.push(annotation_assertion.clone());
+                }
+            }
+        }
+
+        // HACK: This may not remove all duplicates, as we can't order the Vec before deduping.
+        annotations.dedup();
+        annotations
     }
 }
 

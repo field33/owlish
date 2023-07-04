@@ -8,6 +8,7 @@ use crate::{
         ObjectPropertyIRI, IRI,
     },
 };
+use crate::owl::ResourceId;
 
 pub trait ToTtl {
     fn ttl(&self) -> String;
@@ -129,11 +130,18 @@ impl ToTtl for Ontology {
         for a in self.axioms() {
             match a {
                 crate::owl::Axiom::AnnotationAssertion(a) => {
-                    anno_prop_assertions.push(t(
-                        a.subject.ttl(imports),
-                        a.iri.ttl(imports),
-                        a.value.ttl(imports),
-                    ));
+                    match &a.subject {
+                        ResourceId::IRI(subject_iri) => {
+                            anno_prop_assertions.push(t(
+                                subject_iri.ttl(imports),
+                                a.iri.ttl(imports),
+                                a.value.ttl(imports),
+                            ));
+                        }
+                        ResourceId::BlankNode(_) => {
+                            unimplemented!("Can't serialize AnnotationAssertion with blankNode subject")
+                        }
+                    }
                 }
                 crate::owl::Axiom::DataPropertyAssertion(d) => {
                     data_prop_assertions.push(t(

@@ -187,8 +187,9 @@ pub fn family() -> ApiOntology {
         vec![
             Axiom::AnnotationAssertion(AnnotationAssertion::new(
                 wk::rdfs_comment(),
-                iri.new("Person"),
+                iri.new::<IRI>("Person"),
                 LiteralOrIRI::from("Represents the set of all people"),
+                vec![],
                 vec![],
             )),
             Axiom::SubObjectPropertyOf(SubObjectPropertyOf::new(
@@ -648,6 +649,7 @@ pub fn family() -> ApiOntology {
                 iri.new("John"),
                 iri.new("Mary"),
                 vec![],
+                vec![],
             )),
             Axiom::NegativeObjectPropertyAssertion(NegativeObjectPropertyAssertion::new(
                 iri.new("hasWife"),
@@ -665,6 +667,7 @@ pub fn family() -> ApiOntology {
                 iri.new("hasAge"),
                 iri.new("John"),
                 Literal::from(51u8),
+                vec![],
                 vec![],
             )),
             Axiom::NegativeDataPropertyAssertion(NegativeDataPropertyAssertion::new(

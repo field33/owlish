@@ -4,6 +4,7 @@ use crate::{
     error::Error,
     owl::{Axiom, IRIList, IndividualIRI, ObjectPropertyConstructor, IRI},
 };
+use crate::owl::ResourceId;
 
 use super::Annotation;
 
@@ -35,6 +36,9 @@ impl ObjectPropertyIRI {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct ObjectPropertyAssertion {
+    /// Known IDs of reifications of this assertion.
+    #[serde(rename = "resourceIds")]
+    pub resource_ids: Vec<ResourceId>,
     pub subject: IndividualIRI,
     pub iri: ObjectPropertyIRI,
     pub object: IRIList,
@@ -47,12 +51,14 @@ impl ObjectPropertyAssertion {
         subject: IndividualIRI,
         object: IndividualIRI,
         annotations: Vec<Annotation>,
+        resource_ids: Vec<ResourceId>,
     ) -> Self {
         Self {
             iri,
             subject,
             object: IRIList::IRI(object.as_iri().clone()),
             annotations,
+            resource_ids,
         }
     }
     pub fn new_with_list(
@@ -60,8 +66,10 @@ impl ObjectPropertyAssertion {
         subject: IndividualIRI,
         object: Vec<IRI>,
         annotations: Vec<Annotation>,
+        resource_ids: Vec<ResourceId>,
     ) -> Self {
         Self {
+            resource_ids,
             iri,
             subject,
             object: IRIList::List(object),

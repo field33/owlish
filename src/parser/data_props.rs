@@ -98,7 +98,7 @@ pub(crate) fn handle_dataprop_on_bn(
     value: Literal,
 ) -> Result<bool, Error> {
     let annotate = o
-        .annotation(CollectedReificationKey::Bn(subject_bn))
+        .reification(CollectedReificationKey::Bn(subject_bn))
         .cloned();
     if annotate.is_none() {
         return Ok(false);
@@ -141,6 +141,8 @@ fn push_dataprop_assertion(
                             predicate_iri.into(),
                             subject_iri.into(),
                             lit,
+                            vec![],
+                            // TODO: ? or will this be handled in push_axiom?
                             vec![],
                         )
                         .into(),

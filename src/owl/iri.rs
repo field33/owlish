@@ -1,3 +1,4 @@
+use harriet::triple_production::RdfBlankNode;
 use std::{borrow::Cow, collections::HashMap, fmt::Display, str::FromStr};
 
 use crate::error::Error;
@@ -6,6 +7,7 @@ use super::{ClassIRI, ObjectPropertyIRI};
 use iref::Fragment;
 use pct_str::{PctString, URIReserved};
 use serde::{de::Visitor, ser::SerializeMap, Deserialize, Serialize};
+use snowflake::ProcessUniqueId;
 
 pub fn iri<T: From<IRI>>(iri: &str) -> T {
     IRI::new(iri).unwrap().into()
@@ -241,6 +243,210 @@ impl IRIBuilder {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct BlankNode(snowflake::ProcessUniqueId);
+
+impl BlankNode {
+    pub fn new() -> Self {
+        Self(snowflake::ProcessUniqueId::new())
+    }
+}
+
+impl From<RdfBlankNode> for BlankNode {
+    fn from(value: RdfBlankNode) -> Self {
+        Self(value.internal_id)
+    }
+}
+
+impl Serialize for BlankNode {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_key("_type")?;
+        map.serialize_value("BlankNode")?;
+        map.serialize_key("inner")?;
+        map.serialize_value(&self.0)?;
+        map.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for BlankNode {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct IRIVisitor;
+        impl<'de> Visitor<'de> for IRIVisitor {
+            type Value = BlankNode;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str(r#"an object {_type: "BlankNode", inner: <the object for the process-uniquer internal id> }"#)
+            }
+
+            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+            where
+                A: serde::de::MapAccess<'de>,
+            {
+                let key1: Option<&str> = map.next_key()?;
+                if let Some("inner") = key1 {
+                    let value: Option<ProcessUniqueId> = map.next_value()?;
+                    if let Some(inner_id) = value {
+                        return Ok(BlankNode(inner_id));
+                    } else {
+                        return Err(serde::de::Error::custom(
+                            "Could not parse BlankNode: Malformed 'inner' field.",
+                        ));
+                    }
+                } else {
+                    let _value: Option<&str> = map.next_value()?;
+                }
+
+                let key2: Option<&str> = map.next_key()?;
+                if let Some("inner") = key2 {
+                    let value: Option<ProcessUniqueId> = map.next_value()?;
+                    if let Some(inner_id) = value {
+                        return Ok(BlankNode(inner_id));
+                    } else {
+                        return Err(serde::de::Error::custom(
+                            "Could not parse BlankNode: Malformed 'inner' field.",
+                        ));
+                    }
+                }
+                Err(serde::de::Error::custom(
+                    "Could not parse BlankNode: Missing 'inner' field.",
+                ))
+            }
+        }
+        deserializer.deserialize_map(IRIVisitor)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ResourceId {
+    IRI(IRI),
+    BlankNode(BlankNode),
+}
+
+impl ResourceId {
+    pub fn is_iri(&self) -> bool {
+        matches!(&self, Self::IRI(_))
+    }
+
+    pub fn is_blank_node(&self) -> bool {
+        matches!(&self, Self::BlankNode(_))
+    }
+}
+
+impl From<IRI> for ResourceId {
+    fn from(value: IRI) -> Self {
+        Self::IRI(value)
+    }
+}
+
+impl From<BlankNode> for ResourceId {
+    fn from(value: BlankNode) -> Self {
+        Self::BlankNode(value)
+    }
+}
+
+impl Serialize for ResourceId {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_key("_type")?;
+        map.serialize_value("ResourceId")?;
+        match self {
+            ResourceId::IRI(iri) => {
+                map.serialize_key("iri")?;
+                map.serialize_value(&iri)?;
+            }
+            ResourceId::BlankNode(blank_node) => {
+                map.serialize_key("blankNode")?;
+                map.serialize_value(&blank_node)?;
+            }
+        }
+        map.end()
+    }
+}
+
+impl<'de> Deserialize<'de> for ResourceId {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct IRIVisitor;
+        impl<'de> Visitor<'de> for IRIVisitor {
+            type Value = ResourceId;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str(
+                    r#"an object {_type: "ResourceId", either with key `iri` or `blankNode` }"#,
+                )
+            }
+
+            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+            where
+                A: serde::de::MapAccess<'de>,
+            {
+                let key1: Option<&str> = map.next_key()?;
+                if let Some("iri") = key1 {
+                    let value: Option<IRI> = map.next_value()?;
+                    if let Some(inner_id) = value {
+                        return Ok(ResourceId::IRI(inner_id));
+                    } else {
+                        return Err(serde::de::Error::custom(
+                            "Could not parse BlankNode: Malformed 'iri' field.",
+                        ));
+                    }
+                } else if let Some("blankNode") = key1 {
+                    let value: Option<BlankNode> = map.next_value()?;
+                    if let Some(inner_id) = value {
+                        return Ok(ResourceId::BlankNode(inner_id));
+                    } else {
+                        return Err(serde::de::Error::custom(
+                            "Could not parse BlankNode: Malformed 'blankNode' field.",
+                        ));
+                    }
+                } else {
+                    let _value: Option<&str> = map.next_value()?;
+                }
+
+                let key2: Option<&str> = map.next_key()?;
+                if let Some("iri") = key2 {
+                    let value: Option<IRI> = map.next_value()?;
+                    if let Some(inner_id) = value {
+                        return Ok(ResourceId::IRI(inner_id));
+                    } else {
+                        return Err(serde::de::Error::custom(
+                            "Could not parse BlankNode: Malformed 'iri' field.",
+                        ));
+                    }
+                } else if let Some("blankNode") = key2 {
+                    let value: Option<BlankNode> = map.next_value()?;
+                    if let Some(inner_id) = value {
+                        return Ok(ResourceId::BlankNode(inner_id));
+                    } else {
+                        return Err(serde::de::Error::custom(
+                            "Could not parse BlankNode: Malformed 'blankNode' field.",
+                        ));
+                    }
+                } else {
+                    let _value: Option<&str> = map.next_value()?;
+                }
+
+                Err(serde::de::Error::custom(
+                    "Could not parse ResourceId: Missing 'iri' or `blankNode` field.",
+                ))
+            }
+        }
+        deserializer.deserialize_map(IRIVisitor)
+    }
+}
+
 #[cfg(feature = "wasm")]
 mod wasm {
     use wasm_bindgen::prelude::wasm_bindgen;
@@ -252,6 +458,16 @@ export interface IRI {
 }
 
 export function Iri(iri: string): IRI
+
+export interface BlankNode {
+    _type: "BlankNode"
+}
+
+export interface ResourceId {
+    _type: "ResourceId",
+    iri?: IRI,
+    blankNode?: BlankNode,
+}
 "#;
 }
 
@@ -307,5 +523,40 @@ mod tests {
 
         iri.set_leaf(Some("Foobar".into())).unwrap();
         assert_eq!(iri.as_str(), "https://test.org/Foobar");
+    }
+
+    #[test]
+    pub fn test_ser_de_blank_node() {
+        let blank_node_1 = BlankNode::new();
+        let blank_node_2 = BlankNode::new();
+
+        let json = serde_json::to_string(&blank_node_1).unwrap();
+
+        // Rough checking, as this has a variable part inside of it
+        assert!(json.contains(r#"{"_type":"BlankNode","inner":{"prefix":"#));
+
+        dbg!(&json);
+        let parsed_blank_node: BlankNode = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(blank_node_1, parsed_blank_node);
+        assert_ne!(blank_node_2, parsed_blank_node)
+    }
+
+    #[test]
+    pub fn test_ser_de_resource_id() {
+        let iri = ResourceId::IRI(IRI::new("https://test.org#asdf").unwrap());
+
+        let json = serde_json::to_string(&iri).unwrap();
+
+        assert_eq!(
+            json,
+            r#"{"_type":"ResourceId","iri":{"_type":"IRI","string":"https://test.org#asdf"}}"#
+        );
+
+        let json =
+            r#"{"_type":"ResourceId","iri":{"_type":"IRI","string":"https://test.org#asdf"}}"#;
+        let iri1: ResourceId = serde_json::from_str(json).unwrap();
+
+        assert_eq!(iri1, iri)
     }
 }

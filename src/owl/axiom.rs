@@ -90,7 +90,15 @@ impl Axiom {
 
     pub fn subject(&self) -> Option<&IRI> {
         match self {
-            Axiom::AnnotationAssertion(a) => Some(&a.subject),
+            Axiom::AnnotationAssertion(a) => {
+                // TODO: This seems like it could be a source for confusion (silently not having a subject if it's a BlankNode
+                match &a.subject {
+                    ResourceId::IRI(iri_subject) => {
+                        Some(&iri_subject)
+                    }
+                    ResourceId::BlankNode(_) => {None}
+                }
+            },
             Axiom::AnnotationPropertyRange(a) => Some(a.iri.as_iri()),
             Axiom::AnnotationPropertyDomain(a) => Some(a.iri.as_iri()),
             Axiom::SubObjectPropertyOf(a) => match &a.object_property {

@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 
-use crate::owl::{Axiom, ClassIRI, DatatypeIRI, LiteralOrIRI, IRI};
+use crate::owl::{Axiom, ClassIRI, DatatypeIRI, LiteralOrIRI, IRI, ResourceId};
 
 use super::Annotation;
 
@@ -86,8 +86,10 @@ impl From<AnnotationPropertyDomain> for Axiom {
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct AnnotationAssertion {
-    #[serde(rename = "subjectIRI")]
-    pub subject: IRI,
+    /// Known IDs of reifications of this assertion.
+    #[serde(rename = "resourceIds")]
+    pub resource_ids: Vec<ResourceId>,
+    pub subject: ResourceId,
     #[serde(rename = "annotationIRI")]
     pub iri: AnnotationPropertyIRI,
     #[serde(rename = "value")]
@@ -97,17 +99,19 @@ pub struct AnnotationAssertion {
 }
 
 impl AnnotationAssertion {
-    pub fn new(
+    pub fn new<S: Into<ResourceId>>(
         iri: AnnotationPropertyIRI,
-        subject: IRI,
+        subject: S,
         value: LiteralOrIRI,
         annotations: Vec<Annotation>,
+        resource_ids: Vec<ResourceId>,
     ) -> Self {
         Self {
             iri,
-            subject,
+            subject: subject.into(),
             value,
             annotations,
+            resource_ids
         }
     }
 }
@@ -133,9 +137,9 @@ export type AnnotationAssertion = {
      */
     annotationIRI: IRI, 
     /**
-     * The subject IRI.
+     * The ResourceId of the subject.
      */
-    subjectIRI: IRI, 
+    subject: ResourceId,
     /**
      * The asserted value.
      */

@@ -1,4 +1,4 @@
-use crate::owl::{IndividualIRI, IRI};
+use crate::owl::{IndividualIRI, IRI, ResourceId};
 
 mod constructors;
 pub use constructors::*;
@@ -36,6 +36,9 @@ impl DataPropertyIRI {
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct DataPropertyAssertion {
+    /// Known IDs of reifications of this assertion.
+    #[serde(rename = "resourceIds")]
+    pub resource_ids: Vec<ResourceId>,
     #[serde(rename = "dataPropertyIRI")]
     pub iri: DataPropertyIRI,
     #[serde(rename = "subjectIRI")]
@@ -58,12 +61,14 @@ impl DataPropertyAssertion {
         subject: IndividualIRI,
         value: Literal,
         annotations: Vec<Annotation>,
+        resource_ids: Vec<ResourceId>,
     ) -> Self {
         Self {
             iri,
             subject,
             value,
             annotations,
+            resource_ids
         }
     }
 }

@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use crate::owl::Literal;
+use crate::owl::{AnnotationAssertion, Axiom, Literal, ResourceId as OwlResourceId};
 
 use super::Ontology;
 use js_sys::{Array, Number, JSON};
@@ -114,6 +114,21 @@ impl Ontology {
         }
         array.unchecked_into()
     }
+
+    #[wasm_bindgen(js_name = "annotationsForResourceId")]
+    pub fn wasm_annotations_for_resource_id(&self, resource_id: &ResourceId) -> AnnotationAssertionArray {
+        let owl_resource_id: OwlResourceId = serde_json::from_str(&JSON::stringify(resource_id).unwrap().as_string().unwrap()).unwrap();
+
+        let array = Array::new();
+        for a in self.annotation_assertions_for_resource_id(&owl_resource_id) {
+            if let Ok(s) = serde_json::to_string(&a) {
+                if let Ok(value) = JSON::parse(&s) {
+                    array.push(&value);
+                }
+            }
+        }
+        array.unchecked_into()
+    }
 }
 
 #[wasm_bindgen]
@@ -124,6 +139,9 @@ extern "C" {
     pub type DeclarationArray;
     #[wasm_bindgen(typescript_type = "Array<Computation>")]
     pub type ComputationArray;
+
+    #[wasm_bindgen(typescript_type = "Array<AnnotationAssertion>")]
+    pub type AnnotationAssertionArray;
 }
 
 #[wasm_bindgen(typescript_custom_section)]
@@ -401,6 +419,8 @@ export function matchValue<R>(value: Value, matcher: ValueMatcher<R>): R;
 extern "C" {
     #[wasm_bindgen(typescript_type = "IRI")]
     pub type IRI;
+    #[wasm_bindgen(typescript_type = "ResourceId")]
+    pub type ResourceId;
     #[wasm_bindgen(typescript_type = "Value")]
     pub type Value;
     #[wasm_bindgen(typescript_type = "Triple")]

@@ -30,9 +30,18 @@ pub(crate) enum CollectedReificationKey<'a> {
     Iri(Cow<'a, str>),
 }
 
+impl<'a> CollectedReificationKey<'a> {
+    pub(crate) fn into_resource_id(self) -> ResourceId {
+        match self {
+            CollectedReificationKey::Bn(bn) => ResourceId::BlankNode(BlankNode::from(bn)),
+            CollectedReificationKey::Iri(iri) => ResourceId::IRI(IRI::new(iri.as_ref()).unwrap())
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct CollectedReification<'a> {
-    pub(crate) subject: Cow<'a, str>,
+    pub(crate) subject: ResourceId,
     pub(crate) predicate: Cow<'a, str>,
     pub(crate) object: Cow<'a, str>,
 }
@@ -52,11 +61,11 @@ pub(crate) struct OntologyCollector<'a> {
     // (to handle multiple assertions for one annotation which is assigned to e.g. one data prop assertion)
     used_annotations: HashMap<String, Vec<usize>>,
     // During matching, an axiom may not have been parsed yet, but we already have found an annotation for it.
-    pub(crate) annotations_for_later: HashMap<(String, String, String), Vec<Annotation>>,
+    pub(crate) annotations_for_later: HashMap<(ResourceId, String, String), Vec<Annotation>>,
 
     pub blank_nodes: HashMap<RdfBlankNode, CollectedBlankNode<'a>>,
 
-    axiom_index: HashMap<(String, String, String), usize>,
+    axiom_index: HashMap<(ResourceId, String, String), usize>,
     declaration_index: HashMap<String, Vec<usize>>,
 }
 
@@ -108,12 +117,12 @@ impl<'a> OntologyCollector<'a> {
     }
 
     pub(crate) fn push_axiom(&mut self, mut axiom: Axiom) {
-        let axiom_triple: Option<(String, String, String)> = match &axiom {
+        let axiom_triple: Option<(ResourceId, String, String)> = match &axiom {
             Axiom::SubClassOf(sco) => {
                 if let ClassConstructor::IRI(subject) = sco.cls.as_ref() {
                     if let ClassConstructor::IRI(parent) = sco.parent_class.as_ref() {
                         Some((
-                            subject.as_iri().to_string(),
+                            subject.as_iri().to_owned().into(),
                             well_known::rdfs_subClassOf_str.to_string(),
                             parent.as_iri().to_string(),
                         ))
@@ -128,14 +137,14 @@ impl<'a> OntologyCollector<'a> {
                 let sub = &ann.subject;
                 let iri = &ann.iri;
                 let val = &ann.value;
-                Some((sub.to_string(), iri.to_string(), val.to_string()))
+                Some((sub.clone(), iri.to_string(), val.to_string()))
             }
             Axiom::DataPropertyAssertion(ann) => {
                 let sub = &ann.subject;
                 let iri = &ann.iri;
                 let val = &ann.value;
                 Some((
-                    sub.as_iri().to_string(),
+                    sub.as_iri().to_owned().into(),
                     iri.as_iri().to_string(),
                     val.to_string(),
                 ))
@@ -146,7 +155,7 @@ impl<'a> OntologyCollector<'a> {
                 let val = &assertion.object;
                 match val {
                     IRIList::IRI(val) => Some((
-                        sub.as_iri().to_string(),
+                        sub.as_iri().to_owned().into(),
                         iri.as_iri().to_string(),
                         val.to_string(),
                     )),
@@ -170,17 +179,59 @@ impl<'a> OntologyCollector<'a> {
             self.axiom_index
                 .insert(axiom_triple.clone(), self.axioms.len());
         }
+
+        dbg!(&self);
+        // Add resource_ids
+        if let Some(ref axiom_triple) = axiom_triple {
+            match &mut axiom {
+                Axiom::AnnotationAssertion(apa) => {
+                    if let Some(reification_id) = self
+                        .reification_on_triple(&CollectedReification {
+                            subject: axiom_triple.0.clone(),
+                            predicate: axiom_triple.1.as_str().into(),
+                            object: axiom_triple.2.as_str().into(),
+                        })
+                    {
+                        apa.resource_ids.push(reification_id.clone().into_resource_id());
+                    }
+                }
+                Axiom::DataPropertyAssertion(dpa) => {
+                    if let Some(reification_id) = self
+                        .reification_on_triple(&CollectedReification {
+                            subject: axiom_triple.0.clone(),
+                            predicate: axiom_triple.1.as_str().into(),
+                            object: axiom_triple.2.as_str().into(),
+                        })
+                    {
+                        dpa.resource_ids.push(reification_id.clone().into_resource_id());
+                    }
+                }
+                Axiom::ObjectPropertyAssertion(opa) => {
+                    if let Some(reification_id) = self
+                        .reification_on_triple(&CollectedReification {
+                            subject: axiom_triple.0.clone(),
+                            predicate: axiom_triple.1.as_str().into(),
+                            object: axiom_triple.2.as_str().into(),
+                        })
+                    {
+                        opa.resource_ids.push(reification_id.clone().into_resource_id());
+                    }
+                }
+                _ => { }
+            }
+        }
+
         self.axioms.push(axiom);
     }
 
     pub(crate) fn get_from_axiom_index_mut(
         &mut self,
-        s: &str,
+        s: &ResourceId,
         p: &str,
         o: &str,
     ) -> Option<(&mut Axiom, usize)> {
         self.axiom_index
-            .get(&(s.into(), p.into(), o.into()))
+            .get(&(s.clone(), p.into(), o.into()))
             .and_then(|index| self.axioms.get_mut(*index).map(|a| (a, *index)))
     }
 
@@ -197,14 +248,14 @@ impl<'a> OntologyCollector<'a> {
         self.reifications_rev.insert(value, key);
     }
 
-    pub(crate) fn annotation(
+    pub(crate) fn reification(
         &self,
         ann: CollectedReificationKey<'a>,
     ) -> Option<&CollectedReification<'a>> {
         self.reifications.get(&ann)
     }
 
-    pub(crate) fn annotation_on_triple(
+    pub(crate) fn reification_on_triple(
         &self,
         ann: &CollectedReification<'a>,
     ) -> Option<&CollectedReificationKey<'a>> {
@@ -407,14 +458,6 @@ impl<'a> OntologyCollector<'a> {
         }
     }
 
-    pub(crate) fn insert_used_annotation(&mut self, anno_iri: &str, index: usize) {
-        if let Some(indexes) = self.used_annotations.get_mut(anno_iri) {
-            indexes.push(index)
-        } else {
-            self.used_annotations
-                .insert(anno_iri.to_string(), vec![index]);
-        }
-    }
     pub(crate) fn get_used_annotation(&self, anno_iri: &str) -> Option<&Vec<usize>> {
         self.used_annotations.get(anno_iri)
     }

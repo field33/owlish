@@ -4,6 +4,8 @@ use owlish::{
     parser::ParserOptions,
 };
 
+mod reification;
+
 #[test]
 fn data_properties() {
     env_logger::try_init().ok();
@@ -36,7 +38,8 @@ fn data_properties() {
                 .into(),
             IRI::new("http://field33.com/dataset/test").unwrap().into(),
             "29.25".into(),
-            vec![]
+            vec![],
+                vec![],
         ))
     )
 }

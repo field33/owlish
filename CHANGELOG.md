@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.28.0 - 2023-07-05
+#### Features
+- **(structure)** Track ResourceIds on assertions for better reification - (6c74c22) - Maximilian Goisser
+
+- - -
+
 ## v0.27.0 - 2023-06-27
 #### Bug Fixes
 - wasm-pack in CI breakage - (eadd2bf) - Maximilian Goisser
